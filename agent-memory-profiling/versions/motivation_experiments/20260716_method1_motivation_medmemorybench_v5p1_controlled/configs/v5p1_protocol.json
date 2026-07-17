@@ -1,0 +1,40 @@
+{
+  "schema_version": "motivation-v5p1-protocol-1",
+  "revision_id": "20260716_method1_motivation_medmemorybench_v5p1_controlled",
+  "source_alignment_package": "20260715_method1_motivation_medmemorybench_v5_alignment",
+  "retired_main_experiment": "v4/v5 M1 history-scale trend with unequal cell cohorts",
+  "controlled_m1": {
+    "source_workload": "v3 M2 formal invocation query IDs",
+    "source_query_count": 240,
+    "selected_query_count": 81,
+    "selected_query_ids_hash": "52f024aacf768e9b2cca0d6aeccc5e4313e2b3eb2fa688671957f00bc10ddd48",
+    "query_type_counts": {
+      "entity_exact_match": 16,
+      "inference_generation": 16,
+      "multi_hop_clinical_deduction": 13,
+      "multiple_choice": 15,
+      "state_update": 5,
+      "temporal_localization": 16
+    },
+    "conditions": ["medical_only", "medical_plus_official_noise"],
+    "history_scales": [128, 256, 512],
+    "frontier_budget": 32,
+    "final_top_k": 5,
+    "allow_current_session_context": true,
+    "nested_history": true,
+    "gold_evidence_retained": true,
+    "deterministic_seed": 20260716,
+    "primary_metric": "host_traffic_amplification_vs_128",
+    "primary_metric_definition": "per-query host_memory_bytes(scale) / host_memory_bytes(128)"
+  },
+  "reused": ["S1_evidence_structure", "M2_frontier_budget", "M3_tile_scattering"],
+  "appendix_only": ["S2_generic_content_maintenance"],
+  "forbidden_claims": [
+    "Method-1/FSA/QESA/QHDS/selector superiority",
+    "answer-quality improvement",
+    "stage-aware retrieval or access-order learning",
+    "dynamic hypergraph update causality",
+    "PIM hardware latency, energy, or speedup"
+  ],
+  "unified_output": "aggregate/v5p1_motivation_final_data.csv"
+}

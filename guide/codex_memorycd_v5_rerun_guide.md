@@ -1,5 +1,9 @@
 # Codex 执行指导：V5 MemoryCD 原生数据替换与纠偏后的真实模型重跑
 
+> **归档说明（2026-07-17）**：本文对应的 V4/V5 MemoryCD 动机实验已迁移到
+> `agent-memory-profiling/versions/motivation_experiments/`。旧路径和命令保留为
+> 历史协议记录，不应在已整理的 v21 目录中直接执行。
+
 > **版本目的**：在不更换现有模型的前提下，以官方发布的 **MemoryCD** 替换不适合作为主压力集的 LongMemEval-S / MSC，并修正 V4 中会削弱论文说服力的运行设置。V5 的目标不是立刻实现超图或 PIM，而是先获得一套**原生任务、真实用户历史、真实模型、无人工 phase 强制调用、可复核且可作为后续方法基线**的正式结果。
 >
 > **本轮固定模型**：
@@ -992,4 +996,3 @@ Task/domain-conditioned candidate selector
 V5 的价值在于让后续所有方法都必须回答一个清楚的问题：
 
 > 在相同真实用户历史、相同模型、相同最终 context budget 和相同任务 evaluator 下，新的结构方法能否以更小的 rerank frontier 保持或提升原生任务质量？
-

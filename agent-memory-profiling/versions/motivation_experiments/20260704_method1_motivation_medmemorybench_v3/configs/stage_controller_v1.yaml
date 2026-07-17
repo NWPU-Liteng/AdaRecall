@@ -1,0 +1,22 @@
+seed: 20260704
+stage_label_source: controller_fsm_v1
+stages:
+  - ground
+  - plan
+  - reason
+  - reflect
+answer_stage_retrieves: false
+controller_max_new_tokens: 80
+temperature: 0
+top_p: 1.0
+do_sample: false
+stage_instructions:
+  ground: "Establish current clinical issue, temporal anchor, and patient context. Seek recent/current patient state and key constraints."
+  plan: "Decompose what historical evidence is needed. Seek chronic conditions, long-term goals, prior episodes, medications, and relevant preferences."
+  reason: "Retrieve evidence that supports or refutes the current medical or temporal hypothesis. Seek causal, temporal, comparative, and multi-hop supporting memories."
+  reflect: "Check updates, contradictions, traps, safety constraints, and stale facts. Seek latest revisions, medication changes, allergies, contradictions, and critical safety memories."
+stage_query_prefixes:
+  ground: "Current-state grounding evidence:"
+  plan: "Longitudinal planning evidence:"
+  reason: "Causal temporal reasoning evidence:"
+  reflect: "Update contradiction safety-check evidence:"

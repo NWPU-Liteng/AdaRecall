@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "manifest_dir": "versions/20260622_memorycd_candidate_frontier_v5_1_formal/manifests/memorycd_causal_cross",
+      "event_count": 15504,
+      "label_count": 15504,
+      "tenant_errors": 0,
+      "causal_errors": 0,
+      "leakage_errors": 0,
+      "passed": true
+    },
+    {
+      "manifest_dir": "versions/20260622_memorycd_candidate_frontier_v5_1_formal/manifests/memorycd_official_cross",
+      "event_count": 15504,
+      "label_count": 15504,
+      "tenant_errors": 0,
+      "causal_errors": 0,
+      "leakage_errors": 0,
+      "passed": true
+    },
+    {
+      "manifest_dir": "versions/20260622_memorycd_candidate_frontier_v5_1_formal/manifests/memorycd_official_single",
+      "event_count": 15504,
+      "label_count": 15504,
+      "tenant_errors": 0,
+      "causal_errors": 0,
+      "leakage_errors": 0,
+      "passed": true
+    }
+  ]
+}

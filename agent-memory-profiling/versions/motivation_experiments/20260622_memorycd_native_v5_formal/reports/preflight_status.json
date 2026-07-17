@@ -1,0 +1,31 @@
+{
+  "status": "blocked",
+  "date": "2026-06-22",
+  "completed": [
+    "Read codex_memorycd_v5_rerun_guide.md",
+    "Created V5 formal directory structure",
+    "Cloned official MemoryCD repository",
+    "Recorded official repository commit SHA",
+    "Checked conda environment",
+    "Checked GPU availability under sandbox and authorized execution",
+    "Checked fixed model paths and config hashes",
+    "Searched local workspace and user cache for existing MemoryCD data"
+  ],
+  "blocked_by": [
+    "Official Hugging Face dataset WZDavid/MemoryCD could not be downloaded in this environment",
+    "Required data/raw/memorycd/data/cross_domain.jsonl is missing",
+    "Required data/raw/memorycd/meta/meta_<domain>.jsonl.gz files are missing",
+    "faiss is not installed in the target conda environment"
+  ],
+  "not_run": [
+    "official repository small-sample sanity command",
+    "dataset inventory census",
+    "domain selection",
+    "runtime manifest construction",
+    "selection-path profiling",
+    "full task execution",
+    "tenant/time/leakage/dense correctness audits"
+  ],
+  "reason_not_run": "The V5 guide requires official MemoryCD release files and forbids substituting old or synthetic datasets. Without cross_domain.jsonl and metadata files, any formal run would be invalid."
+}
+

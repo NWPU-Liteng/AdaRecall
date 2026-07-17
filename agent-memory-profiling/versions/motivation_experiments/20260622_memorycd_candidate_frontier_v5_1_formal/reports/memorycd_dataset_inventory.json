@@ -1,0 +1,98 @@
+{
+  "data_root": "data/public_datasets/memorycd",
+  "users_file": "data/public_datasets/memorycd/users/cross_domain_users_sampled.jsonl.gz",
+  "files": {
+    "users/cross_domain_users_sampled.jsonl.gz": {
+      "bytes": 107702727,
+      "sha256": "8edebfecbd7e05e6461c6dfd86296419eca7e1119c1b534985097b7d0bad390a",
+      "exists": true
+    },
+    "meta/Beauty_and_Personal_Care.jsonl.gz": {
+      "bytes": 34201032,
+      "sha256": "8747682e3a0ad457894bce72efbb7621b8c4936f4cc6f27ec53fa508f11d9ca7",
+      "exists": true
+    },
+    "meta/Books.jsonl.gz": {
+      "bytes": 142273832,
+      "sha256": "1f50242e9d46ff84410830c2413c2721da2f20c029c028e31489bbf823a19b00",
+      "exists": true
+    },
+    "meta/Electronics.jsonl.gz": {
+      "bytes": 33576945,
+      "sha256": "a843823de7280ff3d9d8b8af427a60687af558ec6d250a6069dcb55355513b2b",
+      "exists": true
+    },
+    "meta/Home_and_Kitchen.jsonl.gz": {
+      "bytes": 73134958,
+      "sha256": "649771c61f8b089d18ee203225b8c8fba68e0c30554a1629fa7842c76b36b268",
+      "exists": true
+    }
+  },
+  "users_scanned": 100,
+  "domains": [
+    "Beauty_and_Personal_Care",
+    "Books",
+    "Electronics",
+    "Home_and_Kitchen"
+  ],
+  "interactions_by_domain": {
+    "Beauty_and_Personal_Care": 23927,
+    "Books": 17126,
+    "Electronics": 14305,
+    "Home_and_Kitchen": 32805
+  },
+  "per_user_interactions": {
+    "Beauty_and_Personal_Care": {
+      "p50": 120,
+      "p90": 498,
+      "p95": 944,
+      "p99": 1255,
+      "max": 1721
+    },
+    "Books": {
+      "p50": 115,
+      "p90": 323,
+      "p95": 453,
+      "p99": 752,
+      "max": 1144
+    },
+    "Electronics": {
+      "p50": 104,
+      "p90": 228,
+      "p95": 422,
+      "p99": 764,
+      "max": 1034
+    },
+    "Home_and_Kitchen": {
+      "p50": 288,
+      "p90": 557,
+      "p95": 700,
+      "p99": 841,
+      "max": 2342
+    }
+  },
+  "time_span": {
+    "min_timestamp": 888011755000,
+    "max_timestamp": 1684016085784
+  },
+  "interaction_schema_keys": [
+    "asin",
+    "helpful_vote",
+    "images",
+    "negative_parent_asins",
+    "parent_asin",
+    "rating",
+    "text",
+    "timestamp",
+    "title",
+    "user_id",
+    "verified_purchase"
+  ],
+  "ranking_interactions_with_negatives": 1200,
+  "metadata_sample_counts": {
+    "Beauty_and_Personal_Care": 2,
+    "Books": 2,
+    "Electronics": 2,
+    "Home_and_Kitchen": 2
+  }
+}

@@ -1,0 +1,15 @@
+seed: 20260716
+memory_items: ../../20260704_method1_motivation_medmemorybench_v3/aggregate/memory_items_turn_pair.jsonl
+queries: ../../20260704_method1_motivation_medmemorybench_v3/aggregate/queries_medmemorybench_en.jsonl
+evidence_mapping: ../../20260704_method1_motivation_medmemorybench_v3/aggregate/query_evidence_mapping.jsonl
+retrieval_config: ../../20260704_method1_motivation_medmemorybench_v3/configs/retrieval_flat.yaml
+history_conditions:
+  - medical_only
+  - medical_plus_official_noise
+history_scales:
+  - 128
+  - 256
+  - 512
+frontier_budget: 32
+final_top_k: 5
+allow_current_session_context: true

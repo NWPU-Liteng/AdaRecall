@@ -1,0 +1,67 @@
+{
+  "status": "blocked",
+  "date": "2026-06-22",
+  "dataset": "WZDavid/MemoryCD",
+  "local_root": "data/raw/memorycd",
+  "required_files": {
+    "cross_domain_jsonl": {
+      "path": "data/raw/memorycd/data/cross_domain.jsonl",
+      "exists": false,
+      "bytes": null,
+      "sha256": null
+    },
+    "metadata": [
+      {
+        "domain": "Beauty_and_Personal_Care",
+        "path": "data/raw/memorycd/meta/meta_Beauty_and_Personal_Care.jsonl.gz",
+        "exists": false,
+        "bytes": null,
+        "sha256": null
+      },
+      {
+        "domain": "Books",
+        "path": "data/raw/memorycd/meta/meta_Books.jsonl.gz",
+        "exists": false,
+        "bytes": null,
+        "sha256": null
+      },
+      {
+        "domain": "Electronics",
+        "path": "data/raw/memorycd/meta/meta_Electronics.jsonl.gz",
+        "exists": false,
+        "bytes": null,
+        "sha256": null
+      },
+      {
+        "domain": "Home_and_Kitchen",
+        "path": "data/raw/memorycd/meta/meta_Home_and_Kitchen.jsonl.gz",
+        "exists": false,
+        "bytes": null,
+        "sha256": null
+      }
+    ]
+  },
+  "official_repository": {
+    "url": "https://github.com/AgentMemoryWorld/MemoryCD.git",
+    "local_path": "third_party/MemoryCD",
+    "commit_sha": "4cee5ebbf8a1ac4c933bde147006217e04678370",
+    "clone_status": "success"
+  },
+  "huggingface_dataset": {
+    "repo_id": "WZDavid/MemoryCD",
+    "revision": null,
+    "download_status": "failed",
+    "failure_summary": "All Hugging Face access paths failed: sandbox DNS resolution failure; authorized CLI and direct URL attempts reset by peer; dataset git endpoint failed during gnutls handshake."
+  },
+  "schema_check": {
+    "attempted": false,
+    "reason": "cross_domain.jsonl is missing"
+  },
+  "counts": {
+    "users": null,
+    "domains": null,
+    "interactions_by_domain": null,
+    "time_span": null
+  }
+}
+

@@ -1,0 +1,16 @@
+seed: 20260704
+embedding_model_dir: ../../models/bge-base-en-v1.5
+embedding_dim: 768
+embedding_max_length: 512
+embedding_batch_size: 16
+reranker_backend: cross_encoder
+reranker_model_dir: ../../models/cross-encoder-ms-marco-MiniLM-L6-v2
+reranker_max_length: 512
+reranker_batch_size: 8
+ann_top_r_multiplier: 4
+frontier_budget: 32
+final_top_k: 5
+header_size_bytes: 128
+selection_only: true
+require_true_reranker: true
+require_cuda: true

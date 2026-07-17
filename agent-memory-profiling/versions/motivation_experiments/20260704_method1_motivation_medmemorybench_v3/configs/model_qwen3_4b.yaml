@@ -1,0 +1,11 @@
+seed: 20260704
+controller_answer_model_dir: ../../../dir
+generation_backend: local_qwen
+controller_max_new_tokens: 120
+answer_max_new_tokens: 128
+temperature: 0
+top_p: 1.0
+do_sample: false
+dtype: bfloat16
+require_cuda: true
+cuda_visible_devices_required: true

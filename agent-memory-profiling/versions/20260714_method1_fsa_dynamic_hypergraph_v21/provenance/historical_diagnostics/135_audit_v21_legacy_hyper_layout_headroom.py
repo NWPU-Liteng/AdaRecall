@@ -17,13 +17,20 @@ from pathlib import Path
 import numpy as np
 
 
-VERSION_ROOT = Path(__file__).resolve().parents[1]
+VERSION_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(VERSION_ROOT / "src"))
 
 from v21.io import iter_jsonl, load_config, sha256_file, write_csv_new, write_json_new  # noqa: E402
 
 
-LEGACY_LAYOUT = VERSION_ROOT.parent / "20260711_method1_qa_basis_formal_v1/artifacts/keypoint_basis_v10_protected_hyper_layout_candidate/schedule_layout_contract/memory_to_tile.csv"
+LEGACY_LAYOUT = (
+    VERSION_ROOT
+    / "provenance"
+    / "legacy_versions"
+    / "20260711_method1_qa_basis_formal_v1"
+    / "artifacts/keypoint_basis_v10_protected_hyper_layout_candidate"
+    / "schedule_layout_contract/memory_to_tile.csv"
+)
 
 
 def load_tile(path: Path) -> dict[str, str]:
@@ -35,6 +42,12 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output-revision", default="r1_attempt001")
     args = parser.parse_args()
+    if not LEGACY_LAYOUT.is_file():
+        raise FileNotFoundError(
+            "The historical all-train layout was not retained in the compact archive. "
+            "Existing v21 aggregate headroom results remain auditable, but this "
+            "diagnostic cannot be rerun from the consolidated package."
+        )
     config = load_config("v21_sparse_joint_tuned_oof_r2.json")
     neutral_path = VERSION_ROOT / "artifacts/v21_effect_closure/v21_neutral_memory_to_tile.csv"
     layouts = {"neutral_source_order": load_tile(neutral_path), "legacy_all_train_hyper_diagnostic": load_tile(LEGACY_LAYOUT)}

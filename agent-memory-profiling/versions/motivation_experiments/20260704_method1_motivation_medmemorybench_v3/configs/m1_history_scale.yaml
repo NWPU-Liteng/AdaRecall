@@ -1,0 +1,27 @@
+seed: 20260704
+data_config: configs/data_medmemorybench_en.yaml
+model_config: configs/model_qwen3_4b.yaml
+retrieval_config: configs/retrieval_flat.yaml
+memory_items: aggregate/memory_items_turn_pair.jsonl
+queries: aggregate/queries_medmemorybench_en.jsonl
+evidence_mapping: aggregate/query_evidence_mapping.jsonl
+output_invocations: aggregate/M1_history_scale_invocations.jsonl
+output_summary: aggregate/M1_history_scale_summary.csv
+frontier_budget: 32
+final_top_k: 5
+selection_only: true
+scale_grid:
+  - 128
+  - 256
+  - 512
+  - 1024
+  - 1536
+  - full
+min_formal_queries_per_scale: 80
+warmup_queries: 2
+history_conditions:
+  - medical_only
+  - medical_plus_official_noise
+strict_pre_query_history: false
+allow_current_session_context: true
+require_cuda: true

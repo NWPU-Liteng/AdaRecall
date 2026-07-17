@@ -1,5 +1,11 @@
 # Codex 执行指导：V4 真实数据、真实模型的 Phase Locality 与多视图超图候选剪枝实验
 
+> **归档说明（2026-07-17）**：本文对应的 V3/V4 动机实验已迁移到
+> `agent-memory-profiling/versions/motivation_experiments/`。文中的旧路径
+> `versions/20260616_phase_aware_real_agent_v3_formal` 和
+> `versions/20260621_real_trace_adaptive_phase_v4_formal` 是历史命名；阅读和
+> 复核请使用该目录下同名子目录，本文不再代表 v21 active pipeline。
+
 > **文档目标**：在现有 `Phase-Aware Real-Agent V3` 的基础上，完成下一阶段正式实验。该阶段不再使用任何人为构造的 query、memory、task tag、relation 或 gold-group 作为在线输入；所有正式 workload 必须来自公开数据集的原始对话、原始问答或原始会话记录，所有在线选择、rerank、阶段控制和回答必须由真实模型执行。
 >
 > **本阶段的核心问题**：
@@ -880,4 +886,3 @@ V4 完成后，**仍不能**声称：
 - [ ] `faiss_flat` 与 `faiss_hnsw` recall 对齐后再做 latency 比较；
 - [ ] 所有 formal run 产出 config snapshot、模型版本、数据 hash、seed、硬件信息和 raw trace；
 - [ ] 生成完整报告，但绝不编造结果；缺失项必须标为未完成而不是估计值。
-

@@ -39,13 +39,26 @@ venv/
 # experiment packages are represented by versions/INDEX.md and v21 provenance.
 /agent-memory-profiling/versions/*/
 !/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/
+!/agent-memory-profiling/versions/motivation_experiments/
+
+# Keep motivation documentation, source, configs, reports, and figures while
+# excluding its archived data products and formal-run payloads.
+/agent-memory-profiling/versions/motivation_experiments/**/aggregate/
+/agent-memory-profiling/versions/motivation_experiments/**/artifacts/
+/agent-memory-profiling/versions/motivation_experiments/**/datasets/
+/agent-memory-profiling/versions/motivation_experiments/**/logs/
+/agent-memory-profiling/versions/motivation_experiments/**/manifests/
+/agent-memory-profiling/versions/motivation_experiments/**/outputs/
+/agent-memory-profiling/versions/motivation_experiments/**/runs/
 
 # Reproducible or externally stored v21 data products. Source, tests, configs,
 # reports, and orchestration scripts in the canonical package remain tracked.
 /agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/aggregate/
 /agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/artifacts/
 /agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/
-/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/provenance/
+/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/provenance/*
+!/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/provenance/consolidation_tools/
+!/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/provenance/historical_diagnostics/
 
 # Common generated experiment payloads and checkpoints
 *.ckpt

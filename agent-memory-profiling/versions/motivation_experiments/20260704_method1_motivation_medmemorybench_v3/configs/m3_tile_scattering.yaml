@@ -1,0 +1,14 @@
+seed: 20260704
+memory_items: aggregate/memory_items_turn_pair.jsonl
+m2_log: aggregate/M2_frontier_budget_invocations.jsonl
+output_csv: aggregate/M3_tile_scattering.csv
+tile_capacities:
+  - 8
+  - 16
+  - 32
+target_frontier_budget: 64
+target_final_top_k: 5
+layouts:
+  - chronological
+  - random_per_persona
+  - oracle_tile_packing_lower_bound

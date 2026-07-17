@@ -1,0 +1,44 @@
+{
+  "schema_version": "motivation-v5-protocol-1",
+  "revision_id": "20260715_method1_motivation_medmemorybench_v5_alignment",
+  "source_package": "20260705_method1_motivation_medmemorybench_v4_completion",
+  "raw_dataset": "20260704_method1_motivation_medmemorybench_v3/aggregate",
+  "label_input": "20260711_method1_qa_basis_formal_v1 train-only evidence labels",
+  "reused_experiments": ["M1_history_scale", "M2_frontier_budget", "M3_tile_scattering"],
+  "supplement_experiments": ["S1_evidence_structure", "S2_generic_content_maintenance"],
+  "split_policy": {
+    "used": ["raw_memory_items", "raw_queries", "train_only_evidence_groups", "train_query_embeddings", "memory_embeddings"],
+    "forbidden": ["calibration_labels", "formal_test_labels", "v21_model_outputs", "v21_selector_outputs", "stage_labels", "access_order", "answer_generation_outputs"]
+  },
+  "s1": {
+    "budgets": [4, 8, 16, 32],
+    "top_k_for_flat_retrieval": 8,
+    "minimum_query_count": 1000,
+    "required_query_types": ["entity_exact_match", "inference_generation", "multi_hop_clinical_deduction", "multiple_choice", "state_update", "temporal_localization"]
+  },
+  "s2": {
+    "base_fraction": 0.8,
+    "growth_percent_of_full_corpus": [1, 5, 10, 20],
+    "probe_queries": 128,
+    "lookup_top_k": 8,
+    "logical_tile_capacity": 16,
+    "tokenizer": "ascii_alphanumeric_lowercase",
+    "ordering_role": "deterministic_content_maintenance_slice_only"
+  },
+  "validation_guardrails": {
+    "s1_min_multi_group_fraction": 0.1,
+    "s1_multi_hop_b8_all_group_rate_max": 0.75,
+    "s2_max_changed_posting_fraction_at_20_percent": 0.25,
+    "s2_min_full_to_incremental_time_ratio": 1.0,
+    "s2_require_exact_lookup": true,
+    "m3_require_non_oracle_scatter": true
+  },
+  "claim_boundaries": {
+    "stage_or_workflow_claim": false,
+    "method_superiority_claim": false,
+    "pim_hardware_claim": false,
+    "causal_access_stream_claim": false,
+    "dynamic_access_chain_claim": false,
+    "dynamic_content_maintenance_claim": "static content insertion maintenance only"
+  }
+}

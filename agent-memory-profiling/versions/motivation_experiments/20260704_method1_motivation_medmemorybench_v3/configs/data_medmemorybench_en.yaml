@@ -1,0 +1,24 @@
+seed: 20260704
+language: en
+data_root: ../../../data/external/MedMemoryBench
+schema_audit_csv: aggregate/medmemorybench_schema_audit.csv
+queries_output: aggregate/queries_medmemorybench_en.jsonl
+memory_output_turn_pair: aggregate/memory_items_turn_pair.jsonl
+memory_output_session_summary_proxy: aggregate/memory_items_session_summary_proxy.jsonl
+strict_pre_query_history: false
+allow_current_session_context: true
+primary_granularity: turn_pair
+session_summary_token_cap: 768
+permitted_prompt_metadata:
+  - session_id
+  - timestamp
+  - chronological_rank
+  - role_labels
+  - session_type
+offline_only_fields:
+  - answers
+  - source_key_points
+  - knowledge_points
+  - event_info
+  - gold_explanation
+  - trap_score

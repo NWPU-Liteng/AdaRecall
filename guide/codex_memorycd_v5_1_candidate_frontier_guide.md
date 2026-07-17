@@ -1,5 +1,9 @@
 # Codex 执行指导：V5.1 MemoryCD 原生任务上的候选前沿质量—代价实验
 
+> **归档说明（2026-07-17）**：本文对应的 MemoryCD 动机/preflight 实验已迁移到
+> `agent-memory-profiling/versions/motivation_experiments/`。文中的旧版本路径仅
+> 用于解释历史实验协议，不是当前 v21 的输入或可运行入口。
+
 > **版本定位**：V5.1 是对 V5 的纠偏升级。它仍然保持 **MemoryCD + 现有 BGE-base retriever + MiniLM-L6 cross-encoder + 本地 Qwen**，不引入超图、PIM、合成数据或更大模型；但将实验主问题从“检索和 rerank 谁占多少时间”改为：
 >
 > > **候选前沿的规模与质量如何共同决定下游任务质量、Host 侧 rerank 工作量和端到端 memory-selection 成本？**

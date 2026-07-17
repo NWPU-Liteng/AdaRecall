@@ -1,0 +1,17 @@
+seed: 20260705
+data_config: configs/data_medmemorybench_en.yaml
+model_config: configs/model_qwen3_4b.yaml
+retrieval_config: configs/retrieval_flat.yaml
+stage_controller_config: configs/stage_controller_v1.yaml
+memory_items: aggregate/memory_items_turn_pair.jsonl
+queries: aggregate/queries_medmemorybench_en.jsonl
+output_stage_trace: aggregate/B_stage_trace_v4.jsonl
+frontier_budget: 64
+final_top_k: 5
+history_condition: full
+selection_only: true
+strict_pre_query_history: false
+allow_current_session_context: true
+require_cuda: true
+smoke_query_count: 1
+formal_query_count: 240

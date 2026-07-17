@@ -14,10 +14,20 @@ their original `aggregate/`, `artifacts/`, `configs/`, `reports/`, `scripts/`,
 - `provenance/v20_parent/`: v20 and v20-r1 manifests, freeze records, source
   code, reports, and compact result summaries needed to audit the parent chain.
 - `provenance/legacy_versions/`: reports, configurations, source code, figures,
-  and compact aggregate summaries from earlier packages. Large raw traces,
-  repeated shards, caches, and checkpoints are intentionally omitted; the
-  selection and hash mappings are recorded in `SELECTION_INDEX.tsv` and
-  `MIGRATION_MANIFEST_20260717.tsv`.
+  and compact aggregate summaries from the non-motivation Method 1 lineage.
+  Large raw traces, repeated shards, caches, and checkpoints are intentionally
+  omitted; the selection and hash mappings are recorded in `SELECTION_INDEX.tsv`
+  and `MIGRATION_MANIFEST_20260717.tsv`. The selection index is global and also
+  records files moved to the separate motivation archive.
+- `../motivation_experiments/`: a separate read-only archive for the earlier
+  real-agent, MemoryCD, and MedMemoryBench motivation packages. These packages
+  support workload/motivation claims but are not active v21 inputs or model
+  variants. See its `README.md` for the inventory and reading order.
+- `provenance/consolidation_tools/`: one-time migration scripts retained as
+  provenance; they are not active v21 commands and must not be rerun.
+- `provenance/historical_diagnostics/`: diagnostic code whose retained outputs
+  are useful for audit but whose original all-train input was intentionally not
+  retained; it is not an active rerun path.
 - `aggregate/archive_original_manifests/`: pre-migration copies of v21 manifests
   and configs whose historical paths were rewritten in the active configuration.
 

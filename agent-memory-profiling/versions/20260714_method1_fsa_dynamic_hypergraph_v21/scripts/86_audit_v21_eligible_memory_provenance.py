@@ -14,7 +14,7 @@ from v21.eligibility import assert_train_only_incidence, generate_eligible_memor
 from v21.io import iter_jsonl, load_config, resolve, sha256_file, write_json_new  # noqa: E402
 
 
-SOURCE_ROOT = VERSION_ROOT.parent / "20260711_method1_qa_basis_formal_v1"
+SOURCE_ROOT = VERSION_ROOT / "provenance" / "legacy_versions" / "20260711_method1_qa_basis_formal_v1"
 
 
 def _hashes(paths: list[Path]) -> dict[str, dict[str, object]]:
