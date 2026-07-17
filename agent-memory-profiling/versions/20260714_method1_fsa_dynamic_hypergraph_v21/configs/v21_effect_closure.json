@@ -1,0 +1,55 @@
+{
+  "schema_version": "v21-method-effect-closure-1",
+  "name": "FSA-QEHG joint semantic-and-evidence-bundle closure",
+  "memory_layout": {
+    "policy": "neutral_source_order_fixed_for_all_methods",
+    "tile_capacity_memories": 16,
+    "dynamic_relayout": false
+  },
+  "payload_bytes": "actual_utf8_payload_bytes_from_memory_items",
+  "candidate_budgets": [8, 16, 32],
+  "activated_semantic_prototypes": [4, 8, 16],
+  "members_per_semantic_edge": [8, 16, 32],
+  "bundle_beam_width": [8, 16, 32],
+  "core_methods": [
+    "ann_flat",
+    "dense_qhds_reference",
+    "sparse_joint_semantic_bundle_hypergraph",
+    "budgeted_pairwise_factor_graph"
+  ],
+  "quality_equivalence_interval_group_coverage": [-0.01, 0.01],
+  "primary_system_gate": [
+    "higher_quality_at_matched_tile_or_byte_cost",
+    "lower_tile_or_byte_cost_inside_quality_equivalence_interval",
+    "stable_nondominated_quality_cost_latency_pareto_point"
+  ],
+  "required_latency": [
+    "ann_seed_search_ms",
+    "latent_aspect_predict_ms",
+    "semantic_edge_lookup_ms",
+    "evidence_bundle_build_ms",
+    "hyperedge_score_ms",
+    "submodular_select_ms",
+    "candidate_union_ms",
+    "payload_gather_ms",
+    "selection_total_ms",
+    "query_e2e_ms"
+  ],
+  "latency_protocol": {
+    "clock": "time.perf_counter_ns",
+    "gpu_synchronize": true,
+    "batch_size": 1,
+    "warmup_queries": 50,
+    "exclude_file_io_and_logging": true,
+    "summary": ["mean", "p50", "p95", "p99"]
+  },
+  "tile_reporting": [
+    "metadata_tile_activations",
+    "payload_tile_activations",
+    "total_unique_tile_activations",
+    "redundant_tile_activations"
+  ],
+  "claim_boundary": "logical Tile and host execution measurements only; no PIM latency estimate",
+  "calibration_read": false,
+  "formal_test_read": false
+}

@@ -1,0 +1,53 @@
+{
+  "schema_version": "v21-hypergraph-tile-layout-oof-5",
+  "revision_id": "v21_hypergraph_tile_layout_oof_r5_20260715",
+  "run_id": "v21_hypergraph_tile_layout_oof_r5_20260715",
+  "source_sparse_run_id": "v21_sparse_joint_tuned_oof_r2_20260714",
+  "source_sparse_attempt": "attempt_001",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "tile_capacity_memories": 16,
+  "structural_core_capacity": 16,
+  "semantic_alias_fill": false,
+  "semantic_root_space": "uot_incidence",
+  "fallback_policy": "chronological_source_order",
+  "model_layout_hyperedge_field": "selected_memory_ids",
+  "rank_entry_bytes": 4,
+  "rank_metadata_tile_bytes": 65536,
+  "evidence_hyperedge_structural_weight": 0,
+  "model_frontier_hyperedge_weight": 1,
+  "layout_policy": "outer_train_B32_model_selection_partial_hyperedges_then_chronological_source_order_fallback",
+  "layout_inputs": [
+    "outer_train_model_generated_B32_selected_hyperedges",
+    "fold_specific_frozen_uot_incidence_for_contract_identity",
+    "memory_persona_id",
+    "memory_chronological_rank"
+  ],
+  "layout_forbidden_inputs": [
+    "target_outer_heldout_selections",
+    "outer_heldout_evidence_groups",
+    "calibration_queries",
+    "formal_test_queries",
+    "access_order",
+    "co_access_trace",
+    "query_specific_runtime_gold_bundle"
+  ],
+  "evaluation_point": {
+    "activated_prototypes": 16,
+    "members_per_semantic_edge": 32,
+    "semantic_bundle_beam": 32,
+    "budgets": [8, 16, 32]
+  },
+  "methods": [
+    "ann_flat",
+    "same_capacity_neural_flat",
+    "sparse_joint_semantic_bundle_hypergraph",
+    "budgeted_pairwise_factor_graph"
+  ],
+  "replication_factor": 1,
+  "minimum_effect_threshold": null,
+  "claim_boundary": "host logical metadata blocks and capacity-16 memory Tiles only; model-generated B32 selection hyperedges are not access/co-access traces; chronological rank is fallback storage order only; no PIM hardware or latency claim",
+  "calibration_read": false,
+  "formal_test_read": false
+}

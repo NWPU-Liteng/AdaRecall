@@ -1,0 +1,30 @@
+{
+  "schema_version": "v21-static-content-update-stress-1",
+  "revision_id": "v21_static_content_update_stress_r1_20260715",
+  "source_seed": 20260712,
+  "source_fold": 0,
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "index_run_id": "v21_sparse_semantic_index_r1_20260714",
+  "index_attempt": "attempt_001",
+  "base_fraction": 0.8,
+  "growth_points_percent_of_full_corpus": [1, 5, 10, 20],
+  "ordering_role": "deterministic_content_maintenance_stress_only_not_causal_agent_insertion_order",
+  "probe_queries": 128,
+  "active_prototypes_per_probe": 16,
+  "members_per_prototype": 32,
+  "warmup_probes": 16,
+  "logical_tile_capacity": 16,
+  "comparators": [
+    "frozen_no_update",
+    "append_overlay",
+    "periodic_full_compaction"
+  ],
+  "quality_contract": "append_overlay bounded lookup must exactly match the compacted index for every probe",
+  "minimum_effect_threshold": null,
+  "causal_stream_claim": false,
+  "access_order_claim": false,
+  "co_access_claim": false,
+  "pim_hardware_claim": false,
+  "calibration_read": false,
+  "formal_test_read": false
+}

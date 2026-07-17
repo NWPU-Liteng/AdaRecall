@@ -1,0 +1,37 @@
+{
+  "schema_version": "v21-query_evidence_association-preregistered-1",
+  "name": "QESA",
+  "expanded_name": "Query-Conditioned Evidence-Set Association",
+  "training_incidence": {
+    "schema": "query_id -> evidence_group_id -> acceptable_memory_ids",
+    "group_member_semantics": "alternative_acceptable_support_for_one_labeled_evidence_aspect",
+    "availability_requirement": "each member must occur in query.eligible_memory_ids",
+    "allowed_split": "train_only_session_blocked_oof"
+  },
+  "inference": {
+    "available_inputs": ["query_embedding", "protected_ann_seeds", "frozen_uot_fsa_incidence", "frozen_memory_embeddings"],
+    "forbidden_inputs": ["query_evidence_groups", "gold_memory_ids", "calibration_labels", "temporal_chain_position"],
+    "path": "query -> learned latent evidence aspects -> activated fuzzy semantic hyperedges -> adaptive memory bundles"
+  },
+  "higher_order_definition": {
+    "unit": "query-conditioned evidence-set coverage",
+    "not_claimed": ["observed_access_order", "coaccess_log", "causal_reasoning_trace", "chain_completion"]
+  },
+  "selector_search": {
+    "latent_aspect_counts": [8, 16, 32],
+    "bundle_member_cap": [2, 4, 8],
+    "budget_frontiers": [8, 16, 32],
+    "selection": "nested_train_oof_pareto_only"
+  },
+  "matched_baselines": [
+    "modular_single_memory_ranking",
+    "pairwise_clique_expansion_of_identical_train_evidence_incidence",
+    "flattened_hypergraph_memory_selector",
+    "hyperedge_first_bundle_selector"
+  ],
+  "evaluation": {
+    "per_group_coverage": "candidate_union intersects acceptable_memory_ids",
+    "multi_group_subset": "query has two_or_more_evidence_groups",
+    "primary_comparison": "paired_query_bootstrap_at_identical_budget_payload_and_protected_seeds"
+  }
+}

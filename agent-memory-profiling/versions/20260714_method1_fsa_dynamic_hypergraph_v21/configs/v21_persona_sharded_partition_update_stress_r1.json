@@ -1,0 +1,23 @@
+{
+  "schema_version": "v21-persona-sharded-partition-update-stress-1",
+  "revision_id": "v21_persona_sharded_partition_update_stress_r1_20260715",
+  "source_seed": 20260712,
+  "source_fold": 0,
+  "base_fraction": 0.8,
+  "growth_points_percent_of_full_corpus": [1, 5, 10, 20],
+  "delete_fraction_of_appended_growth": 0.1,
+  "partition_protocol": "sha256(memory_id) deterministic static base/new-memory partition; no timestamp or causal order",
+  "probe_queries": 256,
+  "active_prototypes_per_probe": 16,
+  "members_per_prototype": 32,
+  "selection_budget": 8,
+  "logical_tile_capacity": 16,
+  "quality_contract": "overlay and compacted persona-sharded lookup and B=8 selection must match for every probe",
+  "causal_stream_claim": false,
+  "access_order_claim": false,
+  "co_access_claim": false,
+  "pim_hardware_claim": false,
+  "minimum_effect_threshold": null,
+  "calibration_read": false,
+  "formal_test_read": false
+}

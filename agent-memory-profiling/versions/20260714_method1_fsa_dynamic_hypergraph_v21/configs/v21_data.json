@@ -1,0 +1,39 @@
+{
+  "schema_version": "v21-data-1",
+  "environment": "agent-memory-profiling",
+  "method": "FSA-QEHG",
+  "parent_versions": [
+    "inputs/qa_basis_v1",
+    "provenance/v20_parent/v20r1"
+  ],
+  "split": {
+    "train_queries": 1355,
+    "calibration_queries": 290,
+    "test_queries": 290,
+    "train_query_plan": "inputs/qa_basis_v1/query_split/query_plan_train.jsonl",
+    "calibration_query_plan": "inputs/qa_basis_v1/query_split/query_plan_calibration.jsonl",
+    "formal_test_access": "forbidden_until_v21_final_freeze"
+  },
+  "memory": {
+    "items": "inputs/memory_medmemorybench_v3/memory_items_turn_pair.jsonl",
+    "embedding_vectors": "inputs/memory_medmemorybench_v3/embedding_cache/embeddings.npy",
+    "embedding_ids": "inputs/memory_medmemorybench_v3/embedding_cache/ids.json"
+  },
+  "query_embeddings": {
+    "vectors": "inputs/qa_basis_v1/query_embeddings/query_vectors.npy",
+    "index": "inputs/qa_basis_v1/query_embeddings/query_index.json",
+    "train_key": "med_train"
+  },
+  "frozen_baseline": {
+    "train_retrieval": "inputs/qa_basis_v1/frozen_train/retrieved_contexts_flat_graph_hyper.jsonl",
+    "method": "flat",
+    "protected_dense_seeds": 5,
+    "final_top_k": 5,
+    "role": "frozen_candidate_and_reranker_comparison_only"
+  },
+  "prohibited_model_inputs": [
+    "stage", "workflow", "future_access", "calibration_labels", "formal_test_labels",
+    "hand_tuned_semantic_recency_linear_score", "laca_or_payload_serialization_order",
+    "derived_temporal_order_from_evidence_groups"
+  ]
+}

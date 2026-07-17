@@ -1,0 +1,14 @@
+{
+  "schema_version": "v21-freeze-1",
+  "formal_test": {
+    "locked": true,
+    "runs": 0,
+    "path_read": false,
+    "unlock_requires": ["fsa_gate", "qhds_gate", "crc_gate", "dynamic_gate", "final_manifest"]
+  },
+  "calibration": {
+    "locked_until": ["selector_architecture_frozen", "semantic_hyperparameters_frozen", "five_seed_fixed_budget_completed"],
+    "allowed_use_after_unlock": ["crc_frontier", "learn_then_test_final_top5", "ood_fallback"],
+    "prohibited": ["adapter_training", "prototype_selection", "selector_architecture_selection"]
+  }
+}

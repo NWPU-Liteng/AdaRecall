@@ -1,0 +1,10 @@
+numpy
+pandas
+matplotlib
+psutil
+requests
+qdrant-client
+torch
+transformers>=4.51.0,<4.52.0
+tokenizers>=0.21.0,<0.22.0
+langgraph

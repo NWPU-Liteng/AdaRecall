@@ -1,0 +1,22 @@
+{
+  "seed": 42,
+  "embedding_dim": 768,
+  "embedding_backend": "transformer",
+  "embedding_model_dir": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/bge-base-en-v1.5",
+  "embedding_max_length": 512,
+  "embedding_batch_size": 16,
+  "retrieval_top_r": 50,
+  "pruner_top_b": 16,
+  "final_top_k": 8,
+  "header_size_bytes": 128,
+  "reranker_backend": "cross_encoder",
+  "reranker_model_dir": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/cross-encoder-ms-marco-MiniLM-L6-v2",
+  "reranker_batch_size": 1,
+  "reranker_max_length": 256,
+  "generation_backend": "local_qwen",
+  "controller_max_new_tokens": 16,
+  "answer_max_new_tokens": 48,
+  "agent_memory_mode": "adaptive_phase",
+  "selection_only": true,
+  "max_events": 16
+}

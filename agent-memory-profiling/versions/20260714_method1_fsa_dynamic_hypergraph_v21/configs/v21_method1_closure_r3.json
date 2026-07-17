@@ -1,0 +1,44 @@
+{
+  "schema_version": "v21-method1-closure-r3-amendment-1",
+  "revision_id": "v21_method1_closure_r3_20260714",
+  "supersedes": {
+    "path": "configs/v21_method1_closure_r2.json",
+    "sha256": "b7311343e01b682b8283f1002f7f7087b9fcea59222c3d3b8e562ee6b6deb4d0",
+    "reason": "r2 bundle-only union cannot guarantee B=32 when semantic_bundle_beam_width=8, arity=3, and protected_ann_seeds=5"
+  },
+  "sparse_joint_run_id": "v21_sparse_joint_oof_r2_20260714",
+  "candidate_frontier_amendment": {
+    "protected_ann_seeds": 5,
+    "semantic_bundle_arity": 3,
+    "semantic_bundle_beam_width": [8, 16, 32],
+    "base_union": "protected ANN seeds union unique members of retained arity-3 semantic bundles",
+    "bounded_edge_member_fallback": "append, in deterministic independent semantic score order, unique members already returned by the same bounded activated-edge lookups until the maximum evaluated B is feasible or the bounded sparse pool is exhausted",
+    "fallback_may_read": "only edge members returned by activated rank-list lookups; it must not extend lookup prefixes or scan dense incidence",
+    "required_counters": ["semantic_bundle_unique_members", "fallback_members_appended", "budget_infeasible_rate"],
+    "rationale": "guarantees a legal B=32 frontier for every preregistered beam setting without weakening the no-dense-online-scan contract"
+  },
+  "core_scope": {
+    "execute_before_gate_c": [
+      "ann_flat", "same_capacity_neural_flat", "dense_qhds_reference",
+      "sparse_joint_semantic_bundle_hypergraph", "budgeted_pairwise_factor_graph",
+      "gold_coverage_oracle", "learned_utility_exact_oracle",
+      "fixed_count", "fixed_byte", "iso_quality", "iso_cost", "logical_tile", "latency", "pareto",
+      "core_statistics", "gate_c", "dynamic_data_feasibility", "dynamic_or_static_fallback"
+    ],
+    "defer_until_after_core_closure": [
+      "corrected_qhds_without_latent_aspects", "qhds_without_uot_incidence",
+      "bundle_locality_without_fuzzy_edges", "fuzzy_edges_without_bundle_locality",
+      "pairwise_clique_expansion", "flattened_hypergraph", "bundle_first_vs_memory_first_sweeps",
+      "legacy_v19_v20_reference"
+    ]
+  },
+  "dynamic_after_gate_c": {
+    "first_action": "audit creation timestamps, recoverable causal insertion order, tie policy, and whether only session-level time exists",
+    "allowed_if_stream_insufficient": ["incremental_content_insertion", "frozen_projection", "online_uot_assignment", "prototype_sufficient_statistics", "sparse_semantic_incidence_overlay", "bundle_locality_overlay", "atomic_publication", "periodic_compaction"],
+    "comparators": ["no_update", "append_only", "local_online_uot", "periodic_full_rebuild"],
+    "growth_points_percent": [1, 5, 10, 20],
+    "failure_policy": "retain a static FSA-QEHG fallback and do not infer access-order behavior"
+  },
+  "calibration_read": false,
+  "formal_test_read": false
+}

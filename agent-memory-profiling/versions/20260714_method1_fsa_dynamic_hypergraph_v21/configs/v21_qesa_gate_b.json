@@ -1,0 +1,27 @@
+{
+  "schema_version": "v21-qesa-gate-b-1",
+  "run_id": "v21_qesa_oof_r1_20260714",
+  "primary_budget": 16,
+  "primary_metric": "group_coverage",
+  "required_comparators": [
+    "query_independent_aspect_prior",
+    "flat_cosine",
+    "shuffled_group_qesa",
+    "same_capacity_mlp_ranker"
+  ],
+  "required_subsets": [
+    "all",
+    "K>=2"
+  ],
+  "gate_rule": {
+    "pooled_session_clustered_ci95_lower_strictly_positive_for_all_comparators": true,
+    "each_seed_point_effect_strictly_positive_for_all_comparators": true,
+    "multi_group_pooled_session_clustered_ci95_lower_strictly_positive_for_all_comparators": true
+  },
+  "bootstrap_samples": 5000,
+  "cluster_sign_flip_samples": 20000,
+  "multiple_comparison_correction": "Holm",
+  "alpha": 0.05,
+  "calibration_read": false,
+  "formal_test_read": false
+}

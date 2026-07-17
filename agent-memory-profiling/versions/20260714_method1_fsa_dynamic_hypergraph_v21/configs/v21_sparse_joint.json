@@ -1,0 +1,38 @@
+{
+  "schema_version": "v21-sparse-joint-semantic-index-1",
+  "revision_id": "v21_sparse_joint_r1_20260714",
+  "index_run_id": "v21_sparse_semantic_index_r1_20260714",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "qesa_run_id": "v21_qesa_oof_r2_20260714",
+  "bundle_locality_phase_decision": "aggregate/v21_bundle_locality_r1_phase_decision.json",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "activated_prototypes_grid": [4, 8, 16],
+  "members_per_semantic_edge_grid": [8, 16, 32],
+  "bundle_beam_width_grid": [8, 16, 32],
+  "final_candidate_budgets": [8, 16, 32],
+  "protected_ann_seeds": 5,
+  "online_lookup": {
+    "rank_list_order": "descending_frozen_uot_incidence_then_memory_index",
+    "eligible_filter": "membership_test_only; stop_after_members_per_semantic_edge",
+    "prohibited": ["full_eligible_by_prototype_scan", "evidence_group_id", "acceptable_memory_ids", "gold_bundle"]
+  },
+  "bundle_component_policy": {
+    "primary": "independent_semantic_edge_member_ranking",
+    "learned_deepsets_bundle_locality": "retained_negative_result_diagnostic_ablation_only",
+    "pairwise_factor_graph": "required_strong_comparator"
+  },
+  "required_online_counters": [
+    "activated_semantic_edges",
+    "incidence_entries_visited",
+    "bundle_hyperedges_generated",
+    "bundle_hyperedges_scored",
+    "duplicate_bundle_expansions",
+    "unique_expanded_memories",
+    "metadata_bytes",
+    "payload_bytes",
+    "candidate_count"
+  ],
+  "calibration_read": false,
+  "formal_test_read": false
+}

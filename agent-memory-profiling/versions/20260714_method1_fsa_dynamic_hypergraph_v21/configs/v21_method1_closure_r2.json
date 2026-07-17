@@ -1,0 +1,99 @@
+{
+  "schema_version": "v21-method1-closure-r2-1",
+  "revision_id": "v21_method1_closure_r2_20260714",
+  "sparse_joint_run_id": "v21_sparse_joint_oof_r1_20260714",
+  "sparse_index_run_id": "v21_sparse_semantic_index_r1_20260714",
+  "sparse_index_attempt": "attempt_001",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "qesa_run_id": "v21_qesa_oof_r2_20260714",
+  "dense_qhds_run_id": "v21_qhds_oof_r1_20260714",
+  "bundle_locality_decision": "aggregate/v21_bundle_locality_r1_phase_decision.json",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "protected_ann_seeds": 5,
+  "grid": {
+    "activated_prototypes": [4, 8, 16],
+    "members_per_semantic_edge": [8, 16, 32],
+    "semantic_bundle_beam_width": [8, 16, 32],
+    "semantic_bundle_arity": 3,
+    "final_candidate_budgets": [8, 16, 32]
+  },
+  "core_methods": [
+    "ann_flat",
+    "same_capacity_neural_flat",
+    "dense_qhds_reference",
+    "sparse_joint_semantic_bundle_hypergraph",
+    "budgeted_pairwise_factor_graph"
+  ],
+  "candidate_contract": {
+    "sparse_primary_bundle": "bounded arity-3 tuples of distinct activated semantic edges; a semantic construction object, not a true evidence group or observed co-access event",
+    "bundle_locality_r1": "negative_result_diagnostic_ablation_only",
+    "candidate_pool": "protected ANN seeds union unique members of retained sparse semantic bundles",
+    "nested_budgets": "one selection order per method; S8 subset S16 subset S32",
+    "no_dense_online_scan": true,
+    "inference_prohibited": ["evidence_group_id", "acceptable_memory_ids", "gold_bundle", "query_id_as_model_feature"]
+  },
+  "pairwise_factor_graph": {
+    "training_supervision": "outer-train valid distinct-member bundles projected to unordered member pairs only",
+    "inference": "same sparse candidate pool and protected ANN seeds as hypergraph; greedy selection on learned nonnegative unary plus pairwise factors",
+    "no_gold_inputs": true
+  },
+  "oracle": {
+    "gold_coverage": "outer-train OOF headroom only; not deployable; reports protected-seed residual groups, B=8/16/32 coverage, and budget infeasibility",
+    "learned_utility_exact": "exact solve on a frozen small candidate pool; no gold evidence input; report greedy score, exact score, regret, normalized regret"
+  },
+  "system_evaluation": {
+    "fixed_count": [8, 16, 32],
+    "fixed_byte": "same actual UTF-8 payload-byte cap per query and comparator",
+    "iso_quality": "minimum candidates, bytes, logical Tiles, and latency for matched group coverage",
+    "iso_cost": "coverage at matched candidate, bytes, logical Tiles, and latency cost",
+    "pareto": ["coverage", "payload_bytes", "total_unique_tile_activations", "query_e2e_ms"],
+    "quality_equivalence_interval_group_coverage": [-0.01, 0.01]
+  },
+  "latency": {
+    "clock": "time.perf_counter_ns",
+    "batch_size": 1,
+    "warmup_queries": 50,
+    "gpu_synchronize": true,
+    "preload": ["models", "rank_index", "incidence", "payload"],
+    "exclude": ["file_io", "logging"],
+    "raw_fields_ms": [
+      "query_encode_ms", "ann_seed_search_ms", "latent_aspect_predict_ms", "semantic_edge_lookup_ms",
+      "evidence_bundle_build_ms", "bundle_hyperedge_score_ms", "submodular_select_ms", "candidate_union_ms",
+      "payload_gather_ms", "rerank_ms", "selection_total_ms", "query_e2e_ms"
+    ],
+    "summary": ["mean", "p50", "p95", "p99"],
+    "paired_queries": true,
+    "cpu_gpu_separate": true
+  },
+  "logical_tile": {
+    "layout": "artifacts/v21_effect_closure/v21_neutral_memory_to_tile.csv",
+    "capacity": 16,
+    "report": ["metadata_tile_activations", "payload_tile_activations", "total_unique_tile_activations", "redundant_tile_activations"],
+    "claim_boundary": "logical Tile access locality only; not PIM hardware or PIM latency"
+  },
+  "statistics": {
+    "paired_query_bootstrap_samples": 5000,
+    "session_clustered_bootstrap_samples": 5000,
+    "k_ge_2_cluster": "persona_id plus query_session_id",
+    "multiplicity": "Holm across preregistered primary Gate C contrasts; BH for explicitly secondary ablations",
+    "retain": ["single_seed", "single_fold", "pooled_oof", "negative_results", "non_significant_results"]
+  },
+  "gate_c": {
+    "final_top5_non_degradation_margin": -0.005,
+    "required": [
+      "top5_no_worse_than_margin",
+      "one_or_more_cost_or_quality_advantage_over_pairwise",
+      "five_seed_session_clustered_paired_evidence",
+      "no_dense_online_incidence_scan"
+    ],
+    "success_options": [
+      "lower_bytes_or_logical_tiles_or_latency_within_quality_equivalence",
+      "higher_coverage_at_matched_cost",
+      "stable_nondominated_pareto_point_not_dominated_by_pairwise",
+      "fewer_candidates_for_matched_k_ge_2_all_groups_covered"
+    ]
+  },
+  "calibration_read": false,
+  "formal_test_read": false
+}

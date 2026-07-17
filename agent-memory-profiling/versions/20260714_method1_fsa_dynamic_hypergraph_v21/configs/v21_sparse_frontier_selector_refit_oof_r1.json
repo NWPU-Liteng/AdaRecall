@@ -1,0 +1,32 @@
+{
+  "schema_version": "v21-sparse-frontier-selector-refit-oof-1",
+  "revision_id": "v21_sparse_frontier_selector_refit_oof_r1_20260715",
+  "run_id": "v21_sparse_frontier_selector_refit_oof_r1_20260715",
+  "frontier_run_id": "v21_fixed_sparse_frontiers_r1_20260715",
+  "frontier_attempt": "attempt_001",
+  "source_sparse_run_id": "v21_sparse_joint_tuned_oof_r2_20260714",
+  "source_sparse_attempt": "attempt_001",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "qesa_run_id": "v21_qesa_oof_r2_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "frontier_size": 96,
+  "protected_ann_seeds": 5,
+  "budgets": [8, 16, 32],
+  "feature_order": [
+    "query_memory_cosine",
+    "qesa_prototype_association",
+    "cosine_times_association",
+    "frontier_position_prior"
+  ],
+  "hidden_dimension": 32,
+  "epochs": 30,
+  "batch_size": 128,
+  "learning_rate": 0.003,
+  "weight_decay": 0.0001,
+  "training_objective": "equal_weight_uncovered_evidence_group_target_distribution_over_actual_sparse_frontier",
+  "architecture_selection": "single_fixed_candidate_utility_mlp_no_inner_sweep",
+  "minimum_effect_threshold": null,
+  "calibration_read": false,
+  "formal_test_read": false
+}

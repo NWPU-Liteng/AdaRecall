@@ -1,0 +1,27 @@
+{
+  "schema_version": "v21-phase1-oof-1",
+  "run_id": "v21_phase1_oof_r1_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "inner_validation_fold_offset": 1,
+  "adapter_grid": {
+    "bottlenecks": [64, 128],
+    "epochs": [20, 30],
+    "learning_rates": [0.0003, 0.001]
+  },
+  "batch_size": 64,
+  "gradient_clip": 1.0,
+  "uot_recipe_eligibility": "primary_converged_and_no_prototype_collapse_in_v21_full_numerical_screen",
+  "inner_recipe_order": [
+    "maximize_inner_group_colocation",
+    "minimize_single_prototype_domination",
+    "maximize_prototype_effective_count",
+    "minimize_build_ms",
+    "minimize_recipe_id"
+  ],
+  "outer_evaluation": "query_level_session_blocked_oof",
+  "gate_a": "all five seed session-clustered bootstrap lower bounds above zero versus matched cosine_knn and all 25 final transports converged without collapse",
+  "quality_equivalence_interval": 0.01,
+  "calibration_read": false,
+  "formal_test_read": false
+}

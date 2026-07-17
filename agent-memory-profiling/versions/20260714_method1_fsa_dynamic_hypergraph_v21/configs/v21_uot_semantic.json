@@ -1,0 +1,56 @@
+{
+  "schema_version": "v21-uot-semantic-preregistered-1",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "adapter": {
+    "architecture": "residual_low_rank_projection",
+    "input_dimension": 768,
+    "bottleneck_dimensions": [64, 128],
+    "epochs": [20, 30],
+    "batch_size": 64,
+    "temperature": 0.07,
+    "learning_rates": [0.0003, 0.001],
+    "weight_decay": 0.0001,
+    "folds": 5,
+    "split": "session_blocked_train_only",
+    "loss_sequence": ["multi_positive_memory", "query_memory_alignment"],
+    "hard_negatives": "raw_embedding_nearest_nonpositive_train_only"
+  },
+  "uot": {
+    "prototype_counts": [32, 64, 96],
+    "initialization": "farthest_point_train_corpus",
+    "cost": "one_minus_cosine",
+    "epsilon_cost_scale_multipliers": [0.01, 0.02, 0.04],
+    "tau_memory": [0.25, 1.0, 4.0],
+    "tau_prototype": [0.25, 1.0, 4.0],
+    "outer_iterations": [1, 2, 4],
+    "sinkhorn_iterations": 300,
+    "sinkhorn_tolerance": 0.000001,
+    "dustbin_prior_mass": 0.05,
+    "dustbin_cost_scale_multipliers": [0.5, 1.0],
+    "prototype_diversity": {
+      "modes": ["none", "logdet_proximal"],
+      "proximal_steps": 8,
+      "step_sizes": [0.002, 0.01]
+    },
+    "membership": {
+      "cumulative_mass": 0.9,
+      "max_memberships": 4,
+      "selection": "fixed_before_results"
+    }
+  },
+  "selection": {
+    "criterion": "nested_train_oof_pareto",
+    "objectives": [
+      "evidence_colocation", "high_order_evidence_coverage", "transport_convergence",
+      "prototype_diversity", "effective_cardinality", "index_size", "build_latency"
+    ],
+    "prohibited": ["calibration_selection", "formal_test_selection", "single_training_loss_selection"]
+  },
+  "gate_fsa": {
+    "requires": [
+      "finite_converged_transport", "no_prototype_collapse", "five_seed_session_blocked_oof",
+      "matched_cosine_knn_not_dominating"
+    ],
+    "failure_action": "stop_qhds_crc_and_dynamic_experiments"
+  }
+}

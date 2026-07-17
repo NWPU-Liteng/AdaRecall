@@ -1,0 +1,35 @@
+{
+  "schema_version": "v21-qhds-fixed-budget-oof-1",
+  "run_id": "v21_qhds_oof_r1_20260714",
+  "qesa_run_id": "v21_qesa_oof_r2_20260714",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "protected_ann_seeds": 5,
+  "budgets": [8, 16, 32],
+  "hidden_dimension": 16,
+  "epochs": 30,
+  "learning_rate": 0.003,
+  "weight_decay": 0.0001,
+  "training_ann_candidates": 96,
+  "training_association_candidates": 96,
+  "training_random_candidates": 32,
+  "training_negative_cap": 224,
+  "contrastive_temperature": 0.2,
+  "scale_regularization": 0.0001,
+  "architecture_selection": "single_preregistered_architecture_no_inner_reselection",
+  "utility": "positive_structural_scale*sum_a p(a|q)*log1p(sum_m incidence(m,a)*relevance(m,q)) + positive_modular_scale*sum_m relevance(m,q)",
+  "feature_order": [
+    "query_memory_cosine",
+    "qesa_incidence_association",
+    "cosine_times_association"
+  ],
+  "ablations": [
+    "qhds_without_latent_aspects",
+    "qhds_without_uot_soft_incidence"
+  ],
+  "quality_equivalence_interval_group_coverage": [-0.01, 0.01],
+  "final_top5_non_degradation_margin": -0.005,
+  "calibration_read": false,
+  "formal_test_read": false
+}

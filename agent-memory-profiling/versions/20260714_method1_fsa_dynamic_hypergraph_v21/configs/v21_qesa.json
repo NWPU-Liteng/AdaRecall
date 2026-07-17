@@ -1,0 +1,43 @@
+{
+  "schema_version": "v21-qesa-oof-1",
+  "run_id": "v21_qesa_oof_r1_20260714",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "latent_aspect_counts": [8, 16, 32],
+  "hidden_dimension": 128,
+  "epochs": 100,
+  "batch_size": 64,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "temperature": 0.07,
+  "aspect_diversity_weight": 0.001,
+  "prediction_entropy_weight": 0.0001,
+  "protected_ann_seeds": 5,
+  "budgets": [8, 16, 32],
+  "inner_selection_budget": 16,
+  "inner_selection_order": [
+    "maximize_multi_group_all_groups_covered",
+    "maximize_multi_group_mean_group_coverage",
+    "maximize_all_query_mean_group_coverage",
+    "minimize_latent_aspect_count"
+  ],
+  "required_baselines": [
+    "query_independent_aspect_prior",
+    "flat_cosine",
+    "shuffled_group_qesa",
+    "same_capacity_mlp_ranker",
+    "linear_probe",
+    "nearest_train_query_memorization"
+  ],
+  "inference_allowed_fields": [
+    "query_embedding",
+    "protected_ann_seed_ids",
+    "eligible_memory_ids",
+    "frozen_uot_fsa_incidence",
+    "frozen_memory_embeddings",
+    "frozen_model_parameters"
+  ],
+  "calibration_read": false,
+  "formal_test_read": false
+}

@@ -1,0 +1,20 @@
+{
+  "schema_version": "v21-sparse-frontier-provenance-oof-1",
+  "revision_id": "v21_sparse_frontier_provenance_oof_r1_20260715",
+  "run_id": "v21_sparse_frontier_provenance_oof_r1_20260715",
+  "source_config": "v21_sparse_joint_tuned_oof_r2.json",
+  "fixed_frontier_run_id": "v21_fixed_sparse_frontiers_r1_20260715",
+  "fixed_frontier_attempt": "attempt_001",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "activated_prototypes": 16,
+  "members_per_semantic_edge": 32,
+  "semantic_bundle_arity": 3,
+  "semantic_bundle_beam": 32,
+  "candidate_pool_cap": 96,
+  "protected_ann_seeds": 5,
+  "exact_frontier_equivalence_required": true,
+  "minimum_effect_threshold": null,
+  "calibration_read": false,
+  "formal_test_read": false
+}

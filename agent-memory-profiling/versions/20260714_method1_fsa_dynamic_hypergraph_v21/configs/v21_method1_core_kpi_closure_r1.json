@@ -1,0 +1,40 @@
+{
+  "schema_version": "v21-method1-core-kpi-closure-1",
+  "revision_id": "v21_method1_core_kpi_closure_r1_20260715",
+  "source_run_id": "v21_sparse_joint_tuned_oof_r2_20260714",
+  "source_attempt": "attempt_001",
+  "source_summary": "aggregate/v21_sparse_joint_core_summary_tuned_r2_attempt001.json",
+  "source_metrics": "aggregate/v21_sparse_joint_core_metrics_tuned_r2_attempt001.csv",
+  "deployment_point": {
+    "activated_prototypes": 16,
+    "members_per_semantic_edge": 32,
+    "semantic_bundle_beam": 32,
+    "candidate_pool_cap": 96,
+    "budgets": [8, 16, 32]
+  },
+  "primary_method": "sparse_joint_semantic_bundle_hypergraph",
+  "comparators": [
+    "ann_flat",
+    "same_capacity_neural_flat",
+    "budgeted_pairwise_factor_graph"
+  ],
+  "core_quality_metrics": {
+    "group_recall_at_k": "fraction of evidence groups with at least one acceptable selected memory; identical to the existing group_coverage",
+    "evidence_member_recall_at_k": "fraction of the union of acceptable evidence memories selected",
+    "evidence_member_precision_at_k": "fraction of selected memories in the union of acceptable evidence memories",
+    "exact_task_success_rate": "fraction of queries for which every evidence group is covered; identical to all_groups_covered"
+  },
+  "core_cost_metrics": [
+    "query_e2e_ms_mean",
+    "query_e2e_ms_p50",
+    "query_e2e_ms_p95",
+    "payload_bytes_mean",
+    "logical_tile_activations_mean"
+  ],
+  "decision_policy": "descriptive_paired_deltas_and_exact_pareto_dominance_only",
+  "minimum_effect_threshold": null,
+  "threshold_based_method_failure": false,
+  "agent_handoff": "the selected B-memory set is the retrieval output; no downstream reranker or answer-accuracy evaluator was executed",
+  "calibration_read": false,
+  "formal_test_read": false
+}

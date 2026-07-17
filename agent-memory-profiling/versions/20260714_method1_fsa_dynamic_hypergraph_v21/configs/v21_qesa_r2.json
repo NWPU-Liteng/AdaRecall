@@ -1,0 +1,47 @@
+{
+  "schema_version": "v21-qesa-oof-r2-1",
+  "run_id": "v21_qesa_oof_r2_20260714",
+  "parent_negative_run_id": "v21_qesa_oof_r1_20260714",
+  "phase1_run_id": "v21_phase1_oof_r1_20260714",
+  "fixed_seeds": [20260712, 20260713, 20260714, 20260715, 20260716],
+  "outer_folds": 5,
+  "latent_aspect_counts": [8, 16, 32],
+  "regularization_regimes": [
+    {
+      "regime_id": "anticollapse_moderate",
+      "aspect_temperature": 0.25,
+      "coverage_weight": 0.25,
+      "target_ce_weight": 1.0,
+      "diversity_weight": 0.1,
+      "map_entropy_weight": 0.01,
+      "aspect_usage_weight": 0.01
+    },
+    {
+      "regime_id": "anticollapse_strong",
+      "aspect_temperature": 0.1,
+      "coverage_weight": 0.25,
+      "target_ce_weight": 1.0,
+      "diversity_weight": 0.5,
+      "map_entropy_weight": 0.01,
+      "aspect_usage_weight": 0.05
+    }
+  ],
+  "hidden_dimension": 128,
+  "epochs": 100,
+  "learning_rate": 0.001,
+  "weight_decay": 0.0001,
+  "protected_ann_seeds": 5,
+  "budgets": [8, 16, 32],
+  "inner_selection_budget": 16,
+  "inner_selection_order": [
+    "maximize_multi_group_all_groups_covered",
+    "maximize_multi_group_mean_group_coverage",
+    "maximize_all_query_mean_group_coverage",
+    "minimize_latent_aspect_count",
+    "lexical_regime_id"
+  ],
+  "revision_limit": "single_mechanism_driven_revision_after_r1_failure",
+  "revision_rationale": "r1 aspect-to-prototype maps had pairwise cosine near 0.97 and query-conditioned prototype L1 deviation 0.043 despite positive gold-prototype headroom",
+  "calibration_read": false,
+  "formal_test_read": false
+}

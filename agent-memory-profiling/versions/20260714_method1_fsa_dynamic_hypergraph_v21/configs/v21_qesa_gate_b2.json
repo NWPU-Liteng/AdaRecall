@@ -1,0 +1,32 @@
+{
+  "schema_version": "v21-qesa-gate-b2-representation-validity-1",
+  "source_run_id": "v21_qesa_oof_r2_20260714",
+  "source_checkpoints_frozen": true,
+  "primary_metrics": [
+    "group_affinity_score",
+    "target_cross_entropy"
+  ],
+  "required_comparators": [
+    "query_independent_aspect_prior",
+    "shuffled_group_qesa"
+  ],
+  "diagnostic_comparator": "frozen_embedding_linear_probe",
+  "prototype_recall_k": 8,
+  "gate_rule": {
+    "all_query_session_clustered_ci95_strictly_positive_for_both_metrics_and_required_comparators": true,
+    "multi_group_session_clustered_ci95_strictly_positive_for_both_metrics_and_required_comparators": true,
+    "each_seed_point_effect_strictly_positive_for_both_metrics_and_required_comparators": true,
+    "mean_aspect_map_pairwise_cosine_at_most": 0.8,
+    "maximum_unit_aspect_map_pairwise_cosine_mean_below": 0.95,
+    "mean_prototype_coordinate_std_at_least": 0.002,
+    "query_id_absent_from_model_input": true,
+    "calibration_and_formal_test_reads_equal_zero": true
+  },
+  "bootstrap_samples": 5000,
+  "cluster_sign_flip_samples": 20000,
+  "multiple_comparison_correction": "Holm",
+  "alpha": 0.05,
+  "role_boundary": "Gate B2 validates latent evidence-aspect prediction; direct retrieval quality versus flat and MLP remains a Gate C end-to-end selector comparison",
+  "calibration_read": false,
+  "formal_test_read": false
+}

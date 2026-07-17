@@ -1,0 +1,27 @@
+{
+  "schema_version": "v21-eligibility-1",
+  "source_config": "inputs/qa_basis_v1/config/keypoint_basis_v6_schedule_layout_candidate.yaml",
+  "include_noise": true,
+  "allow_current_session_context": true,
+  "identity_boundary": "persona_id",
+  "time_boundary": "memory.session_id <= query.query_session_id",
+  "query_event_contract": "benchmark query is evaluated after the accumulated current session",
+  "event_time_limitation": "the source has session IDs but no independent query event timestamp",
+  "eligible_generation_inputs": [
+    "memory.persona_id",
+    "memory.session_id",
+    "memory.session_type",
+    "memory.chronological_rank",
+    "query.persona_id",
+    "query.query_session_id"
+  ],
+  "prohibited_generation_inputs": [
+    "gold_answers",
+    "gold_memory_ids",
+    "evidence_groups",
+    "acceptable_memory_ids",
+    "source_key_points",
+    "calibration_rows",
+    "formal_test_rows"
+  ]
+}

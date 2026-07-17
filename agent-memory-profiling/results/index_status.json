@@ -1,0 +1,8 @@
+{
+  "backend_mode": "ann_numpy",
+  "embedding_mode": "hash_embedding",
+  "num_memories": 100,
+  "dim": 384,
+  "input_file": "data/synthetic_memories_100.jsonl",
+  "retrieval_backend": "ann_numpy"
+}
