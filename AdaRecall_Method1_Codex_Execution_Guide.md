@@ -169,27 +169,27 @@ ObjectiveTuple(
 
 ### 2.1 只读输入包
 
-主要输入：
+主要输入（动机实验已独立归档）：
 
 ```text
-/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260705_method1_motivation_medmemorybench_v4_completion
+/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/motivation_experiments/20260705_method1_motivation_medmemorybench_v4_completion
 ```
 
 继承的 v3 源包：
 
 ```text
-/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260704_method1_motivation_medmemorybench_v3
+/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/motivation_experiments/20260704_method1_motivation_medmemorybench_v3
 ```
 
 必须优先复用以下文件，而不是重新生成一个不一致的数据版本：
 
 - `aggregate/B_stage_trace_v4.jsonl`
 - `aggregate/B_chronological_split_manifest.csv`
-- `aggregate/M2_frontier_budget_invocations.jsonl`
-- `aggregate/M2_frontier_budget_summary.csv`
-- `aggregate/M3_tile_scattering.csv`
-- `aggregate/C_keypoint_alignment_rows.jsonl`
-- `aggregate/C_strict_evidence_budget_summary.csv`
+- `20260704_method1_motivation_medmemorybench_v3/aggregate/M2_frontier_budget_invocations.jsonl`
+- `20260704_method1_motivation_medmemorybench_v3/aggregate/M2_frontier_budget_summary.csv`
+- `20260704_method1_motivation_medmemorybench_v3/aggregate/M3_tile_scattering.csv`
+- `20260705_method1_motivation_medmemorybench_v4_completion/aggregate/C_keypoint_alignment_rows.jsonl`
+- `20260705_method1_motivation_medmemorybench_v4_completion/aggregate/C_strict_evidence_budget_summary.csv`
 - v3/v4 的 memory/query JSONL、schema、config、dataset hash 和 runtime manifest
 
 如果某个复用文件实际位于 v3 并由 v4 符号链接引用，应保留这一关系并记录真实源路径。
@@ -1041,7 +1041,7 @@ conda run -n agent-memory-profiling python scripts/00_verify_environment.py \
   --device "cuda:${ADARECALL_GPU_ID}"
 
 conda run -n agent-memory-profiling python scripts/00_verify_motivation_contract.py \
-  --motivation-root versions/20260705_method1_motivation_medmemorybench_v4_completion
+  --motivation-root versions/motivation_experiments/20260705_method1_motivation_medmemorybench_v4_completion
 
 conda run -n agent-memory-profiling python scripts/02_run_feasibility_gate.py \
   --config configs/formal_eval.yaml \
