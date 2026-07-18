@@ -1,0 +1,65 @@
+schema_version: method1-v28-graph-only-1
+random_seed: 20260718
+scientific_boundary:
+  selection_split: train_strict_5fold_oof
+  forbidden_splits: [development, test, consumed_locomo]
+  memory_ann_calls: 0
+  candidate_query_memory_similarity_calls: 0
+budget:
+  full_n: 128
+  frontier_c: 32
+  final_k: 5
+  expanded_pool_cap: 256
+  tile_capacity: 32
+semantic:
+  coarse_k_min: 32
+  coarse_k_max: 64
+  memberships_per_memory: 3
+  membership_temperature: 0.08
+  medoids_per_edge: 3
+  max_degree_before_split: 192
+  split_children: 2
+  split_hysteresis_release_degree: 160
+  merge_similarity: 0.985
+  merge_release_similarity: 0.975
+  minimum_merge_age: 16
+  active_high_confidence: 4
+  active_low_confidence: 8
+  confidence_entropy_max: 0.68
+  confidence_margin_min: 0.08
+  alignment_centroid_weight: 0.72
+  alignment_medoid_weight: 0.28
+  alignment_temperature: 0.18
+  semantic_restart: 0.78
+  semantic_steps: 1
+history:
+  source: fold_excluded_frozen_policy_coretrieval
+  native_agent_access_claim: false
+  minimum_support: 2
+  maximum_edge_size: 32
+  history_restart: 0.82
+  semantic_weight: 1.0
+  history_weight: 0.08
+  agreement_weight: 0.04
+  recency_weight: 0.04
+selector:
+  relevance_lambda: 1.0
+  edge_coverage_lambda: 0.25
+  facility_lambda: 0.08
+  exact_audit_max_pool: 16
+gate:
+  bootstrap_samples: 10000
+  per_query_difference_threshold: 1.0e-12
+  candidate_recall_ci_lower_min: -0.01
+  group_coverage_ci_lower_min: -0.01
+  noninferior_fold_count_min: 4
+  loss_rate_minus_win_rate_max: 0.02
+  ndcg_ci_lower_min: -0.01
+  precision_ci_lower_min: -0.01
+  recall5_ci_lower_min: -0.01
+  group_coverage5_ci_lower_min: -0.01
+  mean_tile_reduction_min: 0.20
+  p95_tile_reduction_min: 0.15
+  fetched_bytes_reduction_min: 0.15
+  physical_latency_reduction_min: 0.10
+  safety_violations_max: 0

@@ -1,0 +1,20 @@
+{
+  "config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "forbidden": [
+    "MedMemoryBench development",
+    "MedMemoryBench test",
+    "consumed LoCoMo"
+  ],
+  "formal_oof_runs_allowed": 1,
+  "formal_oof_runs_consumed": 0,
+  "freeze_attempt": 2,
+  "frozen_at_utc": "2026-07-18T19:44:30.796885+00:00",
+  "frozen_config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "git_branch": "main",
+  "git_commit": "e0c2566cac02df645266f3eb76468b2b10ed7842",
+  "schema_version": "method1-v28-design-freeze-1",
+  "source_manifest": "source_manifest_attempt_002.json",
+  "source_manifest_sha256": "3edeeeaf350c8a75a9d0f72b168a3921334f310591bb1ef0de6eb960d0495633",
+  "status": "FROZEN_BEFORE_FORMAL_OOF",
+  "synthetic_test_receipt_sha256": "e5dc2c72060d17e816aeef03b3ee79b0ff6bacee1a974cd181863fe5ad8a7a59"
+}

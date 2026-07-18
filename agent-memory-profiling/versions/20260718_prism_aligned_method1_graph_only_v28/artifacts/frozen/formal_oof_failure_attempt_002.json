@@ -1,0 +1,17 @@
+{
+  "schema_version": "method1-v28-formal-oof-failure-1",
+  "status": "PRE_RESULT_ENGINEERING_FAILURE",
+  "freeze_attempt": 2,
+  "run_id": "v28_frontier_oof_20260719_attempt002_e0c2566",
+  "git_commit": "e0c2566cac02df645266f3eb76468b2b10ed7842",
+  "config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "snapshots_built": 1,
+  "queries_completed": 0,
+  "query_rows_generated": 0,
+  "aggregate_generated": false,
+  "metrics_generated": false,
+  "failure": "ValueError: output array is read-only while normalizing dataset.query_vector() in edge alignment",
+  "repair_scope": "systematic copy-on-normalize for every external query view plus a read-only integration test; no config, Gate, model, dataset, or scoring change",
+  "overwrite_performed": false,
+  "next_action": "new commit, source manifest, freeze attempt 003, and immutable run ID"
+}

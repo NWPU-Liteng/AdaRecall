@@ -30,7 +30,7 @@ def propagate_coretrieval(
     restart: float = 0.82,
 ) -> HistoryPropagation:
     local_by_id = {memory_id: i for i, memory_id in enumerate(snapshot.memory_ids)}
-    query = np.asarray(query_embedding, dtype=np.float32)
+    query = np.asarray(query_embedding, dtype=np.float32).copy()
     query /= max(float(np.linalg.norm(query)), 1e-12)
     contributions = np.zeros(len(snapshot.positions), dtype=np.float64)
     edge_ids: dict[int, list[str]] = {}
@@ -74,7 +74,7 @@ def propagate_coretrieval(
             continue
         context_match = 1.0
         if query_embeddings_by_id is not None and str(event["query_id"]) in query_embeddings_by_id:
-            context = np.asarray(query_embeddings_by_id[str(event["query_id"])], dtype=np.float32)
+            context = np.asarray(query_embeddings_by_id[str(event["query_id"])], dtype=np.float32).copy()
             context /= max(float(np.linalg.norm(context)), 1e-12)
             context_match = max(float(query @ context), 0.0)
         reliability = min(1.0, float(np.mean(np.log1p(repeated_pairs))) / np.log(4.0))

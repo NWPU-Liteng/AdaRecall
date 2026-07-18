@@ -31,7 +31,7 @@ class HNSWSnapshotIndex:
         self.index.add(np.ascontiguousarray(snapshot.embeddings, dtype=np.float32))
 
     def search(self, query_embedding: np.ndarray, budget: int) -> BaselineResult:
-        query = np.asarray(query_embedding, dtype=np.float32).reshape(1, -1)
+        query = np.asarray(query_embedding, dtype=np.float32).reshape(1, -1).copy()
         query /= np.maximum(np.linalg.norm(query, axis=1, keepdims=True), 1e-12)
         _, indices = self.index.search(query, min(int(budget), len(self.snapshot.positions)))
         rows = [int(value) for value in indices[0] if int(value) >= 0]
@@ -39,7 +39,7 @@ class HNSWSnapshotIndex:
 
 
 def exact_dense(snapshot: CausalGraphSnapshot, query_embedding: np.ndarray, budget: int) -> BaselineResult:
-    query = np.asarray(query_embedding, dtype=np.float32)
+    query = np.asarray(query_embedding, dtype=np.float32).copy()
     query /= max(float(np.linalg.norm(query)), 1e-12)
     scores = snapshot.embeddings @ query
     order = sorted(range(len(scores)), key=lambda i: (-float(scores[i]), snapshot.memory_ids[i]))[:budget]
@@ -58,7 +58,7 @@ def standard_ivf_prototype(
     pool_cap: int,
     budget: int,
 ) -> BaselineResult:
-    query = np.asarray(query_embedding, dtype=np.float32)
+    query = np.asarray(query_embedding, dtype=np.float32).copy()
     query /= max(float(np.linalg.norm(query)), 1e-12)
     centroids = np.vstack([edge.centroid for edge in snapshot.edges[: snapshot.coarse_edge_count]])
     cell_order = np.argsort(-(centroids @ query), kind="stable")[:active_cells]

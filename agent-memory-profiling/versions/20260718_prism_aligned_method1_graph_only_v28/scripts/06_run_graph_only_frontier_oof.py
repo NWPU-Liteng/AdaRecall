@@ -115,7 +115,7 @@ def main() -> None:
     contents = [memory.content for memory in dataset.memories]
     memory_namespace = {memory.memory_id: memory.namespace_id for memory in dataset.memories}
     memory_arrival = {memory.memory_id: memory.arrival_order for memory in dataset.memories}
-    query_embeddings = {query.query_id: np.asarray(dataset.query_vector("train", query.query_id), dtype=np.float32) for query in dataset.queries["train"]}
+    query_embeddings = {query.query_id: np.asarray(dataset.query_vector("train", query.query_id), dtype=np.float32).copy() for query in dataset.queries["train"]}
     access_events = load_access_events(all_query_by_id)
 
     grouped: dict[tuple[str, int], list[object]] = defaultdict(list)

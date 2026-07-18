@@ -43,7 +43,7 @@ def align_query_to_edges(
 ) -> EdgeActivation:
     if not snapshot.coarse_edge_count:
         return EdgeActivation((), (), np.empty(0, dtype=np.float32), np.empty(0, dtype=np.float32), 0.0, 0.0, False, 0, 0)
-    query = np.asarray(query_embedding, dtype=np.float32)
+    query = np.asarray(query_embedding, dtype=np.float32).copy()
     query /= max(float(np.linalg.norm(query)), 1e-12)
     edges = snapshot.edges[: snapshot.coarse_edge_count]
     centroids = np.vstack([edge.centroid for edge in edges]).astype(np.float32)

@@ -95,7 +95,7 @@ def _edge_stats(
     medoids_per_edge: int,
     version: int,
 ) -> EdgeDescriptor:
-    centroid = np.asarray(centroid, dtype=np.float32)
+    centroid = np.asarray(centroid, dtype=np.float32).copy()
     centroid /= max(float(np.linalg.norm(centroid)), 1e-12)
     similarities = embeddings[member_rows] @ centroid
     medoid_order = sorted(range(len(member_rows)), key=lambda i: (-float(similarities[i]), int(global_positions[member_rows[i]])))
