@@ -1,0 +1,14 @@
+schema_version: method1-v28-baselines-1
+full_n: 128
+frontier_c: 32
+expanded_pool_cap: 256
+baselines:
+  - full_hnsw_128
+  - dense_hnsw_32
+  - standard_ivf_prototype_32
+  - lexical_bm25_32
+fairness:
+  same_namespace: true
+  same_causal_snapshot: true
+  same_query_embedding: true
+  same_reranker: true

@@ -1,0 +1,27 @@
+{
+  "schema_version": "method1-v28-v27-provenance-audit-1",
+  "status": "PROVENANCE_CONFLICT",
+  "promotion_allowed": false,
+  "paper_evidence_allowed": false,
+  "git_commit_for_v27": null,
+  "logs_found": false,
+  "handoff": {
+    "path": "Method1_V27_NewConversation_Handoff_20260718.md",
+    "sha256": "ba331a00ce24655eddd285cf360d8499200c1ee69103805542cd0c793b876d92",
+    "mtime": "2026-07-18T22:30:56.672128305+08:00",
+    "recorded_aggregate_sha256": "51f3a05e0679c27f7c2ef1016a17113a45690eee3d05353ed6b01973cf5b094e"
+  },
+  "current": {
+    "config_sha256": "92f3393cf88e36f898419ea21e18b897f5b29d996defee8ea055b1ff658bb61c",
+    "source_sha256": "b4175a1dbe385c0f049a803421b864efbb30933ad6d27d3d004933e6b63328fa",
+    "runner_sha256": "4d32d1a4a8da40ee1229d6f0fa72bfe6704ca63c75291c503596c5f11d1b6c66",
+    "rows_sha256": "f19aaddbd5081e2302cc1c5b7e8aa938a57d5908e61daa3939e8f96f2446f0cb",
+    "layout_rows_sha256": "a5ea98b84301a436d05781506fe7a72548740ecb37d0686f9200335b41debb66",
+    "aggregate_sha256": "09203e196d2c183ca7daf9b9cac4ea085ba65964c4ede468f4b2dd542929949b",
+    "aggregate_mtime": "2026-07-18T23:17:16.232967675+08:00",
+    "aggregate_size_bytes": 6869,
+    "aggregate_schema": "obsolete_mean_additions_24_plus_8_style"
+  },
+  "reason": "aggregate mismatch plus post-handoff overwrite and no immutable rows-to-aggregate run chain",
+  "required_v28_action": "start new immutable run lineage"
+}

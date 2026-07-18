@@ -1,0 +1,49 @@
+{
+  "counts": {
+    "memories": 42034,
+    "train_evaluations": 1355,
+    "train_queries": 1355
+  },
+  "dataset": "MedMemoryBench English",
+  "files": {
+    "memories": {
+      "bytes": 152645756,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/memory_records.jsonl",
+      "sha256": "90354ca736efb907e40e1869c5e9dea04603189f41af7bcbabb3fea0426b19d0"
+    },
+    "memory_embeddings": {
+      "bytes": 172171392,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/memory.npy",
+      "sha256": "49df8ef49078a8f7852a45eb913c515fb06bd72d2c6c5ba2b6af0dbb452cf58b"
+    },
+    "query_embeddings": {
+      "bytes": 5550208,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/queries_train.npy",
+      "sha256": "f3bc1b812066ada70ea623f14c7d44b63510058a75a50e0d713c9ef5459166e1"
+    },
+    "query_index": {
+      "bytes": 347779,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/queries_train_index.json",
+      "sha256": "8eacb2008bda7e77326a8229bd073d2aa118d57f126178eacbaf6ae4baca291c"
+    },
+    "train_evaluation": {
+      "bytes": 714377,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/train_evaluation.jsonl",
+      "sha256": "234c7be4d8fc23cfc707583f5798e4de9f12f61286de5d7bb477579f4ead9d83"
+    },
+    "train_queries": {
+      "bytes": 656819,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/train_queries.jsonl",
+      "sha256": "c469729ccb6fd59aef00474d0456be6a9b364c170d6c76a4809d47b2eaa83a37"
+    }
+  },
+  "forbidden_splits": [
+    "development",
+    "test"
+  ],
+  "license": "inherited from canonical v24 manifest",
+  "namespace_count": 20,
+  "namespace_source": "dataset_provided",
+  "schema_version": "method1-v28-dataset-manifest-1",
+  "selection_scope": "train strict five-fold OOF development evidence"
+}

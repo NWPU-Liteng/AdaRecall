@@ -1,0 +1,15 @@
+{
+  "attention_implementation": "eager",
+  "captured_at_utc": "2026-07-18T16:54:17.409020+00:00",
+  "conda_environment": "agent-memory-profiling",
+  "core_dependencies_changed": false,
+  "cuda_available": false,
+  "cuda_device_count": 0,
+  "gpu_names": [],
+  "numpy": "1.26.4",
+  "nvidia_smi_returncode": 9,
+  "python": "3.10.20",
+  "scikit_learn": "1.7.1",
+  "torch": "2.1.0+cu121",
+  "transformers": "4.51.3"
+}

@@ -1,0 +1,87 @@
+{
+  "models": {
+    "Qwen3-Embedding-0.6B": {
+      "attention_implementation": "eager",
+      "config": {
+        "bytes": 727,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B/config.json",
+        "sha256": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0"
+      },
+      "local_files_only": true,
+      "model_type": "qwen3",
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B",
+      "smoke": {
+        "attention_implementation": "eager",
+        "batch_single_max_abs": 0.0,
+        "batch_single_passed": true,
+        "cold_start_ms": 7417.286709183827,
+        "dimension": 1024,
+        "finite": true,
+        "negative_similarity": 0.8202711343765259,
+        "passed": true,
+        "peak_gpu_memory_bytes": 1204951040,
+        "positive_similarity": 0.8320815563201904,
+        "query_norm": 1.0,
+        "runtime": {
+          "actual_device": "cuda:0",
+          "dimension": 1024,
+          "dtype": "torch.bfloat16",
+          "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it.",
+          "max_length": 512,
+          "model_dir": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B",
+          "requested_device": "cuda:0"
+        },
+        "warm_batch_ms": 42.43505001068115
+      },
+      "tokenizer": {
+        "bytes": 11422654,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B/tokenizer.json",
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "weights": {
+        "bytes": 1191588280,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B/model.safetensors",
+        "sha256": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b"
+      }
+    },
+    "Qwen3-Reranker-0.6B": {
+      "attention_implementation": "eager",
+      "config": {
+        "bytes": 727,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Reranker-0.6B/config.json",
+        "sha256": "d479c427a9ca5295218063d4f9aca4f297ab4ac27487cca7af42c84643d51ef0"
+      },
+      "local_files_only": true,
+      "model_type": "qwen3",
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Reranker-0.6B",
+      "smoke": {
+        "attention_implementation": "eager",
+        "batch_single_max_abs": 0.0005828738212585449,
+        "batch_single_passed": true,
+        "cold_start_ms": 1178.205176955089,
+        "device": "cuda:0",
+        "input_tokens": 162,
+        "no_token_id": 2152,
+        "passed": true,
+        "peak_gpu_memory_bytes": 1269566976,
+        "scores": [
+          0.1919327974319458,
+          9.818327271204907e-06
+        ],
+        "warm_batch_ms": 40.6991820782423,
+        "yes_token_id": 9693
+      },
+      "tokenizer": {
+        "bytes": 11422654,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Reranker-0.6B/tokenizer.json",
+        "sha256": "aeb13307a71acd8fe81861d94ad54ab689df773318809eed3cbe794b4492dae4"
+      },
+      "weights": {
+        "bytes": 1191588280,
+        "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Reranker-0.6B/model.safetensors",
+        "sha256": "27cd75a405b9c1b46b59abfd88aaa209e6fed2a1972cde9b70e7659537c5e65b"
+      }
+    }
+  },
+  "schema_version": "method1-v28-model-manifest-1"
+}

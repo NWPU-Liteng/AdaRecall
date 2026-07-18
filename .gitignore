@@ -58,6 +58,14 @@ venv/
 !/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v25/**/
 /agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v25/runs/
 
+# Keep the v28 causal Graph-only implementation and compact audit evidence;
+# immutable per-query runs and materialized physical Tile stores stay local.
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_graph_only_v28/
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_graph_only_v28/**/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_graph_only_v28/runs/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_graph_only_v28/artifacts/causal_snapshots/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_graph_only_v28/artifacts/physical_tile_stores/
+
 # Keep motivation documentation, source, configs, reports, and figures while
 # excluding its archived data products and formal-run payloads.
 /agent-memory-profiling/versions/motivation_experiments/**/aggregate/

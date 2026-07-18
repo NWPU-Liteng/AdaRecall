@@ -1,0 +1,13 @@
+{
+  "captured_at_utc": "2026-07-18T19:38:02.550665+00:00",
+  "command": [
+    "python",
+    "-m",
+    "pytest",
+    "-q"
+  ],
+  "exit_code": 0,
+  "output": "...................                                                      [100%]\n19 passed in 2.76s\n",
+  "passed": true,
+  "schema_version": "method1-v28-synthetic-test-receipt-1"
+}

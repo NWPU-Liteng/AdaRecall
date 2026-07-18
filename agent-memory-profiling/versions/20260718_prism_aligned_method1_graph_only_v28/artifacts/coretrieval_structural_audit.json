@@ -1,0 +1,23 @@
+{
+  "schema_version": "method1-v28-coretrieval-structural-audit-1",
+  "scientific_scope": "no gold or qrels read; train query metadata and frozen-policy Top-5 IDs only",
+  "fold_exclusion": true,
+  "future_event_exclusion": true,
+  "native_agent_access_claim": false,
+  "support_unit": "repeated unordered memory pair within legal co-retrieval events",
+  "query_count": 1355,
+  "event_count": 1355,
+  "visible_events_mean": 24.669372693726938,
+  "repeat_supported_events_mean": 12.113653136531365,
+  "queries_with_repeat_supported_event": 1084,
+  "query_coverage_rate": 0.8,
+  "repeat_supported_pairs_mean": 15.417712177121771,
+  "repeat_supported_events_p50": 9,
+  "repeat_supported_events_p95": 33,
+  "freeze_decision": {
+    "semantic_weight": 1.0,
+    "history_weight": 0.08,
+    "agreement_weight": 0.04,
+    "reason": "positive but conservative dual-view contribution based only on causal structural support"
+  }
+}

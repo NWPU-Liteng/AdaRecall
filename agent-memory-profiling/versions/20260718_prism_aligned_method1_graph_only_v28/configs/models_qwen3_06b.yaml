@@ -1,0 +1,15 @@
+schema_version: method1-v28-qwen-models-1
+embedding:
+  name: Qwen/Qwen3-Embedding-0.6B
+  local_path: agent-memory-profiling/models/models/Qwen3-Embedding-0.6B
+  dtype: bfloat16
+  attention: eager
+  max_length: 512
+  normalize: true
+reranker:
+  name: Qwen/Qwen3-Reranker-0.6B
+  local_path: agent-memory-profiling/models/models/Qwen3-Reranker-0.6B
+  dtype: bfloat16
+  attention: eager
+  max_length: 512
+  batch_size: 8
