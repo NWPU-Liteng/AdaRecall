@@ -1,0 +1,24 @@
+{
+  "schema_version": "method1-v29-causal-graph-evidence-posterior-1",
+  "random_seed": 20260718,
+  "alpha_qwen_grid": [0.25, 0.5, 0.75, 0.9, 1.0],
+  "graph_prior_kinds": ["x_sem", "submodular_total_marginal", "selection_order"],
+  "baseline_prior_kind": "retrieval_order",
+  "objective": {
+    "ndcg_at_10": 1.0,
+    "recall_at_5": 1.0,
+    "group_coverage_at_5": 1.0,
+    "precision_at_5": 0.25
+  },
+  "gate_d_ci_lower": {
+    "ndcg_at_10": -0.01,
+    "precision_at_5": -0.01,
+    "recall_at_5": -0.01,
+    "group_coverage_at_5": -0.01
+  },
+  "bootstrap_samples": 10000,
+  "candidate_ids_frozen": true,
+  "dense_candidate_signal_for_graph": false,
+  "dense_fallback_slots": 0,
+  "query_type_parameters": false
+}

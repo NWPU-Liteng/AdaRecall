@@ -15,6 +15,7 @@ package continues development-only optimization without rereading v24 test. The 
 | [`20260718_prism_aligned_method1_closure_v24`](20260718_prism_aligned_method1_closure_v24) | PRISM-aligned Qwen3 dual-view hypergraph closure. Engineering, development, test-once, and replay paths completed; formal Gate E quality failed and is preserved without test retuning. |
 | [`20260718_prism_aligned_method1_closure_v25`](20260718_prism_aligned_method1_closure_v25) | Degree-calibrated failure analysis and Dense + lexical safety frontier. Development gates closed; awaiting a genuinely fresh holdout. |
 | [`20260718_prism_aligned_method1_graph_only_v28`](20260718_prism_aligned_method1_graph_only_v28) | Strictly causal Graph-only closure: edge-descriptor query alignment, fuzzy hierarchy, pair-supported co-retrieval propagation, graph-owned submodular Top-32, causal Tile/I/O, and incremental replay. v27 provenance conflict is quarantined; formal OOF awaits the design freeze receipt. |
+| [`20260719_method1_graph_qwen_posterior_v29`](20260719_method1_graph_qwen_posterior_v29) | Cross-fitted Causal Graph Evidence Posterior optimization of the v28 Qwen failure. Candidate IDs remain frozen and Graph-only; only the final Qwen/graph structural posterior is calibrated, with retrieval-rank controls for every baseline. |
 
 The independent motivation archive is documented at
 [`motivation_experiments/README.md`](motivation_experiments/README.md). It
