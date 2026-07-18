@@ -1,0 +1,42 @@
+{
+  "aggregate_file_sha256": "d789034bff55b708c0ac6873e16730cd5e53cc4e3c7ae1693d3b86eabf904623",
+  "candidate_identity_violations": 0,
+  "config_sha256": "a5f73c2168bf43501099798436b6c42576feec967d72b1894e3e292383a32923",
+  "dense_signal_for_graph": false,
+  "freeze_receipt_sha256": "428ce133a527cdaa2e86d42c8d349728660f1bcc8972a3e2120601770b1a20ff",
+  "gate_d_promoted_vs_dense_posterior": [],
+  "gate_d_promoted_vs_dense_qwen": [],
+  "graph_only_methods": {
+    "dual_graph_only_32": {
+      "group_coverage_at_5": 0.01955719557195572,
+      "group_coverage_delta_vs_dense_qwen": -0.007626076260762607,
+      "group_coverage_delta_vs_dense_qwen_ci_95": [-0.01648216482164822, 0.0011070110701107013],
+      "ndcg_at_10": 0.0100902078314405,
+      "ndcg_delta_vs_dense_qwen": -0.004572572888251823,
+      "ndcg_delta_vs_dense_qwen_ci_95": [-0.009344260757880264, -0.00009432466334839476],
+      "recall_at_5": 0.00897908979089791,
+      "recall_delta_vs_dense_qwen": -0.007995079950799507,
+      "recall_delta_vs_dense_qwen_ci_95": [-0.014640221402214021, -0.0015990159901599014]
+    },
+    "semantic_graph_only_32": {
+      "group_coverage_at_5": 0.02189421894218942,
+      "group_coverage_delta_vs_dense_qwen": -0.005289052890528906,
+      "group_coverage_delta_vs_dense_qwen_ci_95": [-0.014145141451414512, 0.003201107011070066],
+      "ndcg_at_10": 0.010103872455173704,
+      "ndcg_delta_vs_dense_qwen": -0.004558908264518617,
+      "ndcg_delta_vs_dense_qwen_ci_95": [-0.009228834917974237, -0.00019259303226916593],
+      "recall_at_5": 0.01008610086100861,
+      "recall_delta_vs_dense_qwen": -0.006888068880688806,
+      "recall_delta_vs_dense_qwen_ci_95": [-0.013161131611316112, -0.0009840098400984007]
+    }
+  },
+  "query_count": 1355,
+  "row_count": 6775,
+  "rows_sha256": "06725c1b0a471910135c0b46142e936219ac60acbb27ae21f29f3fa83d59038a",
+  "run_id": "v29_crossfit_oof_20260719",
+  "schema_version": "method1-v29-crossfit-failure-receipt-1",
+  "scientific_scope": "strict five-fold cross-fitted development evidence after v28 Gate-D failure",
+  "status": "GRAPH_ONLY_QWEN_FAILED",
+  "v28_frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "v28_qwen_rows_sha256": "439d32655eed0d6e136a181c9b66d373ad54e13937fbe16fe8131eea9e559696"
+}

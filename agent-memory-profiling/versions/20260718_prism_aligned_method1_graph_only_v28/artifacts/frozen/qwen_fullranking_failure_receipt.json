@@ -1,0 +1,40 @@
+{
+  "aggregate_file_sha256": "6a25c401f23606e6f56b345eb9e094a548fd440e526198072e5cf80fbc7cde23",
+  "aggregate_payload_sha256": "15f371e66874b86a0e2544711b2fc79ba904a81d779e9712f1f47499347d7448",
+  "frontier_aggregate_sha256": "8a618b0b958f64597e4064996126e51fb50d0ee0bf3dbf3cde9fcfe1f0f7de99",
+  "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "frontier_run_id": "v28_frontier_oof_20260719_attempt003_913cd3f",
+  "full_ranking_persisted": true,
+  "gate_d_promoted": [],
+  "graph_only_methods": {
+    "dual_graph_only_32": {
+      "group_coverage_at_5": 0.02066420664206642,
+      "group_coverage_delta_vs_dense": -0.006519065190651907,
+      "group_coverage_delta_vs_dense_ci_95": [-0.014637146371463714, 0.0016020910209101646],
+      "ndcg_at_10": 0.010321584901114381,
+      "ndcg_delta_vs_dense": -0.004341195818577942,
+      "ndcg_delta_vs_dense_ci_95": [-0.00855218530205815, -0.00035301457700906923],
+      "recall_at_5": 0.009717097170971708,
+      "recall_delta_vs_dense": -0.007257072570725706,
+      "recall_delta_vs_dense_ci_95": [-0.012915129151291513, -0.0018450184501845018]
+    },
+    "semantic_graph_only_32": {
+      "group_coverage_at_5": 0.02140221402214022,
+      "group_coverage_delta_vs_dense": -0.005781057810578106,
+      "group_coverage_delta_vs_dense_ci_95": [-0.014022140221402213, 0.0025830258302583027],
+      "ndcg_at_10": 0.010767353540415841,
+      "ndcg_delta_vs_dense": -0.00389542717927648,
+      "ndcg_delta_vs_dense_ci_95": [-0.008109927115068074, 0.00008874911044830693],
+      "recall_at_5": 0.01045510455104551,
+      "recall_delta_vs_dense": -0.006519065190651906,
+      "recall_delta_vs_dense_ci_95": [-0.01242312423124231, -0.0008610086100861009]
+    }
+  },
+  "query_count": 1355,
+  "row_count": 8130,
+  "rows_sha256": "439d32655eed0d6e136a181c9b66d373ad54e13937fbe16fe8131eea9e559696",
+  "run_id": "v28_qwen_oof_20260719_fullranking",
+  "schema_version": "method1-v28-qwen-failure-receipt-1",
+  "scientific_scope": "strict five-fold OOF development evidence",
+  "status": "GRAPH_ONLY_QWEN_FAILED"
+}

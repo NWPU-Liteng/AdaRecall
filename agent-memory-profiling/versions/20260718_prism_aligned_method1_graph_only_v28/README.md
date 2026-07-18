@@ -1,6 +1,6 @@
 # Method 1 v28: Causal Graph-only Closure
 
-Status: `IMPLEMENTATION_AND_SYNTHETIC_AUDIT_IN_PROGRESS`
+Status: `GRAPH_ONLY_QWEN_FAILED`
 
 This version is the non-overwriting successor to the v27 exploratory screen.
 It implements the frozen Method 1 path without memory-level ANN, query-memory
@@ -19,3 +19,10 @@ Scientific boundaries:
 - MedMemoryBench development/test and the consumed LoCoMo source are forbidden.
 - Formal runs require an immutable, previously absent `runs/<run_id>` directory.
 - Gate failure is preserved. Dense retrieval cannot repair Graph-only output.
+
+The immutable attempt-003 Frontier OOF run passed Gate C for both Semantic and
+Dual Graph-only, with all 32 slots graph-owned and no Dense fallback. The
+schema-corrected full-ranking Qwen run then failed Gate D for both methods.
+Fresh evaluation is therefore locked. Compact result hashes and the immutable
+failure decision are registered in
+`artifacts/frozen/qwen_fullranking_failure_receipt.json`.

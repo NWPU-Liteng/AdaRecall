@@ -1,0 +1,11 @@
+{
+  "config_sha256": "a5f73c2168bf43501099798436b6c42576feec967d72b1894e3e292383a32923",
+  "crossfit_source_sha256": "f9ca69a69d10ad58a4011c52a245d9c62dbf5d90b5c7d57a2df4b6934323eee2",
+  "frozen_at_utc": "2026-07-18T20:54:48.270807+00:00",
+  "git_commit": "91032cb8778dfba57d7d64463e0ad6ad2a5afe8e",
+  "posterior_source_sha256": "046d3958d7eba6bac1b53334aeb7934992f94d68c1884eaa4d0df467295d2e3c",
+  "schema_version": "method1-v29-freeze-1",
+  "status": "FROZEN_BEFORE_CROSSFIT_OOF",
+  "v28_frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "v28_qwen_rows_sha256": "439d32655eed0d6e136a181c9b66d373ad54e13937fbe16fe8131eea9e559696"
+}
