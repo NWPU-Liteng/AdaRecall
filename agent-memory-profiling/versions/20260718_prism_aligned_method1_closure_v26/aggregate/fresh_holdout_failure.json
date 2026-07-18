@@ -1,0 +1,13 @@
+{
+  "status": "FRESH_HOLDOUT_FORMAL_RUN_FAILED_NO_RERUN",
+  "dataset": "LoCoMo",
+  "dataset_is_independent": true,
+  "formal_read_count": 1,
+  "gold_read_consumed": true,
+  "metrics_computed": false,
+  "failure_stage": "frozen adapter schema validation",
+  "failure": "composite evidence string D8:6; D9:17 did not match a released dia_id",
+  "post_read_fix_applied": false,
+  "rerun_performed": false,
+  "new_unread_holdout_required": true
+}

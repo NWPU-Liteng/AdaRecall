@@ -1,0 +1,11 @@
+{
+  "formal_read_number": 1,
+  "run_id": "v26_locomo_fresh_once_20260718",
+  "source_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "started_at_utc": "2026-07-18T12:57:45.103234+00:00",
+  "status": "FAILED_ADAPTER_SCHEMA_GOLD_READ_CONSUMED_NO_RERUN",
+  "failed_at_utc": "2026-07-18T12:57:48Z",
+  "failure": "evidence field contained composite dialog ID string D8:6; D9:17 not described by the frozen list-of-dialog-ids adapter",
+  "metrics_computed": false,
+  "rerun_allowed": false
+}

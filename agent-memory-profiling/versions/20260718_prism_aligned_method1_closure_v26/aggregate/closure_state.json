@@ -1,0 +1,13 @@
+{
+  "status": "V26_OOF_SUCCESS_FRESH_RUN_FAILED_AWAITING_NEW_HOLDOUT",
+  "oof_gate_passed": true,
+  "selected_method": "lexical_c_with_local_qwen_reranker",
+  "fresh_holdout_source_independent": true,
+  "fresh_holdout_metrics_available": false,
+  "fresh_formal_runs_consumed": 1,
+  "fresh_rerun_forbidden": true,
+  "agent_replay_passed": true,
+  "incremental_update_passed": true,
+  "candidate_reduction_vs_full": 0.75,
+  "safety_violations": 0
+}

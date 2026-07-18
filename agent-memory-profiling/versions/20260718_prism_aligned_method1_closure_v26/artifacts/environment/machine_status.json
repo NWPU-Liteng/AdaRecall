@@ -1,0 +1,17 @@
+{
+  "captured_at_utc": "2026-07-18T12:58:26Z",
+  "git_head": "7bbca88",
+  "origin_main_before_final_push": "900dfe2",
+  "python": "3.10.20",
+  "torch": "2.1.0+cu121",
+  "transformers": "4.51.3",
+  "scikit_learn": "1.7.1",
+  "gpu_model": "NVIDIA GeForce RTX 3090",
+  "gpu_count": 7,
+  "oof_qwen_devices": [0, 2, 3, 4],
+  "oof_qwen_peak_observed_memory_mib_per_device": 3762,
+  "oof_qwen_observed_utilization": "83-100%",
+  "external_busy_devices_at_start": [1, 5, 6],
+  "attention_implementation": "eager",
+  "post_run_restricted_nvidia_smi_status": "NVML unavailable in restricted shell; formal GPU shards recorded CUDA runtime and passed smoke"
+}
