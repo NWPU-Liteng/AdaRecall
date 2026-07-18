@@ -1,0 +1,17 @@
+{
+  "candidate_ids_frozen": true,
+  "config_sha256": "6fbb275308936f5157405e0f14757f8a6a86c4d0db181befaab3a80a687e36e5",
+  "cuda_smoke_sha256": "d55e14bb067d90d7b63467beef880228f96248c2513dba8d37152bbe99ce6f70",
+  "formal_runs_allowed": 1,
+  "formal_runs_consumed": 0,
+  "fresh_authorized": false,
+  "frontier_aggregate_sha256": "8a618b0b958f64597e4064996126e51fb50d0ee0bf3dbf3cde9fcfe1f0f7de99",
+  "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "frozen_at_utc": "2026-07-18T21:31:08.577113+00:00",
+  "git_commit": "503b5f4115ab86928b0bd12932b3534715f4e8c0",
+  "identical_packing_for_all_methods": true,
+  "schema_version": "method1-v30-qwen-control-freeze-1",
+  "source_manifest_sha256": "d745f60731327219c87894952e88e8d42858ffed13863ffb2d2e6c61b3a6faea",
+  "status": "FROZEN_BEFORE_CANDIDATE_IDENTICAL_QWEN_OOF",
+  "test_receipt_sha256": "dfa9193121fe5e7a88479d2ac927f58c05d97535ff54be3931d318b4145614dc"
+}

@@ -1,0 +1,53 @@
+{
+  "files": [
+    {
+      "path": "configs/qwen_suffix_preserving.yaml",
+      "sha256": "6fbb275308936f5157405e0f14757f8a6a86c4d0db181befaab3a80a687e36e5"
+    },
+    {
+      "path": "scripts/00_diagnose_v28_failure.py",
+      "sha256": "c889084b1e04ffdbe6bb6bf7f8ce8c3866191d8c47a19945075b40ca9d267a94"
+    },
+    {
+      "path": "scripts/01_audit_qwen_truncation.py",
+      "sha256": "2c91a0df607c381f48831c60a61ed6298aa96f622c124061d1c83e9a1193c9ca"
+    },
+    {
+      "path": "scripts/02_run_tests.py",
+      "sha256": "f1b5d07dddf8f3dcbb3a30ffcdc2d7bbce5883789c63e1c016b47173f40df8d1"
+    },
+    {
+      "path": "scripts/02_smoke_qwen_cuda.py",
+      "sha256": "8d5d10c71454fbb939f072af611a91f63583ea35f9b4b0290ce403b40a17c067"
+    },
+    {
+      "path": "scripts/03_freeze_qwen_control.py",
+      "sha256": "61ca0a19317aeb28acaa4fa8fc33a39758eea99057b3b63d2ea6e5b631e16e55"
+    },
+    {
+      "path": "scripts/04_run_corrected_qwen_control.py",
+      "sha256": "0b37fb5b6003c2a18f0c0a3d69b2aa4140638379b9a01c0a6848ea1cab44b875"
+    },
+    {
+      "path": "scripts/common.py",
+      "sha256": "b681137ce9a23a85f4782bf30a32d256fe5369cad9332dd5fdfa199016a90e58"
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "e5ede05502535c0017519135a5c9e4e3998e395855c08a7e3ce8b68084b5f2dc"
+    },
+    {
+      "path": "src/qwen_reranker.py",
+      "sha256": "21b943ab55fec49502590990ed192aadde07019d58004923855001866ebb097f"
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "0fc50a2377240314294277058f05b955a9a51141a8721da28bad2eb2d840d143"
+    },
+    {
+      "path": "tests/test_qwen_packing.py",
+      "sha256": "42a7892d564da4d0f3a4a194ca39567454956528328f690be0b5f79e85a6fd3d"
+    }
+  ],
+  "schema_version": "method1-v30-qwen-control-source-manifest-1"
+}
