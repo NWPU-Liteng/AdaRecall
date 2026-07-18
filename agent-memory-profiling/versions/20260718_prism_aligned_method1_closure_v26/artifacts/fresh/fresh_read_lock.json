@@ -1,0 +1,14 @@
+{
+  "schema_version": "method1-v26-fresh-read-lock-1",
+  "status": "LOCKED_FOR_SINGLE_FRESH_READ",
+  "run_id": "v26_locomo_fresh_once_20260718",
+  "locked_at_utc": "2026-07-18T12:46:00Z",
+  "frozen_git_commit": "8a8d55b",
+  "frozen_config": "configs/fresh_holdout.json",
+  "selected_config": "artifacts/selected_frozen_config.json",
+  "dataset_manifest": "artifacts/fresh/dataset_manifest.json",
+  "source_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "formal_runs_allowed": 1,
+  "formal_runs_consumed": 0,
+  "retuning_after_read": false
+}
