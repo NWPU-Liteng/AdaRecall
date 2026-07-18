@@ -9,6 +9,13 @@ snapshot hashes matched the independent v28 manifest. Candidate identity,
 layout consistency, future, namespace, duplicate, and past-snapshot mutation
 violations were all zero.
 
+A separately committed, read-only cross-run verifier rebuilt all 148 snapshots
+and compared them with the earlier Gate E run. All 148 immutable semantic
+layout hashes and all 1,355 per-query semantic Tile ID lists matched exactly;
+candidate and snapshot violations were also zero. This distinguishes logical
+cross-run layout identity from the formal runner's physical range/byte
+conservation check.
+
 Each insertion performed online Top-3 fuzzy prototype sufficient-statistic
 updates and appended the payload, embedding, and metadata to a physical delta
 Tile. Insertion P50/P95 was 0.285/0.407 ms. One delta Tile was affected per

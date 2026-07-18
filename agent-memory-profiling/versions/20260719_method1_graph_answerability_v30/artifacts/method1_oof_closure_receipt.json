@@ -8,6 +8,7 @@
   "gate_e_passed_semantic": true,
   "gate_f_passed_semantic": true,
   "gate_g_incremental_aggregate_sha256": "eed0c36f50af025ce13b87dd30a0c0687de5914960ce918dbc65b995d8d864b6",
+  "gate_g_layout_crossrun_audit_sha256": "b3316852913b892cc15bf139e12be6bcc49c6d3afea952b5d6e253133c54013e",
   "gate_g_passed": true,
   "lexical_control_retained": true,
   "schema_version": "method1-graph-only-oof-closure-1",

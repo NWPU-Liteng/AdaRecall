@@ -1,0 +1,17 @@
+{
+  "candidate_identity_violations_vs_gate_e_run": 0,
+  "fresh_authorized": false,
+  "immutable_layout_hash_violations": 0,
+  "inputs": {
+    "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+    "gate_g_snapshot_rows_sha256": "f8137ce07aed99d8e68b47f6417c72cdf8c2c06a2e863034173b5faf01911e39",
+    "layout_rows_sha256": "8813ce0f389bbb4015b1b4c69da8eaacc0b3eaa7d5be8e8a4c9beaeae284e1d0"
+  },
+  "query_count": 1355,
+  "query_tile_id_violations_vs_gate_e_run": 0,
+  "runtime_seconds": 257.98869284498505,
+  "schema_version": "method1-v30-gate-g-cross-run-layout-audit-1",
+  "snapshot_count": 148,
+  "snapshot_hash_violations": 0,
+  "status": "CROSS_RUN_LAYOUT_EXACT"
+}

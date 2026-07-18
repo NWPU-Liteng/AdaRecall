@@ -30,6 +30,8 @@ protected slot, or Dense fallback enters the main method.
   passed with zero causal or identity violations. Insertion P50/P95 was
   0.285/0.407 ms and mean write amplification was 1.021x. Boundary compaction
   remains a full exact rebuild averaging 1.343 s and is not claimed as local.
+  An independent cross-run verifier also matched all 1,355 semantic Tile ID
+  lists exactly to the earlier Gate E run.
 
 ## Negative And Limiting Evidence
 
