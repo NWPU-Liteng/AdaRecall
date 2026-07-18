@@ -34,6 +34,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--smoke-queries", type=int, default=0)
+    parser.add_argument("--freeze-receipt", default="design_freeze_receipt.json")
     return parser.parse_args()
 
 
@@ -74,19 +75,20 @@ def main() -> None:
     config = load_yaml(config_path)
     formal = args.smoke_queries <= 0
     if formal:
-        receipt_path = VERSION_ROOT / "artifacts" / "frozen" / "design_freeze_receipt.json"
+        receipt_path = VERSION_ROOT / "artifacts" / "frozen" / args.freeze_receipt
         if not receipt_path.is_file():
             raise RuntimeError("formal OOF requires the design freeze receipt")
         receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
         if receipt["status"] != "FROZEN_BEFORE_FORMAL_OOF" or receipt["config_sha256"] != sha256_file(config_path):
             raise RuntimeError("formal config differs from freeze receipt")
-        source_manifest_path = VERSION_ROOT / "artifacts" / "frozen" / "source_manifest.json"
+        source_manifest_path = VERSION_ROOT / "artifacts" / "frozen" / receipt.get("source_manifest", "source_manifest.json")
         frozen_sources = json.loads(source_manifest_path.read_text(encoding="utf-8"))
         for row in frozen_sources["files"]:
             path = VERSION_ROOT / row["path"]
             if not path.is_file() or sha256_file(path) != row["sha256"]:
                 raise RuntimeError(f"formal source differs from freeze: {row['path']}")
-        start_receipt = VERSION_ROOT / "artifacts" / "frozen" / "formal_oof_start_receipt.json"
+        suffix = "" if int(receipt.get("freeze_attempt", 1)) == 1 else f"_attempt_{int(receipt['freeze_attempt']):03d}"
+        start_receipt = VERSION_ROOT / "artifacts" / "frozen" / f"formal_oof_start_receipt{suffix}.json"
         start_receipt.parent.mkdir(parents=True, exist_ok=True)
         with start_receipt.open("x", encoding="utf-8") as handle:
             json.dump({"run_id": args.run_id, "started_at_unix": time.time(), "formal_run_number": 1}, handle, indent=2, sort_keys=True)
@@ -105,7 +107,7 @@ def main() -> None:
     if formal and set(fold_by_id) != set(all_query_by_id):
         raise RuntimeError("fold manifest does not cover canonical train queries exactly")
 
-    embeddings = np.asarray(dataset.embeddings, dtype=np.float32)
+    embeddings = np.asarray(dataset.embeddings, dtype=np.float32).copy()
     embeddings /= np.maximum(np.linalg.norm(embeddings, axis=1, keepdims=True), 1e-12)
     memory_ids = dataset.memory_ids
     namespaces = [memory.namespace_id for memory in dataset.memories]
@@ -307,6 +309,8 @@ def main() -> None:
         "runtime_seconds": time.perf_counter() - started,
         "hnsw_recall_vs_exact_at_32_mean": float(np.mean(exact_hnsw_recall)),
         "config_sha256": sha256_file(config_path),
+        "freeze_receipt": args.freeze_receipt if formal else None,
+        "freeze_receipt_sha256": sha256_file(VERSION_ROOT / "artifacts" / "frozen" / args.freeze_receipt) if formal else None,
         "fold_manifest_sha256": sha256_file(fold_manifest_path),
         "rows_sha256": sha256_file(run_dir / "per_query_frontier.jsonl"),
         "snapshot_manifest_sha256": sha256_file(run_dir / "causal_snapshot_manifest.json"),

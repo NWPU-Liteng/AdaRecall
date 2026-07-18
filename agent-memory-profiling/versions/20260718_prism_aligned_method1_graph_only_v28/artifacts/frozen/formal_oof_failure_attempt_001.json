@@ -1,0 +1,15 @@
+{
+  "schema_version": "method1-v28-formal-oof-failure-1",
+  "status": "PRE_QUERY_ENGINEERING_FAILURE",
+  "freeze_attempt": 1,
+  "run_id": "v28_frontier_oof_20260719_frozen_7c0148f",
+  "git_commit": "7c0148f3eb678210103fcaba82b0abecb7d36752",
+  "config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "query_rows_generated": 0,
+  "aggregate_generated": false,
+  "metrics_generated": false,
+  "failure": "ValueError: output array is read-only while normalizing the mmap-backed embedding view",
+  "repair_scope": "copy the cached embedding array before normalization; no config, Gate, model, dataset, or algorithm change",
+  "overwrite_performed": false,
+  "next_action": "new commit, source manifest, freeze attempt 002, and immutable run ID"
+}
