@@ -1,0 +1,20 @@
+{
+  "compaction_mode": "full_exact_boundary_rebuild",
+  "config_sha256": "7263bbaa5bd08c9b1aeb620b855d9d4c91b497ad7b2d8c2db12b349a3128d822",
+  "fresh_authorized": false,
+  "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "frontier_snapshot_manifest_sha256": "982c1595fed5d0f6501c5bb7dfc3acf52dab2fb8a28b0d8afff6d7af09f5b88b",
+  "frozen_at_utc": "2026-07-18T23:08:22.609052+00:00",
+  "git_commit": "860480e5c224cf349e2980bb6817c39403cf753b",
+  "graph_config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "incremental_runs_allowed": 1,
+  "layout_aggregate_sha256": "c1d9ffa2b3edc762feb0441309b57978790e947a784f8cc47dfec297531faf54",
+  "layout_rows_sha256": "8813ce0f389bbb4015b1b4c69da8eaacc0b3eaa7d5be8e8a4c9beaeae284e1d0",
+  "layout_snapshot_manifest_sha256": "f2271cccae56995c34a955be7f13920078213917df27088b66bcda5f804e6cec",
+  "local_compaction_claim": false,
+  "native_agent_access_claim": false,
+  "schema_version": "method1-v30-incremental-freeze-attempt-002-1",
+  "source_manifest_sha256": "4a51970376cb29926e20f31d57a682fa1a573d12f882b7f06e8f0e736ccebf38",
+  "status": "FROZEN_BEFORE_INCREMENTAL_GATE_G_ATTEMPT_002",
+  "test_receipt_sha256": "ddaa05f3c3f181183a74a5c984d1c334382fd393ccb2422556ee07e4fad50e5b"
+}

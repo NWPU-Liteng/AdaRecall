@@ -1,0 +1,113 @@
+{
+  "files": [
+    {
+      "path": "configs/incremental_gate_g.yaml",
+      "sha256": "7263bbaa5bd08c9b1aeb620b855d9d4c91b497ad7b2d8c2db12b349a3128d822"
+    },
+    {
+      "path": "configs/qwen_suffix_preserving.yaml",
+      "sha256": "6fbb275308936f5157405e0f14757f8a6a86c4d0db181befaab3a80a687e36e5"
+    },
+    {
+      "path": "configs/system_gates.yaml",
+      "sha256": "e469cbec8cc16cfa4a1771bcd848744e5022b62aae3abeac3985a5cc57ebf842"
+    },
+    {
+      "path": "scripts/00_diagnose_v28_failure.py",
+      "sha256": "c889084b1e04ffdbe6bb6bf7f8ce8c3866191d8c47a19945075b40ca9d267a94"
+    },
+    {
+      "path": "scripts/01_audit_qwen_truncation.py",
+      "sha256": "2c91a0df607c381f48831c60a61ed6298aa96f622c124061d1c83e9a1193c9ca"
+    },
+    {
+      "path": "scripts/02_run_tests.py",
+      "sha256": "f1b5d07dddf8f3dcbb3a30ffcdc2d7bbce5883789c63e1c016b47173f40df8d1"
+    },
+    {
+      "path": "scripts/02_smoke_qwen_cuda.py",
+      "sha256": "8d5d10c71454fbb939f072af611a91f63583ea35f9b4b0290ce403b40a17c067"
+    },
+    {
+      "path": "scripts/03_freeze_qwen_control.py",
+      "sha256": "61ca0a19317aeb28acaa4fa8fc33a39758eea99057b3b63d2ea6e5b631e16e55"
+    },
+    {
+      "path": "scripts/04_run_corrected_qwen_control.py",
+      "sha256": "0b37fb5b6003c2a18f0c0a3d69b2aa4140638379b9a01c0a6848ea1cab44b875"
+    },
+    {
+      "path": "scripts/05_run_system_tests.py",
+      "sha256": "52264eda4ca2eb4ed1cdae1d76bb17171a49e497b4f7089c5d5ed3e6d93bd5cd"
+    },
+    {
+      "path": "scripts/06_freeze_system.py",
+      "sha256": "3dfd18e273614eed4c260eb72519573f888441655b4823df8c18c8eb89284a5d"
+    },
+    {
+      "path": "scripts/07_run_layout_io_e2e.py",
+      "sha256": "376004c1b9e040095f385963ea46ec5c426c1062e485beef03a7bc0ed78c4368"
+    },
+    {
+      "path": "scripts/08_run_incremental_tests.py",
+      "sha256": "dc5537a34f1ff22140a547cc6d0cf734d536618755b71a0ced6ee23ff6842785"
+    },
+    {
+      "path": "scripts/09_freeze_incremental.py",
+      "sha256": "e33691c7ec967409c91dcffef6fbdc38a004fde68736b49d2061012926933fd1"
+    },
+    {
+      "path": "scripts/10_run_incremental_agent.py",
+      "sha256": "7f45818ec049ec8dbe18f1434e97b69070460e972dc0016fef7160592c3fa5f2"
+    },
+    {
+      "path": "scripts/common.py",
+      "sha256": "b681137ce9a23a85f4782bf30a32d256fe5369cad9332dd5fdfa199016a90e58"
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "e5ede05502535c0017519135a5c9e4e3998e395855c08a7e3ce8b68084b5f2dc"
+    },
+    {
+      "path": "src/causal_tile_layout.py",
+      "sha256": "fe2acd35ef8704f4213057966e127ebcda414132d5bacf3f98ac5a7e8451975e"
+    },
+    {
+      "path": "src/contracts.py",
+      "sha256": "30270907e76f637f294b25f6a3dbe75be1fe1879524d7dbef8537875abfd699c"
+    },
+    {
+      "path": "src/incremental_update.py",
+      "sha256": "2616b20d67b803d96876d46ea32e3baebbca63a0f9cab8b4954a414bf6b4dfd5"
+    },
+    {
+      "path": "src/physical_tile_store.py",
+      "sha256": "ee90e59cc7282ef0787f78ff8f4a652e879bce8a000485a316f8df8bd7113d59"
+    },
+    {
+      "path": "src/qwen_reranker.py",
+      "sha256": "21b943ab55fec49502590990ed192aadde07019d58004923855001866ebb097f"
+    },
+    {
+      "path": "src/streaming_fuzzy_hierarchy.py",
+      "sha256": "5f3a739cf9790fe8e26f4724b0e1ea83838276fad3f04fb2e37b37b6b8cc4a0a"
+    },
+    {
+      "path": "tests/conftest.py",
+      "sha256": "0fc50a2377240314294277058f05b955a9a51141a8721da28bad2eb2d840d143"
+    },
+    {
+      "path": "tests/test_incremental_gate_g.py",
+      "sha256": "7e97994f989f69f4442728cbda4b1ff36c3228b4fa4c74234a25470cc949cc78"
+    },
+    {
+      "path": "tests/test_qwen_packing.py",
+      "sha256": "42a7892d564da4d0f3a4a194ca39567454956528328f690be0b5f79e85a6fd3d"
+    },
+    {
+      "path": "tests/test_system_contracts.py",
+      "sha256": "5cb631d4c4e02a65e9c42c0608f3711fc12a097f6c3a2aca4283af6f8a72c52b"
+    }
+  ],
+  "schema_version": "method1-v30-incremental-source-manifest-attempt-002-1"
+}
