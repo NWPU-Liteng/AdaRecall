@@ -1,6 +1,6 @@
 # Method 1 v30: Causal Graph Answerability Refinement
 
-Status: `QWEN_INPUT_INVALIDITY_CONFIRMED`
+Status: `CORRECTED_QWEN_GATE_D_PASSED_SYSTEM_PENDING`
 
 v30 continues the Graph-only Method 1 path after v28 passed Frontier Gate C
 but failed Qwen Gate D and v29 rejected linear graph/Qwen rank fusion. It does
@@ -30,3 +30,14 @@ The first controlled repair will keep every v28 candidate ID fixed and apply
 one suffix-preserving Qwen packing policy to all retrieval methods. This must
 be frozen and evaluated before changing the graph selector, so interface and
 candidate effects remain identifiable.
+
+The immutable candidate-identical corrected-Qwen OOF run passed Gate D for
+both Semantic and Dual Graph-only. Candidate identity and generation suffix
+violations were zero. Semantic improved mean nDCG@10, Recall@5, and group
+coverage@5 relative to Dense-HNSW-32; every pre-frozen lower CI bound remained
+above -0.01. This is train OOF development evidence, not fresh confirmation.
+
+Fresh remains locked until physical Tile/I/O, end-to-end Pareto, and causal
+incremental Gates E-G are completed. The 2,048-token validity repair also
+increased estimated 32-candidate Qwen time to about 1.82 seconds, so quality
+closure does not imply system closure.
