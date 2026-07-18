@@ -1,0 +1,47 @@
+{
+  "schema_version": "method1-prism-aligned-v25-development-only",
+  "version": "20260718_prism_aligned_method1_closure_v25",
+  "random_seed": 20260718,
+  "source_version": "20260718_prism_aligned_method1_closure_v24",
+  "source_index_run_id": "v24_index_20260718",
+  "budget": {
+    "seed_s": 16,
+    "frontier_c": 32,
+    "expanded_pool_cap": 256
+  },
+  "semantic_hypergraph": {
+    "top_active_edges": 16,
+    "activation_temperature": 0.1
+  },
+  "history_hypergraph": {
+    "top_active_edges": 32,
+    "activation_temperature": 0.1
+  },
+  "diffusion": {
+    "alpha_restart": 0.8,
+    "steps": 2
+  },
+  "search": {
+    "max_replacements": [0, 1, 2, 4],
+    "protected_prefix": [24, 28],
+    "graph_margin": [0.05, 0.1, 0.2],
+    "max_dense_drop": [0.02, 0.04, 0.08],
+    "history_weight": [0.0, 0.1, 0.25],
+    "minimum_graph_rank": [0.7, 0.85]
+  },
+  "fusion_search": {
+    "beta_dense": [0.6, 0.7, 0.8, 0.9, 0.95],
+    "history_weight": [0.0, 0.1, 0.25]
+  },
+  "promotion": {
+    "validation_candidate_recall_delta_min": 0.0,
+    "validation_group_coverage_delta_min": 0.0,
+    "max_mean_replacements": 2.0,
+    "require_strict_positive_signal": true
+  },
+  "scientific_boundary": {
+    "allowed_splits": ["development"],
+    "test_must_not_be_read": true,
+    "v24_test_is_historical_evidence_only": true
+  }
+}

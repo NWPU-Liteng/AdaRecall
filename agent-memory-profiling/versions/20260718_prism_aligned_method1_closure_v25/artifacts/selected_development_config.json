@@ -1,0 +1,15 @@
+{
+  "candidate_count": 32,
+  "lexical": {
+    "max_features": 60000,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "weight": 0.3
+  },
+  "promotion_passed": true,
+  "reranker": "Qwen3-Reranker-0.6B",
+  "scientific_scope": "development_only_no_test_read",
+  "strategy": "dense_lexical_safety_frontier"
+}

@@ -1,0 +1,167 @@
+{
+  "absolute_metrics": {
+    "v24_dense_c": {
+      "candidate_recall_final": 0.0034482758620689655,
+      "candidate_recall_frontier": 0.020689655172413793,
+      "evidence_group_coverage_final": 0.010919540229885057,
+      "evidence_group_coverage_frontier": 0.028160919540229885,
+      "ndcg_at_10": 0.0013339751973604885,
+      "precision_at_k": 0.0006896551724137932
+    },
+    "v24_full_n": {
+      "candidate_recall_final": 0.006896551724137931,
+      "candidate_recall_frontier": 0.04597701149425287,
+      "evidence_group_coverage_final": 0.011494252873563218,
+      "evidence_group_coverage_frontier": 0.08936781609195402,
+      "ndcg_at_10": 0.00493336744163239,
+      "precision_at_k": 0.0013793103448275863
+    },
+    "v25_lexical_fusion_c": {
+      "candidate_recall_final": 0.013793103448275862,
+      "candidate_recall_frontier": 0.04310344827586207,
+      "evidence_group_coverage_final": 0.03333333333333333,
+      "evidence_group_coverage_frontier": 0.08419540229885057,
+      "ndcg_at_10": 0.010344827586206896,
+      "precision_at_k": 0.0027586206896551726
+    }
+  },
+  "algorithm_decision": "weak hypergraph signals remain diagnostics/layout signals, not the primary relevance selector",
+  "cost": {
+    "candidate_reduction_vs_full": 0.75,
+    "dense_c_ms_mean": 787.8371884580702,
+    "full_n_ms_mean": 3120.9261224532884,
+    "net_gain_vs_full_ms_mean": 2301.9032543773988,
+    "v25_ms_mean": 819.0228680758897
+  },
+  "development_closed": true,
+  "failed_or_bounded_attempts": {
+    "degree_calibrated_fusion": "safe positive development signal but did not enlarge v24 final effect",
+    "degree_calibrated_residual": "failed tuning-to-validation generalization",
+    "lexical_safety_frontier": "passed tuning, validation, Qwen final-quality, cost, and safety development gates"
+  },
+  "gates": {
+    "candidate_vs_dense": true,
+    "cost_vs_full": true,
+    "final_quality_vs_dense": true,
+    "quality_vs_full_noninferior": true,
+    "safety": true
+  },
+  "method": "dense_lexical_safety_frontier_with_qwen_reranker",
+  "new_dataset_downloaded": false,
+  "paired_vs_dense": {
+    "candidate_recall_final": {
+      "ci_95": [
+        -0.0034482758620689655,
+        0.027586206896551724
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.010344827586206896,
+      "win_rate": 0.013793103448275862
+    },
+    "candidate_recall_frontier": {
+      "ci_95": [
+        0.005172413793103448,
+        0.041379310344827586
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.022413793103448276,
+      "win_rate": 0.03103448275862069
+    },
+    "evidence_group_coverage_final": {
+      "ci_95": [
+        0.005172413793103448,
+        0.041379310344827586
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.022413793103448276,
+      "win_rate": 0.03103448275862069
+    },
+    "evidence_group_coverage_frontier": {
+      "ci_95": [
+        0.03017241379310345,
+        0.08362068965517241
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.05603448275862069,
+      "win_rate": 0.06896551724137931
+    },
+    "ndcg_at_10": {
+      "ci_95": [
+        -0.0005536497300124996,
+        0.02107981790608779
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.009010852388846408,
+      "win_rate": 0.013793103448275862
+    },
+    "precision_at_k": {
+      "ci_95": [
+        -0.0006896551724137932,
+        0.004827586206896552
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean_delta": 0.00206896551724138,
+      "win_rate": 0.013793103448275862
+    }
+  },
+  "paired_vs_full": {
+    "candidate_recall_final": {
+      "ci_95": [
+        0.0,
+        0.017241379310344827
+      ],
+      "loss_rate": 0.0,
+      "mean_delta": 0.006896551724137931,
+      "win_rate": 0.006896551724137931
+    },
+    "candidate_recall_frontier": {
+      "ci_95": [
+        -0.013218390804597701,
+        0.007471264367816093
+      ],
+      "loss_rate": 0.010344827586206896,
+      "mean_delta": -0.0028735632183908046,
+      "win_rate": 0.0034482758620689655
+    },
+    "evidence_group_coverage_final": {
+      "ci_95": [
+        0.008620689655172414,
+        0.03793103448275862
+      ],
+      "loss_rate": 0.0,
+      "mean_delta": 0.021839080459770115,
+      "win_rate": 0.03103448275862069
+    },
+    "evidence_group_coverage_frontier": {
+      "ci_95": [
+        -0.022413793103448276,
+        0.01149425287356322
+      ],
+      "loss_rate": 0.02413793103448276,
+      "mean_delta": -0.005172413793103447,
+      "win_rate": 0.010344827586206896
+    },
+    "ndcg_at_10": {
+      "ci_95": [
+        0.0,
+        0.012547058220183498
+      ],
+      "loss_rate": 0.0,
+      "mean_delta": 0.005411460144574507,
+      "win_rate": 0.010344827586206896
+    },
+    "precision_at_k": {
+      "ci_95": [
+        0.0,
+        0.0034482758620689655
+      ],
+      "loss_rate": 0.0,
+      "mean_delta": 0.0013793103448275863,
+      "win_rate": 0.006896551724137931
+    }
+  },
+  "query_count": 290,
+  "scientific_scope": "development only; v24 test was already revealed and was not read or rerun",
+  "status": "V25_DEVELOPMENT_CLOSED_AWAITING_FRESH_HOLDOUT",
+  "test_read": false
+}

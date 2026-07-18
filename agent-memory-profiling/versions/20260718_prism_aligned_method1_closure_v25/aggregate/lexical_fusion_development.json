@@ -1,0 +1,75 @@
+{
+  "config": {
+    "lexical_weight": 0.3,
+    "max_features": 60000
+  },
+  "cost": {
+    "candidate_reduction_vs_full": 0.75,
+    "net_gain_ms_mean": 2301.9032543773988,
+    "offline_lexical_build_ms": 47342.02536405064,
+    "ours_total_wall_ms_mean": 819.0228680758897,
+    "v24_full_semantic_selection_ms_mean": 3120.9261224532884
+  },
+  "deltas_vs_v24_dense_c": {
+    "candidate_recall_final": {
+      "ci_95": [
+        -0.0034482758620689655,
+        0.027586206896551724
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.010344827586206896,
+      "win_rate": 0.013793103448275862
+    },
+    "candidate_recall_frontier": {
+      "ci_95": [
+        0.005172413793103448,
+        0.041379310344827586
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.022413793103448276,
+      "win_rate": 0.03103448275862069
+    },
+    "evidence_group_coverage_final": {
+      "ci_95": [
+        0.005172413793103448,
+        0.041379310344827586
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.022413793103448276,
+      "win_rate": 0.03103448275862069
+    },
+    "evidence_group_coverage_frontier": {
+      "ci_95": [
+        0.03017241379310345,
+        0.08362068965517241
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.05603448275862069,
+      "win_rate": 0.06896551724137931
+    },
+    "ndcg_at_10": {
+      "ci_95": [
+        -0.0005536497300124996,
+        0.02107981790608779
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.009010852388846408,
+      "win_rate": 0.013793103448275862
+    },
+    "precision_at_k": {
+      "ci_95": [
+        -0.0006896551724137932,
+        0.004827586206896552
+      ],
+      "loss_rate": 0.0034482758620689655,
+      "mean": 0.00206896551724138,
+      "win_rate": 0.013793103448275862
+    }
+  },
+  "development_signal": true,
+  "query_count": 290,
+  "safety_passed": true,
+  "scientific_status": "development_only_no_test_read",
+  "status": "DEVELOPMENT_SIGNAL",
+  "test_read": false
+}

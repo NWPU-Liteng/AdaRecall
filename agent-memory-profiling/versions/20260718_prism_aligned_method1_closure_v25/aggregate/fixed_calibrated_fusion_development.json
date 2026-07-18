@@ -1,0 +1,75 @@
+{
+  "config": {
+    "beta_dense": 0.7,
+    "history_weight": 0.25
+  },
+  "cost": {
+    "candidate_reduction_vs_full": 0.75,
+    "net_gain_ms_mean": 2269.9506164648856,
+    "ours_total_wall_ms_mean": 850.9755059884026,
+    "v24_full_semantic_selection_ms_mean": 3120.9261224532884
+  },
+  "deltas_vs_v24_dense_c": {
+    "candidate_recall_final": {
+      "ci_95": [
+        0.0,
+        0.010344827586206896
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.0034482758620689655,
+      "win_rate": 0.0034482758620689655
+    },
+    "candidate_recall_frontier": {
+      "ci_95": [
+        0.0,
+        0.005172413793103448
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.0017241379310344827,
+      "win_rate": 0.0034482758620689655
+    },
+    "evidence_group_coverage_final": {
+      "ci_95": [
+        0.0,
+        0.015517241379310345
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.006896551724137931,
+      "win_rate": 0.010344827586206896
+    },
+    "evidence_group_coverage_frontier": {
+      "ci_95": [
+        0.0,
+        0.01206896551724138
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.005172413793103448,
+      "win_rate": 0.010344827586206896
+    },
+    "ndcg_at_10": {
+      "ci_95": [
+        0.0,
+        0.0044552747386902725
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.0014850915795634244,
+      "win_rate": 0.0034482758620689655
+    },
+    "precision_at_k": {
+      "ci_95": [
+        0.0,
+        0.00206896551724138
+      ],
+      "loss_rate": 0.0,
+      "mean": 0.0006896551724137932,
+      "win_rate": 0.0034482758620689655
+    }
+  },
+  "development_signal": true,
+  "expected_query_count": 290,
+  "query_count": 290,
+  "safety_passed": true,
+  "scientific_status": "development_only_already_seen_not_independent",
+  "status": "DEVELOPMENT_SIGNAL",
+  "test_read": false
+}

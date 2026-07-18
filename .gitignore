@@ -52,6 +52,12 @@ venv/
 /agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/artifacts/hypergraph/
 /agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/figures/
 
+# Keep the v25 development-only optimization code and compact closure evidence;
+# per-query reranker rows remain generated artifacts.
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v25/
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v25/**/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v25/runs/
+
 # Keep motivation documentation, source, configs, reports, and figures while
 # excluding its archived data products and formal-run payloads.
 /agent-memory-profiling/versions/motivation_experiments/**/aggregate/

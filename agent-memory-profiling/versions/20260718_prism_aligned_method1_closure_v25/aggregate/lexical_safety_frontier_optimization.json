@@ -1,0 +1,45 @@
+{
+  "model": {
+    "kind": "tfidf_word_1_2",
+    "max_features": 60000,
+    "trained_on": "memory_text_without_labels",
+    "vocabulary_size": 60000
+  },
+  "partition_counts": {
+    "tuning": 142,
+    "validation": 148
+  },
+  "promotion_passed": true,
+  "scientific_status": "development_tuning_validation_no_test_read",
+  "selected_weight": 0.3,
+  "status": "PROMOTED_TO_DEVELOPMENT_RERANKER",
+  "test_read": false,
+  "tuning_result": {
+    "candidate_recall_delta": 0.035211267605633804,
+    "group_coverage_delta": 0.0721830985915493,
+    "lexical_weight": 0.3,
+    "loss_rate": 0.0,
+    "mean_replacements": 23.549295774647888,
+    "query_count": 142,
+    "win_rate": 0.08450704225352113
+  },
+  "validation_ci": {
+    "candidate_recall_delta_95": [
+      -0.013513513513513514,
+      0.033783783783783786
+    ],
+    "group_coverage_delta_95": [
+      0.006756756756756757,
+      0.0777027027027027
+    ]
+  },
+  "validation_result": {
+    "candidate_recall_delta": 0.010135135135135136,
+    "group_coverage_delta": 0.04054054054054054,
+    "lexical_weight": 0.3,
+    "loss_rate": 0.006756756756756757,
+    "mean_replacements": 23.5472972972973,
+    "query_count": 148,
+    "win_rate": 0.05405405405405406
+  }
+}
