@@ -1,0 +1,17 @@
+{
+  "config_sha256": "e469cbec8cc16cfa4a1771bcd848744e5022b62aae3abeac3985a5cc57ebf842",
+  "corrected_qwen_aggregate_sha256": "ad29fd28ef585e0240876ad2f80b66ed1623be0e8ef0f6df18feffc1dba60c35",
+  "corrected_qwen_rows_sha256": "475fdb788cb4d2cf64880cafd3743f10b5f00045d89f61f6596780a076df0805",
+  "fresh_authorized": false,
+  "frontier_aggregate_sha256": "8a618b0b958f64597e4064996126e51fb50d0ee0bf3dbf3cde9fcfe1f0f7de99",
+  "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "frozen_at_utc": "2026-07-18T22:36:30.331136+00:00",
+  "git_commit": "685ebb1dc379e826ce6c0baf03d62f232469ee9c",
+  "graph_config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "incremental_runs_allowed": 1,
+  "layout_io_runs_allowed": 1,
+  "schema_version": "method1-v30-system-freeze-1",
+  "source_manifest_sha256": "0ae40086865dabca8abf2831870a5c43c23b7ff2c5fbfe585e471ebd3e6fee59",
+  "status": "FROZEN_BEFORE_LAYOUT_IO_E2E_INCREMENTAL",
+  "test_receipt_sha256": "c34f6da63a8bd67c5122de68ee120f6083e5ff5cec62e8aba0e43752d5adc010"
+}
