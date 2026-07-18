@@ -1,0 +1,30 @@
+{
+  "base_smoke": {
+    "attention_implementation": "eager",
+    "device": "cuda:0",
+    "long_prompt_suffix_preserved": true,
+    "long_prompt_truncated": true,
+    "max_length": 2048,
+    "no_token_id": 2152,
+    "passed": true,
+    "scores": [
+      0.2689414322376251,
+      1.3007128472963814e-05
+    ],
+    "yes_token_id": 9693
+  },
+  "device": "cuda:0",
+  "long_prompt": {
+    "document_tokens": 5210,
+    "document_tokens_kept": 1974,
+    "elapsed_ms": 218.206092,
+    "original_tokens": 5284,
+    "packed_tokens": 2048,
+    "score": 0.9820137619972229,
+    "suffix_tokens": 9,
+    "truncated": true
+  },
+  "passed": true,
+  "peak_gpu_memory_bytes": 2153292288,
+  "schema_version": "method1-v30-corrected-qwen-cuda-smoke-1"
+}

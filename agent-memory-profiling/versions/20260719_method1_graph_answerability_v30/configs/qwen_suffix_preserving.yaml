@@ -1,0 +1,32 @@
+schema_version: method1-v30-qwen-suffix-preserving-1
+random_seed: 20260718
+scientific_scope: candidate-identical repair of invalid v28 Qwen prompt truncation
+frozen_inputs:
+  frontier_run_id: v28_frontier_oof_20260719_attempt003_913cd3f
+  frontier_rows_sha256: 834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98
+  frontier_aggregate_sha256: 8a618b0b958f64597e4064996126e51fb50d0ee0bf3dbf3cde9fcfe1f0f7de99
+model:
+  path: models/models/Qwen3-Reranker-0.6B
+  dtype: bfloat16
+  attention_implementation: eager
+  max_length: 2048
+  batch_size: 4
+  instruction: "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it."
+packing:
+  preserve_chat_prefix: true
+  preserve_generation_suffix: true
+  document_policy: balanced_head_tail
+  document_head_fraction: 0.5
+  maximum_full_prompt_over_budget_rate_in_audit: 0.005
+fairness:
+  identical_for_all_methods: true
+  candidate_ids_frozen: true
+  graph_receives_dense_signal: false
+  qwen_feedback_to_candidates: false
+gate_d_ci_lower:
+  ndcg_at_10: -0.01
+  precision_at_5: -0.01
+  recall_at_5: -0.01
+  group_coverage_at_5: -0.01
+bootstrap_samples: 10000
+fresh_authorized: false

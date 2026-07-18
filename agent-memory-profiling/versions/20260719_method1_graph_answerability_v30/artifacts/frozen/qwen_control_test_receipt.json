@@ -1,0 +1,9 @@
+{
+  "packer_source_sha256": "21b943ab55fec49502590990ed192aadde07019d58004923855001866ebb097f",
+  "passed": true,
+  "schema_version": "method1-v30-qwen-control-tests-1",
+  "status": "TESTS_PASSED",
+  "stdout": "...                                                                      [100%]\n3 passed in 0.80s\n",
+  "test_file_sha256": "42a7892d564da4d0f3a4a194ca39567454956528328f690be0b5f79e85a6fd3d",
+  "tested_at_utc": "2026-07-18T21:30:02.051541+00:00"
+}
