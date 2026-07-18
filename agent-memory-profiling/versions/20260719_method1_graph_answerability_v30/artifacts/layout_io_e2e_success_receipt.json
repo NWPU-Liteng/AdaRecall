@@ -1,0 +1,58 @@
+{
+  "aggregate_file_sha256": "c1d9ffa2b3edc762feb0441309b57978790e947a784f8cc47dfec297531faf54",
+  "aggregate_payload_sha256": "a93b3fb8468b9eb9d0bec62b7370074d082de1dd029647091f2240954d3ffac6",
+  "candidate_identity_violations": 0,
+  "config_sha256": "e469cbec8cc16cfa4a1771bcd848744e5022b62aae3abeac3985a5cc57ebf842",
+  "freeze_receipt_sha256": "16ea1ebdeef971d13caabb4fa2c67cfd4ac66ea0cca69d288b7a78d1f018b618",
+  "fresh_authorized": false,
+  "gate_e": {
+    "coretrieval": {
+      "mean_cold_latency_reduction": -0.1601710551798725,
+      "mean_fetched_bytes_reduction": 0.04206963285856724,
+      "mean_tile_reduction": 0.03954703068077092,
+      "passed": false
+    },
+    "dual": {
+      "mean_cold_latency_reduction": 0.11222291538455686,
+      "mean_fetched_bytes_reduction": 0.6494472871638768,
+      "mean_tile_reduction": 0.639599701531844,
+      "p95_tile_reduction": 0.625,
+      "passed": true
+    },
+    "semantic": {
+      "mean_cold_latency_reduction": 0.7029582850019862,
+      "mean_fetched_bytes_reduction": 0.7353275994255903,
+      "mean_tile_reduction": 0.7335732783215556,
+      "p95_tile_reduction": 0.6666666666666667,
+      "passed": true
+    }
+  },
+  "gate_e_promoted": ["semantic", "dual"],
+  "gate_f": {
+    "dual_graph_only_32": {
+      "dominated_by": [],
+      "mean_net_gain_vs_dense_ms": -24.017591171955726,
+      "mean_net_gain_vs_full_ms": 5450.5946981457955,
+      "mean_net_gain_vs_ivf_ms": -7.1760605247232485,
+      "passed": true,
+      "total_warm_ms_mean": 1891.6857461463646
+    },
+    "semantic_graph_only_32": {
+      "dominated_by": [],
+      "mean_net_gain_vs_dense_ms": -33.49119373726938,
+      "mean_net_gain_vs_full_ms": 5441.121095580483,
+      "mean_net_gain_vs_ivf_ms": -16.649663090036903,
+      "passed": true,
+      "total_warm_ms_mean": 1901.1593487116786
+    }
+  },
+  "gate_f_promoted": ["semantic_graph_only_32", "dual_graph_only_32"],
+  "physical_byte_conservation_violations": 0,
+  "query_count": 1355,
+  "rows_sha256": "8813ce0f389bbb4015b1b4c69da8eaacc0b3eaa7d5be8e8a4c9beaeae284e1d0",
+  "run_id": "v30_layout_io_e2e_20260719",
+  "runtime_seconds": 726.5593785787933,
+  "schema_version": "method1-v30-layout-io-e2e-success-receipt-1",
+  "snapshot_manifest_sha256": "f2271cccae56995c34a955be7f13920078213917df27088b66bcda5f804e6cec",
+  "status": "GATES_E_AND_F_PASSED"
+}

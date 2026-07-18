@@ -1,6 +1,6 @@
 # Method 1 v30: Causal Graph Answerability Refinement
 
-Status: `CORRECTED_QWEN_GATE_D_PASSED_SYSTEM_PENDING`
+Status: `GATES_C_TO_F_PASSED_INCREMENTAL_PENDING`
 
 v30 continues the Graph-only Method 1 path after v28 passed Frontier Gate C
 but failed Qwen Gate D and v29 rejected linear graph/Qwen rank fusion. It does
@@ -41,3 +41,13 @@ Fresh remains locked until physical Tile/I/O, end-to-end Pareto, and causal
 incremental Gates E-G are completed. The 2,048-token validity repair also
 increased estimated 32-candidate Qwen time to about 1.82 seconds, so quality
 closure does not imply system closure.
+
+The immutable physical Tile and end-to-end run passed Gate E for Semantic and
+Dual layouts and Gate F for both graph methods. Semantic layout reduced mean
+activated Tiles by 73.36%, fetched bytes by 73.53%, and requested-cold read
+latency by 70.30% versus chronological layout. Co-retrieval layout failed and
+is retained as a negative Access result. Graph methods were slower than
+Dense/IVF by 16-34 ms but had higher final quality, so neither baseline
+strictly dominated them; both remained much faster than Full-128.
+
+Gate G causal incremental replay is still required. Fresh is still locked.
