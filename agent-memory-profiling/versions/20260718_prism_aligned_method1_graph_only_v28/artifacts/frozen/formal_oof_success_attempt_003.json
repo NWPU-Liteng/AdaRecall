@@ -1,0 +1,17 @@
+{
+  "schema_version": "method1-v28-formal-oof-success-1",
+  "status": "FRONTIER_OOF_COMPLETE",
+  "freeze_attempt": 3,
+  "run_id": "v28_frontier_oof_20260719_attempt003_913cd3f",
+  "git_commit": "913cd3f6f5bea30882a67bd614c33112a83a3bad",
+  "config_sha256": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+  "query_count": 1355,
+  "row_count": 8130,
+  "snapshot_count": 148,
+  "rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "aggregate_sha256": "8a618b0b958f64597e4064996126e51fb50d0ee0bf3dbf3cde9fcfe1f0f7de99",
+  "snapshot_manifest_sha256": "982c1595fed5d0f6501c5bb7dfc3acf52dab2fb8a28b0d8afff6d7af09f5b88b",
+  "semantic_gate_c_passed": true,
+  "dual_gate_c_passed": true,
+  "overwrite_performed": false
+}

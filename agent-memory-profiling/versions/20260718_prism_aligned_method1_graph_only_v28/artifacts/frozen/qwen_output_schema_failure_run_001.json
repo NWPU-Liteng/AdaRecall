@@ -1,0 +1,18 @@
+{
+  "schema_version": "method1-v28-qwen-output-audit-1",
+  "status": "QWEN_OUTPUT_SCHEMA_INCOMPLETE",
+  "run_id": "v28_qwen_oof_20260719_gatec",
+  "frontier_run_id": "v28_frontier_oof_20260719_attempt003_913cd3f",
+  "query_count": 1355,
+  "row_count": 8130,
+  "all_candidates_scored": true,
+  "full_ranking_persisted": false,
+  "top10_persisted": true,
+  "top5_persisted": true,
+  "rows_sha256": "559c03dd5206b3383a6a5b8b0fde177c083a5f55d156fc4897bae91cf6258763",
+  "aggregate_sha256": "50faae487e4928adf22b5063cb456b6dc9398e35440e1019a557883394a5b74e",
+  "gate_d_promoted": [],
+  "reuse_for_full_ranking_analysis": false,
+  "repair_scope": "persist the already-computed full ranking and scores in a new immutable run; model, candidates, prompt, max length, batch size, metrics, and Gate unchanged",
+  "overwrite_performed": false
+}

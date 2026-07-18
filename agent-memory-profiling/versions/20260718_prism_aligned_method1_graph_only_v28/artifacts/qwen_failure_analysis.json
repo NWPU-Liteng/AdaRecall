@@ -1,0 +1,28 @@
+{
+  "schema_version": "method1-v28-qwen-failure-analysis-1",
+  "scientific_scope": "post-Gate-D diagnosis; not preregistered promotion evidence",
+  "frontier_run_id": "v28_frontier_oof_20260719_attempt003_913cd3f",
+  "qwen_run_id": "v28_qwen_oof_20260719_gatec",
+  "semantic_graph_only_32": {
+    "queries_graph_adds_gold": 55,
+    "queries_graph_loses_dense_gold": 36,
+    "added_gold_total": 55,
+    "lost_gold_total": 37,
+    "top10_recall": 0.022755227552275523,
+    "dense_top10_recall": 0.025215252152521524,
+    "top10_delta": -0.002460024600246002,
+    "novel_gold_promoted_to_top5_queries": 6
+  },
+  "dual_graph_only_32": {
+    "queries_graph_adds_gold": 56,
+    "queries_graph_loses_dense_gold": 36,
+    "added_gold_total": 56,
+    "lost_gold_total": 37,
+    "top10_recall": 0.02164821648216482,
+    "dense_top10_recall": 0.025215252152521524,
+    "top10_delta": -0.0035670356703567034,
+    "novel_gold_promoted_to_top5_queries": 5
+  },
+  "diagnosis": "Graph-only increases frontier evidence, but pairwise Qwen promotes very few graph-novel gold memories into Top-5; optimize the graph/Qwen posterior interface without changing candidate purity",
+  "prohibited_response": "do not add Dense fallback, Dense score, BM25 score, or post-hoc v28 Gate changes"
+}
