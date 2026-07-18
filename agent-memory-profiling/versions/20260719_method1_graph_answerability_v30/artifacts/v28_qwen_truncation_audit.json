@@ -1,0 +1,69 @@
+{
+  "all_semantic_candidates": {
+    "count": 43360,
+    "maximum": 2548,
+    "mean": 816.7485009225093,
+    "median": 786.0,
+    "over_1024_count": 7603,
+    "over_1024_rate": 0.17534594095940959,
+    "over_2048_count": 92,
+    "over_2048_rate": 0.002121771217712177,
+    "over_512_count": 39344,
+    "over_512_rate": 0.907380073800738,
+    "p95": 1328.0
+  },
+  "by_candidate_role": {
+    "graph_novel_gold": {
+      "count": 55,
+      "maximum": 1579,
+      "mean": 1032.090909090909,
+      "median": 1021.0,
+      "over_1024_count": 27,
+      "over_1024_rate": 0.4909090909090909,
+      "over_2048_count": 0,
+      "over_2048_rate": 0.0,
+      "over_512_count": 55,
+      "over_512_rate": 1.0,
+      "p95": 1495.1999999999998
+    },
+    "selected_false_positive": {
+      "count": 43265,
+      "maximum": 2548,
+      "mean": 816.3732809430255,
+      "median": 786.0,
+      "over_1024_count": 7568,
+      "over_1024_rate": 0.17492199237258754,
+      "over_2048_count": 92,
+      "over_2048_rate": 0.002126430139835895,
+      "over_512_count": 39250,
+      "over_512_rate": 0.9071998150930313,
+      "p95": 1328.0
+    },
+    "shared_gold": {
+      "count": 40,
+      "maximum": 1576,
+      "mean": 926.5,
+      "median": 922.0,
+      "over_1024_count": 8,
+      "over_1024_rate": 0.2,
+      "over_2048_count": 0,
+      "over_2048_rate": 0.0,
+      "over_512_count": 39,
+      "over_512_rate": 0.975,
+      "p95": 1409.8
+    }
+  },
+  "chat_template_prefix_tokens_for_short_audit_query": 63,
+  "chat_template_suffix_tokens": 9,
+  "fresh_authorized": false,
+  "frontier_rows_sha256": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+  "model_path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Reranker-0.6B",
+  "required_fix": "preserve chat prefix and assistant generation suffix; apply identical document-window policy to every retrieval method",
+  "right_truncation_removes_generation_suffix_when_over_budget": true,
+  "schema_version": "method1-v30-qwen-truncation-audit-1",
+  "scientific_scope": "post-hoc engineering validity audit of immutable v28 Qwen input formatting",
+  "status": "TRUNCATION_AUDIT_COMPLETE",
+  "tokenizer_truncation_side": "right",
+  "v28_max_length": 512,
+  "validity_decision": "INVALID_YES_NO_POSITION_FOR_TRUNCATED_PROMPTS"
+}

@@ -1,0 +1,957 @@
+{
+  "immutable_inputs": {
+    "config": "d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b",
+    "frontier": "834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98",
+    "qwen": "439d32655eed0d6e136a181c9b66d373ad54e13937fbe16fe8131eea9e559696"
+  },
+  "interpretation_guard": {
+    "diagnosis_may_promote_configuration": false,
+    "fresh_authorized": false,
+    "gold_may_enter_new_algorithm": false
+  },
+  "pool_gold_not_selected": {
+    "active_edge_cohesion_max": {
+      "mean": 0.8354521878231418,
+      "median": 0.8304574450177655,
+      "p25": 0.816970493130935,
+      "p75": 0.8438514432932036
+    },
+    "active_edge_degree_min": {
+      "mean": 77.57700205338809,
+      "median": 73.0,
+      "p25": 47.0,
+      "p75": 104.0
+    },
+    "active_membership_max": {
+      "mean": 0.39975354444482736,
+      "median": 0.41412144899368286,
+      "p25": 0.2863999754190445,
+      "p75": 0.5005895793437958
+    },
+    "count": 487,
+    "document_characters": {
+      "mean": 3943.7864476386035,
+      "median": 3811.0,
+      "p25": 3203.0,
+      "p75": 4525.0
+    },
+    "document_whitespace_tokens": {
+      "mean": 678.8809034907598,
+      "median": 668.0,
+      "p25": 552.5,
+      "p75": 774.0
+    },
+    "graph_score": {
+      "mean": 0.19924115368516593,
+      "median": 0.10888002067804337,
+      "p25": 0.05233269929885864,
+      "p75": 0.24352353066205978
+    },
+    "pool_rank_by_x_sem": {
+      "mean": 140.48254620123203,
+      "median": 139.0,
+      "p25": 83.0,
+      "p75": 195.0
+    },
+    "x_sem": {
+      "mean": 0.0026814390721964397,
+      "median": 0.0018717587227001786,
+      "p25": 0.001013880013488233,
+      "p75": 0.0035873757442459464
+    }
+  },
+  "query_count": 1355,
+  "qwen_stage_dual": {
+    "by_fold": {
+      "0": {
+        "dense_frontier_gold": 8,
+        "dense_only_gold": 5,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 14,
+        "graph_novel_gold": 11,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 3
+      },
+      "1": {
+        "dense_frontier_gold": 18,
+        "dense_only_gold": 11,
+        "dense_top5_gold": 7,
+        "graph_frontier_gold": 17,
+        "graph_novel_gold": 10,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 3
+      },
+      "2": {
+        "dense_frontier_gold": 13,
+        "dense_only_gold": 6,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 16,
+        "graph_novel_gold": 9,
+        "graph_novel_gold_top5": 2,
+        "graph_top5_gold": 3
+      },
+      "3": {
+        "dense_frontier_gold": 12,
+        "dense_only_gold": 5,
+        "dense_top5_gold": 6,
+        "graph_frontier_gold": 21,
+        "graph_novel_gold": 13,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 4
+      },
+      "4": {
+        "dense_frontier_gold": 23,
+        "dense_only_gold": 9,
+        "dense_top5_gold": 11,
+        "graph_frontier_gold": 26,
+        "graph_novel_gold": 13,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 4
+      }
+    },
+    "by_namespace": {
+      "1": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "10": {
+        "dense_frontier_gold": 2,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "11": {
+        "dense_frontier_gold": 1,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 3,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "12": {
+        "dense_frontier_gold": 8,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 9,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "13": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "14": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "15": {
+        "dense_frontier_gold": 0,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 2,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "16": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "17": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "18": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "19": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "2": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "20": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 4,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "3": {
+        "dense_frontier_gold": 0,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 1,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "4": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 2
+      },
+      "5": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 4,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "6": {
+        "dense_frontier_gold": 5,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "7": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 3,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "8": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 7,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "9": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 2
+      }
+    },
+    "by_query_type": {
+      "entity_exact_match": {
+        "dense_frontier_gold": 7,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 7,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "inference_generation": {
+        "dense_frontier_gold": 14,
+        "dense_only_gold": 7,
+        "dense_top5_gold": 6,
+        "graph_frontier_gold": 18,
+        "graph_novel_gold": 12,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 3
+      },
+      "multi_hop_clinical_deduction": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 7,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "multiple_choice": {
+        "dense_frontier_gold": 36,
+        "dense_only_gold": 20,
+        "dense_top5_gold": 11,
+        "graph_frontier_gold": 36,
+        "graph_novel_gold": 19,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 4
+      },
+      "state_update": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 7,
+        "graph_novel_gold": 5,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "temporal_localization": {
+        "dense_frontier_gold": 7,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 5,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 6,
+        "graph_novel_gold_top5": 2,
+        "graph_top5_gold": 5
+      }
+    },
+    "overall_query_counts": {
+      "dense_frontier_gold": 74,
+      "dense_only_gold": 36,
+      "dense_top5_gold": 30,
+      "graph_frontier_gold": 94,
+      "graph_novel_gold": 56,
+      "graph_novel_gold_top5": 5,
+      "graph_top5_gold": 17
+    }
+  },
+  "qwen_stage_semantic": {
+    "by_fold": {
+      "0": {
+        "dense_frontier_gold": 8,
+        "dense_only_gold": 5,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 14,
+        "graph_novel_gold": 11,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 3
+      },
+      "1": {
+        "dense_frontier_gold": 18,
+        "dense_only_gold": 11,
+        "dense_top5_gold": 7,
+        "graph_frontier_gold": 17,
+        "graph_novel_gold": 10,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 3
+      },
+      "2": {
+        "dense_frontier_gold": 13,
+        "dense_only_gold": 6,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 16,
+        "graph_novel_gold": 9,
+        "graph_novel_gold_top5": 2,
+        "graph_top5_gold": 3
+      },
+      "3": {
+        "dense_frontier_gold": 12,
+        "dense_only_gold": 5,
+        "dense_top5_gold": 6,
+        "graph_frontier_gold": 20,
+        "graph_novel_gold": 12,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 4
+      },
+      "4": {
+        "dense_frontier_gold": 23,
+        "dense_only_gold": 9,
+        "dense_top5_gold": 11,
+        "graph_frontier_gold": 26,
+        "graph_novel_gold": 13,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 5
+      }
+    },
+    "by_namespace": {
+      "1": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "10": {
+        "dense_frontier_gold": 2,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "11": {
+        "dense_frontier_gold": 1,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 3,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "12": {
+        "dense_frontier_gold": 8,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 9,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "13": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "14": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "15": {
+        "dense_frontier_gold": 0,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 2,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "16": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "17": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "18": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 6,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "19": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "2": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "20": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 4,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "3": {
+        "dense_frontier_gold": 0,
+        "dense_only_gold": 0,
+        "dense_top5_gold": 0,
+        "graph_frontier_gold": 1,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "4": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 2
+      },
+      "5": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 4,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 3,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "6": {
+        "dense_frontier_gold": 5,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 5,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 0
+      },
+      "7": {
+        "dense_frontier_gold": 3,
+        "dense_only_gold": 1,
+        "dense_top5_gold": 1,
+        "graph_frontier_gold": 3,
+        "graph_novel_gold": 1,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 1
+      },
+      "8": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 3,
+        "graph_frontier_gold": 7,
+        "graph_novel_gold": 4,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "9": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 4,
+        "graph_novel_gold": 2,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 2
+      }
+    },
+    "by_query_type": {
+      "entity_exact_match": {
+        "dense_frontier_gold": 7,
+        "dense_only_gold": 3,
+        "dense_top5_gold": 4,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 7,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "inference_generation": {
+        "dense_frontier_gold": 14,
+        "dense_only_gold": 7,
+        "dense_top5_gold": 6,
+        "graph_frontier_gold": 18,
+        "graph_novel_gold": 12,
+        "graph_novel_gold_top5": 2,
+        "graph_top5_gold": 4
+      },
+      "multi_hop_clinical_deduction": {
+        "dense_frontier_gold": 6,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 7,
+        "graph_novel_gold_top5": 1,
+        "graph_top5_gold": 2
+      },
+      "multiple_choice": {
+        "dense_frontier_gold": 36,
+        "dense_only_gold": 20,
+        "dense_top5_gold": 11,
+        "graph_frontier_gold": 35,
+        "graph_novel_gold": 18,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 4
+      },
+      "state_update": {
+        "dense_frontier_gold": 4,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 2,
+        "graph_frontier_gold": 7,
+        "graph_novel_gold": 5,
+        "graph_novel_gold_top5": 0,
+        "graph_top5_gold": 1
+      },
+      "temporal_localization": {
+        "dense_frontier_gold": 7,
+        "dense_only_gold": 2,
+        "dense_top5_gold": 5,
+        "graph_frontier_gold": 11,
+        "graph_novel_gold": 6,
+        "graph_novel_gold_top5": 2,
+        "graph_top5_gold": 5
+      }
+    },
+    "overall_query_counts": {
+      "dense_frontier_gold": 74,
+      "dense_only_gold": 36,
+      "dense_top5_gold": 30,
+      "graph_frontier_gold": 93,
+      "graph_novel_gold": 55,
+      "graph_novel_gold_top5": 6,
+      "graph_top5_gold": 18
+    }
+  },
+  "schema_version": "method1-v30-v28-mechanism-diagnosis-1",
+  "scientific_scope": "gold-aware post-hoc analysis of consumed train OOF; not promotion evidence",
+  "selected_candidate_features_by_role": {
+    "graph_novel_gold": {
+      "active_edge_cohesion_max": {
+        "mean": 0.8611049085434459,
+        "median": 0.8546153666461338,
+        "p25": 0.8224143932827054,
+        "p75": 0.8897917614762555
+      },
+      "active_edge_count": {
+        "mean": 2.5636363636363635,
+        "median": 3.0,
+        "p25": 2.0,
+        "p75": 3.0
+      },
+      "active_edge_degree_min": {
+        "mean": 32.50909090909091,
+        "median": 26.0,
+        "p25": 18.0,
+        "p75": 41.5
+      },
+      "active_membership_max": {
+        "mean": 0.6719441294670105,
+        "median": 0.6430492997169495,
+        "p25": 0.5590756833553314,
+        "p75": 0.7702576816082001
+      },
+      "count": 55,
+      "coverage_and_facility_zero": {
+        "mean": 0.05454545454545454,
+        "median": 0.0,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "document_characters": {
+        "mean": 4086.3454545454547,
+        "median": 4066.0,
+        "p25": 3402.0,
+        "p75": 4736.0
+      },
+      "document_whitespace_tokens": {
+        "mean": 695.3454545454546,
+        "median": 697.0,
+        "p25": 581.0,
+        "p75": 779.5
+      },
+      "edge_coverage_marginal": {
+        "mean": 0.006958618592613096,
+        "median": 0.001177530037239194,
+        "p25": 0.0,
+        "p75": 0.007801787927746773
+      },
+      "facility_marginal": {
+        "mean": 0.002249023426259722,
+        "median": 0.00015053863637149334,
+        "p25": 6.362751591950655e-06,
+        "p75": 0.0012526889890432358
+      },
+      "qwen_rank": {
+        "mean": 15.618181818181819,
+        "median": 14.0,
+        "p25": 9.0,
+        "p75": 23.5
+      },
+      "qwen_score": {
+        "mean": 0.11284788121807982,
+        "median": 0.04535257816314697,
+        "p25": 0.010464104823768139,
+        "p75": 0.1465812772512436
+      },
+      "relevance_marginal": {
+        "mean": 0.6587668681686575,
+        "median": 0.7560280561447144,
+        "p25": 0.3554874658584595,
+        "p75": 0.9260329604148865
+      },
+      "selection_order": {
+        "mean": 16.036363636363635,
+        "median": 18.0,
+        "p25": 7.0,
+        "p75": 25.0
+      },
+      "total_marginal": {
+        "mean": 0.6679745101875303,
+        "median": 0.7580978177394718,
+        "p25": 0.3806673888443038,
+        "p75": 0.9333996231104357
+      },
+      "x_sem": {
+        "mean": 0.012094567275860092,
+        "median": 0.01071860920637846,
+        "p25": 0.007460641209036112,
+        "p75": 0.014999598264694214
+      }
+    },
+    "selected_false_positive": {
+      "active_edge_cohesion_max": {
+        "mean": 0.895503122765435,
+        "median": 0.8975358297084662,
+        "p25": 0.8633287163761525,
+        "p75": 0.943763299410596
+      },
+      "active_edge_count": {
+        "mean": 2.8541315150814746,
+        "median": 3.0,
+        "p25": 3.0,
+        "p75": 3.0
+      },
+      "active_edge_degree_min": {
+        "mean": 41.48660580145614,
+        "median": 37.0,
+        "p25": 26.0,
+        "p75": 47.0
+      },
+      "active_membership_max": {
+        "mean": 0.6665065897505752,
+        "median": 0.6694642305374146,
+        "p25": 0.5318233966827393,
+        "p75": 0.7981099486351013
+      },
+      "count": 43265,
+      "coverage_and_facility_zero": {
+        "mean": 0.014561423783658847,
+        "median": 0.0,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "document_characters": {
+        "mean": 3126.6983705073385,
+        "median": 2972.0,
+        "p25": 2268.0,
+        "p75": 3744.0
+      },
+      "document_whitespace_tokens": {
+        "mean": 525.8981162602565,
+        "median": 503.0,
+        "p25": 376.0,
+        "p75": 628.0
+      },
+      "edge_coverage_marginal": {
+        "mean": 0.006406616208437575,
+        "median": 0.0017744870856404305,
+        "p25": 0.0,
+        "p75": 0.006056941580027342
+      },
+      "facility_marginal": {
+        "mean": 0.0018645206587396626,
+        "median": 0.00010015839710831643,
+        "p25": 3.6271082353778185e-06,
+        "p75": 0.000944221019744873
+      },
+      "qwen_rank": {
+        "mean": 16.5049115913556,
+        "median": 17.0,
+        "p25": 9.0,
+        "p75": 25.0
+      },
+      "qwen_score": {
+        "mean": 0.1326153339295332,
+        "median": 0.03058881126344204,
+        "p25": 0.004764452576637268,
+        "p75": 0.14033624529838562
+      },
+      "relevance_marginal": {
+        "mean": 0.7318853947726733,
+        "median": 0.8472833633422852,
+        "p25": 0.531751275062561,
+        "p75": 0.9695641398429871
+      },
+      "selection_order": {
+        "mean": 16.50156015254825,
+        "median": 17.0,
+        "p25": 9.0,
+        "p75": 25.0
+      },
+      "total_marginal": {
+        "mean": 0.7401565316398506,
+        "median": 0.8518018294835928,
+        "p25": 0.5404029912129045,
+        "p75": 0.9743618054265233
+      },
+      "x_sem": {
+        "mean": 0.011945182302159274,
+        "median": 0.010736305266618729,
+        "p25": 0.007617352530360222,
+        "p75": 0.013839233666658401
+      }
+    },
+    "shared_gold": {
+      "active_edge_cohesion_max": {
+        "mean": 0.88658480435004,
+        "median": 0.8995204761397176,
+        "p25": 0.8273687547110167,
+        "p75": 0.9432357930919781
+      },
+      "active_edge_count": {
+        "mean": 2.95,
+        "median": 3.0,
+        "p25": 3.0,
+        "p75": 3.0
+      },
+      "active_edge_degree_min": {
+        "mean": 38.325,
+        "median": 34.0,
+        "p25": 18.0,
+        "p75": 42.25
+      },
+      "active_membership_max": {
+        "mean": 0.6361739441752434,
+        "median": 0.612293541431427,
+        "p25": 0.5343934893608093,
+        "p75": 0.7257724106311798
+      },
+      "count": 40,
+      "coverage_and_facility_zero": {
+        "mean": 0.0,
+        "median": 0.0,
+        "p25": 0.0,
+        "p75": 0.0
+      },
+      "document_characters": {
+        "mean": 3632.1,
+        "median": 3597.0,
+        "p25": 3114.5,
+        "p75": 4140.0
+      },
+      "document_whitespace_tokens": {
+        "mean": 625.9,
+        "median": 614.0,
+        "p25": 542.0,
+        "p75": 705.25
+      },
+      "edge_coverage_marginal": {
+        "mean": 0.0070938354787358545,
+        "median": 0.0006561148184118792,
+        "p25": 0.0,
+        "p75": 0.004671277012676001
+      },
+      "facility_marginal": {
+        "mean": 0.002523365789750528,
+        "median": 9.625224862247706e-05,
+        "p25": 2.5931034178938715e-06,
+        "p75": 0.00127227196469903
+      },
+      "qwen_rank": {
+        "mean": 12.4,
+        "median": 9.0,
+        "p25": 4.75,
+        "p75": 17.25
+      },
+      "qwen_score": {
+        "mean": 0.21014730585447977,
+        "median": 0.14217493683099747,
+        "p25": 0.016798445023596287,
+        "p75": 0.2553521692752838
+      },
+      "relevance_marginal": {
+        "mean": 0.7018689872696996,
+        "median": 0.7852044105529785,
+        "p25": 0.505929172039032,
+        "p75": 0.9146202057600021
+      },
+      "selection_order": {
+        "mean": 15.45,
+        "median": 15.5,
+        "p25": 9.0,
+        "p75": 21.0
+      },
+      "total_marginal": {
+        "mean": 0.711486188538186,
+        "median": 0.793209638763219,
+        "p25": 0.5065162599746145,
+        "p75": 0.916362036310602
+      },
+      "x_sem": {
+        "mean": 0.016142860491527244,
+        "median": 0.013619419187307358,
+        "p25": 0.008836446329951286,
+        "p75": 0.020084785763174295
+      }
+    }
+  },
+  "semantic_reproduction_mismatches": 0,
+  "snapshot_count": 148,
+  "snapshot_structure": {
+    "maximum_coarse_degree": 639,
+    "mean_coarse_cohesion": 0.8400043595129288,
+    "mean_coarse_degree_p95": 228.35439189189188,
+    "snapshots_with_children": 101,
+    "total_child_edges": 1090
+  },
+  "stage_counts": {
+    "active_child_queries": 807,
+    "gold_in_active_pool_queries": 508,
+    "gold_pool_but_not_selected_queries": 435,
+    "gold_selected_queries": 93,
+    "graph_novel_gold_queries": 55,
+    "queries": 1355
+  },
+  "status": "POSTHOC_DIAGNOSIS_COMPLETE_NO_PROMOTION"
+}
