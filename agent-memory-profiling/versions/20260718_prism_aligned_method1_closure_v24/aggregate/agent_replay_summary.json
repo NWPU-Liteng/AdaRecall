@@ -1,0 +1,27 @@
+{
+  "methods": {
+    "dense_c": {
+      "reference_agreement_final": 0.012451171875,
+      "reference_agreement_frontier": 0.056884765625,
+      "reranker_pairs_sum": 4096,
+      "semantic_selection_ms_sum": 101098.55424496345
+    },
+    "full_n": {
+      "reference_agreement_final": 0.012939453125,
+      "reference_agreement_frontier": 0.206298828125,
+      "reranker_pairs_sum": 16384,
+      "semantic_selection_ms_sum": 400034.66456593014
+    },
+    "ours_c": {
+      "reference_agreement_final": 0.01318359375,
+      "reference_agreement_frontier": 0.062255859375,
+      "reranker_pairs_sum": 4096,
+      "semantic_selection_ms_sum": 102101.0105824098
+    }
+  },
+  "quality_non_decreasing_vs_full": true,
+  "run_id": "v24_agent_replay_20260718",
+  "status": "COMPLETED",
+  "task_success_available": false,
+  "tasks": 128
+}

@@ -1,0 +1,43 @@
+{
+  "artifacts": {
+    "history_edges": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/runs/v24_index_20260718/index/history_edges.json",
+    "semantic_incidence": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/runs/v24_index_20260718/index/semantic_incidence.npz",
+    "semantic_prototypes": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/runs/v24_index_20260718/index/semantic_prototypes.npy"
+  },
+  "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+  "history": {
+    "build_ms": 84.59322503767908,
+    "edge_count": 1355,
+    "event_kind_counts": {
+      "co_candidate": 1355
+    },
+    "event_size_max": 32,
+    "event_size_mean": 32.0,
+    "event_size_median": 32.0,
+    "singleton_events_dropped": 0,
+    "source_semantics": "co_candidate_only",
+    "support_mean": 1.0,
+    "task_success_available": false
+  },
+  "index_run_id": "v24_index_20260718",
+  "semantic": {
+    "assignment_entropy_mean": 1.341333083122814,
+    "assignment_entropy_p95": 1.3857472777366637,
+    "build_ms": 10518.776392098516,
+    "effective_membership_count_mean": 4.0,
+    "finite": true,
+    "health_passed": true,
+    "incidence_nnz": 168136,
+    "max_prototype_mass_fraction": 0.032383162278865556,
+    "member_count_max": 1361,
+    "member_count_median": 288.42962646484375,
+    "member_count_min": 8,
+    "nonempty_prototype_fraction": 1.0,
+    "nonempty_prototypes": 128,
+    "prototype_collapse_flag": false,
+    "prototype_count": 128,
+    "prototype_pairwise_cosine_max": 0.9916913509368896,
+    "prototype_pairwise_cosine_mean": 0.5146576166152954,
+    "temperature": 0.1
+  }
+}

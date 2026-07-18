@@ -1,0 +1,169 @@
+{
+  "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+  "development_gate": {
+    "backend": "qwen3",
+    "candidate_gate_passed": true,
+    "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+    "cost": {
+      "candidate_reduction": 0.75,
+      "dense_semantic_selection_ms": {
+        "count": 290,
+        "mean": 787.8371884580702,
+        "median": 787.8513964824378
+      },
+      "full_semantic_selection_ms": {
+        "count": 290,
+        "mean": 3120.9261224532884,
+        "median": 3115.1884575374424
+      },
+      "net_gain_ms": {
+        "count": 290,
+        "mean": 2328.1605583655746,
+        "median": 2325.7022919133306
+      },
+      "ours_semantic_selection_ms": {
+        "count": 290,
+        "mean": 792.7655640877141,
+        "median": 793.2406064355746
+      }
+    },
+    "cost_passed": true,
+    "deltas": {
+      "candidate_recall_final": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0034482758620689655,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.0,
+          "median": 0.0
+        }
+      },
+      "evidence_group_coverage_final": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.006896551724137931,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.00632183908045977,
+          "median": 0.0
+        }
+      },
+      "ndcg_at_10": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0014850915795634244,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": -0.002114300664708477,
+          "median": 0.0
+        }
+      },
+      "precision_at_k": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0006896551724137932,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.0,
+          "median": 0.0
+        }
+      }
+    },
+    "epsilon_dense": 0.005,
+    "epsilon_full": 0.01,
+    "full_non_inferior": true,
+    "index_run_id": "v24_index_20260718",
+    "passed": true,
+    "positive_quality_signal": true,
+    "quality_non_negative": true,
+    "query_count": 290,
+    "run_id": "v24_development_20260718",
+    "safety_passed": true,
+    "stage": "development",
+    "test_read_status": "not_read"
+  },
+  "development_run_id": "v24_development_20260718",
+  "resolved_config": {
+    "budget": {
+      "expanded_pool_cap": 256,
+      "final_k": 5,
+      "frontier_c": 32,
+      "full_n": 128,
+      "sanity_final_k": 5,
+      "sanity_frontier_c": 10,
+      "sanity_full_n": 20,
+      "seed_s": 16
+    },
+    "config_path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/configs/closure_main.json",
+    "data": {
+      "development_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_calibration.jsonl",
+      "frozen_train_retrieval": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/frozen_train/retrieved_contexts_flat_graph_hyper.jsonl",
+      "memory_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/memory_medmemorybench_v3/memory_items_turn_pair.jsonl",
+      "test_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_test.jsonl",
+      "train_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_train.jsonl"
+    },
+    "diffusion": {
+      "alpha_restart": 0.8,
+      "beta_dense": 0.7,
+      "history_weight": 0.25,
+      "steps": 2
+    },
+    "gate": {
+      "bootstrap_seed": 20260718,
+      "dense_quality_epsilon": 0.005,
+      "full_quality_epsilon": 0.01,
+      "require_positive_net_gain": true,
+      "test_once": true
+    },
+    "git_commit": "75def25b15799752bb6177a215d774bb2458a518",
+    "history_hypergraph": {
+      "activation_temperature": 0.1,
+      "event_kind": "co_candidate",
+      "max_event_size": 32,
+      "top_active_edges": 32
+    },
+    "model": {
+      "attention": "sdpa",
+      "dtype": "bfloat16",
+      "embedding_batch_size": 16,
+      "embedding_model_dir": "models/models/Qwen3-Embedding-0.6B",
+      "embedding_repo": "Qwen/Qwen3-Embedding-0.6B",
+      "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it.",
+      "max_length": 512,
+      "reranker_batch_size": 8,
+      "reranker_model_dir": "models/models/Qwen3-Reranker-0.6B",
+      "reranker_repo": "Qwen/Qwen3-Reranker-0.6B"
+    },
+    "project_root": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling",
+    "random_seed": 20260718,
+    "reranker": {
+      "backend": "qwen3",
+      "batch_size": 8,
+      "device": "auto",
+      "dtype": "bfloat16",
+      "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it.",
+      "max_length": 512
+    },
+    "schema_version": "method1-prism-aligned-v24",
+    "semantic_hypergraph": {
+      "activation_temperature": 0.1,
+      "n_prototypes": 128,
+      "temperature": 0.1,
+      "top_active_edges": 16,
+      "top_memberships": 4
+    },
+    "version": "20260718_prism_aligned_method1_closure_v24",
+    "version_root": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24"
+  },
+  "status": "FROZEN_FOR_TEST",
+  "test_read_status": "not_read"
+}

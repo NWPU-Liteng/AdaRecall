@@ -1,16 +1,18 @@
 # Experiment Version Index
 
-Updated: 2026-07-17
+Updated: 2026-07-18
 
-## Single Canonical Package
+## Active Packages
 
-Only one runnable experiment package remains under `versions/`. The separate
-`motivation_experiments/` directory is a read-only historical track and is not
-an alternative Method 1 implementation.
+The v21 package remains the consolidated historical mainline. The independent
+v24 package is the PRISM-aligned pre-reranker closure implementation and keeps
+its failed formal quality Gate as an immutable baseline. The separate
+`motivation_experiments/` directory remains a read-only historical track.
 
 | Package | Role |
 |---|---|
 | [`20260714_method1_fsa_dynamic_hypergraph_v21`](20260714_method1_fsa_dynamic_hypergraph_v21) | Method 1 FSA-QEHG mainline, all current v21 configurations/results, consolidated inputs, and historical provenance. |
+| [`20260718_prism_aligned_method1_closure_v24`](20260718_prism_aligned_method1_closure_v24) | PRISM-aligned Qwen3 dual-view hypergraph closure. Engineering, development, test-once, and replay paths completed; formal Gate E quality failed and is preserved without test retuning. |
 
 The independent motivation archive is documented at
 [`motivation_experiments/README.md`](motivation_experiments/README.md). It

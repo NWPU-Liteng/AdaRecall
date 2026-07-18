@@ -1,0 +1,172 @@
+{
+  "agent_replay": {
+    "methods": {
+      "dense_c": {
+        "reference_agreement_final": 0.012451171875,
+        "reference_agreement_frontier": 0.056884765625,
+        "reranker_pairs_sum": 4096,
+        "semantic_selection_ms_sum": 101098.55424496345
+      },
+      "full_n": {
+        "reference_agreement_final": 0.012939453125,
+        "reference_agreement_frontier": 0.206298828125,
+        "reranker_pairs_sum": 16384,
+        "semantic_selection_ms_sum": 400034.66456593014
+      },
+      "ours_c": {
+        "reference_agreement_final": 0.01318359375,
+        "reference_agreement_frontier": 0.062255859375,
+        "reranker_pairs_sum": 4096,
+        "semantic_selection_ms_sum": 102101.0105824098
+      }
+    },
+    "quality_non_decreasing_vs_full": true,
+    "run_id": "v24_agent_replay_20260718",
+    "status": "COMPLETED",
+    "task_success_available": false,
+    "tasks": 128
+  },
+  "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+  "development_gate": {
+    "backend": "qwen3",
+    "candidate_gate_passed": true,
+    "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+    "cost": {
+      "candidate_reduction": 0.75,
+      "dense_semantic_selection_ms": {
+        "count": 290,
+        "mean": 787.8371884580702,
+        "median": 787.8513964824378
+      },
+      "full_semantic_selection_ms": {
+        "count": 290,
+        "mean": 3120.9261224532884,
+        "median": 3115.1884575374424
+      },
+      "net_gain_ms": {
+        "count": 290,
+        "mean": 2328.1605583655746,
+        "median": 2325.7022919133306
+      },
+      "ours_semantic_selection_ms": {
+        "count": 290,
+        "mean": 792.7655640877141,
+        "median": 793.2406064355746
+      }
+    },
+    "cost_passed": true,
+    "deltas": {
+      "candidate_recall_final": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0034482758620689655,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.0,
+          "median": 0.0
+        }
+      },
+      "evidence_group_coverage_final": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.006896551724137931,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.00632183908045977,
+          "median": 0.0
+        }
+      },
+      "ndcg_at_10": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0014850915795634244,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": -0.002114300664708477,
+          "median": 0.0
+        }
+      },
+      "precision_at_k": {
+        "ours_minus_dense": {
+          "count": 290,
+          "mean": 0.0006896551724137932,
+          "median": 0.0
+        },
+        "ours_minus_full": {
+          "count": 290,
+          "mean": 0.0,
+          "median": 0.0
+        }
+      }
+    },
+    "epsilon_dense": 0.005,
+    "epsilon_full": 0.01,
+    "full_non_inferior": true,
+    "index_run_id": "v24_index_20260718",
+    "passed": true,
+    "positive_quality_signal": true,
+    "quality_non_negative": true,
+    "query_count": 290,
+    "run_id": "v24_development_20260718",
+    "safety_passed": true,
+    "stage": "development",
+    "test_read_status": "not_read"
+  },
+  "figures": [
+    "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/figures/ndcg_at_10_by_method.png",
+    "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/figures/total_ms_by_method.png",
+    "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/figures/latency_curve.png"
+  ],
+  "gate_a_model_passed": true,
+  "gate_b_data_passed": true,
+  "status": "METHOD1_CLOSURE_FAILED_OR_INCOMPLETE",
+  "test_comparison": {
+    "net_gain_ms": {
+      "ci95": [
+        2324.8565970513378,
+        2335.6071452817137
+      ],
+      "count": 290,
+      "mean": 2329.753160137876,
+      "median": 2326.1072036111727
+    },
+    "ours_minus_dense_ndcg": {
+      "ci95": [
+        -0.006526859519704733,
+        0.0
+      ],
+      "count": 290,
+      "mean": -0.0021756198399015777,
+      "median": 0.0
+    },
+    "ours_minus_full_ndcg": {
+      "ci95": [
+        -0.007425457897817122,
+        0.0
+      ],
+      "count": 290,
+      "mean": -0.002970183159126849,
+      "median": 0.0
+    },
+    "query_count": 290
+  },
+  "test_cost_passed": true,
+  "test_quality_checks": {
+    "dense_ci_lower_within_epsilon": false,
+    "dense_mean_non_negative": false,
+    "full_ci_lower_within_epsilon": true
+  },
+  "test_quality_passed": false,
+  "test_read_status": "read_once",
+  "test_status": {
+    "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/runs/v24_test_once_20260718/query_results.jsonl",
+    "rows": 870,
+    "status": "COMPLETED_ONCE"
+  }
+}

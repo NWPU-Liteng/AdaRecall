@@ -1,0 +1,68 @@
+{
+  "schema_version": "method1-prism-aligned-v24",
+  "version": "20260718_prism_aligned_method1_closure_v24",
+  "random_seed": 20260718,
+  "data": {
+    "memory_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/memory_medmemorybench_v3/memory_items_turn_pair.jsonl",
+    "train_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_train.jsonl",
+    "development_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_calibration.jsonl",
+    "test_query_source": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/query_split/query_plan_test.jsonl",
+    "frozen_train_retrieval": "versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/frozen_train/retrieved_contexts_flat_graph_hyper.jsonl"
+  },
+  "model": {
+    "embedding_repo": "Qwen/Qwen3-Embedding-0.6B",
+    "reranker_repo": "Qwen/Qwen3-Reranker-0.6B",
+    "embedding_model_dir": "models/models/Qwen3-Embedding-0.6B",
+    "reranker_model_dir": "models/models/Qwen3-Reranker-0.6B",
+    "dtype": "bfloat16",
+    "attention": "sdpa",
+    "max_length": 512,
+    "embedding_batch_size": 16,
+    "reranker_batch_size": 8,
+    "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it."
+  },
+  "budget": {
+    "full_n": 128,
+    "seed_s": 16,
+    "frontier_c": 32,
+    "final_k": 5,
+    "expanded_pool_cap": 256,
+    "sanity_full_n": 20,
+    "sanity_frontier_c": 10,
+    "sanity_final_k": 5
+  },
+  "semantic_hypergraph": {
+    "n_prototypes": 128,
+    "top_memberships": 4,
+    "temperature": 0.10,
+    "top_active_edges": 16,
+    "activation_temperature": 0.10
+  },
+  "history_hypergraph": {
+    "max_event_size": 32,
+    "top_active_edges": 32,
+    "activation_temperature": 0.10,
+    "event_kind": "co_candidate"
+  },
+  "diffusion": {
+    "alpha_restart": 0.80,
+    "steps": 2,
+    "beta_dense": 0.70,
+    "history_weight": 0.25
+  },
+  "reranker": {
+    "backend": "qwen3",
+    "device": "auto",
+    "dtype": "bfloat16",
+    "max_length": 512,
+    "batch_size": 8,
+    "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it."
+  },
+  "gate": {
+    "dense_quality_epsilon": 0.005,
+    "full_quality_epsilon": 0.010,
+    "require_positive_net_gain": true,
+    "bootstrap_seed": 20260718,
+    "test_once": true
+  }
+}

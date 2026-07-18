@@ -1,0 +1,51 @@
+{
+  "causal_fields": {
+    "memory_arrival_order": "session_id",
+    "query_cutoff_order": "query_session_id"
+  },
+  "config_hash": "89ed915ea5286e27b57fa40eac3e00e6cb7f69914856bf192d7e9f38f2fc398d",
+  "gold_location": "*_evaluation.jsonl only",
+  "memory_count": 42034,
+  "namespace_count": 20,
+  "namespace_counts": {
+    "1": 2086,
+    "10": 2084,
+    "11": 2100,
+    "12": 2092,
+    "13": 2096,
+    "14": 2115,
+    "15": 2108,
+    "16": 2115,
+    "17": 2109,
+    "18": 2111,
+    "19": 2095,
+    "2": 2088,
+    "20": 2111,
+    "3": 2095,
+    "4": 2087,
+    "5": 2110,
+    "6": 2107,
+    "7": 2106,
+    "8": 2118,
+    "9": 2101
+  },
+  "query_id_overlaps": {},
+  "schema_version": "method1-v24-canonical-dataset-1",
+  "selector_excluded_fields": [
+    "evidence_groups",
+    "gold_memory_ids",
+    "gold_answers",
+    "query_type"
+  ],
+  "source_hashes": {
+    "development_queries": "673eb7f3ed41d0ea74ba33660050fd9d49dfc4d76584a5b394b3a723dfb84713",
+    "memory": "5055cb3a373f4cc2440f62b06f3bb2b5b0a4b1159fb54f17eb1005846f98d0c0",
+    "test_queries": "a24fdb701d2de4a0410a1661657b763c0c28dd65b3b69b912eebd0ac21ec5a84",
+    "train_queries": "e860fcd05a225f9495bf6aaeff081e087fa13db41c24504baf09c4aaedcbc612"
+  },
+  "split_counts": {
+    "development": 290,
+    "test": 290,
+    "train": 1355
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "dataset": "MedMemoryBench English",
+  "memory_count_expected": 42034,
+  "split_counts_expected": {
+    "train": 1355,
+    "development": 290,
+    "test": 290
+  },
+  "namespace_field": "persona_id",
+  "cutoff_field": "query_session_id",
+  "memory_arrival_field": "session_id",
+  "gold_usage": "evaluation_only"
+}

@@ -41,6 +41,17 @@ venv/
 !/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/
 !/agent-memory-profiling/versions/motivation_experiments/
 
+# Keep the PRISM-aligned v24 implementation and small audit manifests in Git;
+# generated dataset/model/run payloads remain external artifacts.
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/
+!/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/**/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/runs/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/artifacts/environment/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/artifacts/models/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/artifacts/hypergraph/
+/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/figures/
+
 # Keep motivation documentation, source, configs, reports, and figures while
 # excluding its archived data products and formal-run payloads.
 /agent-memory-profiling/versions/motivation_experiments/**/aggregate/

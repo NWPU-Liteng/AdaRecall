@@ -1,0 +1,13 @@
+{
+  "config_hash": "89ed915ea5286e27b57fa40eac3e00e6cb7f69914856bf192d7e9f38f2fc398d",
+  "dropped_short_or_ineligible": 0,
+  "event_count": 1355,
+  "event_kind": "co_candidate",
+  "gold_used": false,
+  "native_agent_read_trace": false,
+  "queries_seen": 1355,
+  "schema_version": "method1-v24-history-events-1",
+  "source": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260714_method1_fsa_dynamic_hypergraph_v21/inputs/qa_basis_v1/frozen_train/retrieved_contexts_flat_graph_hyper.jsonl",
+  "source_sha256": "20b860a9ccbc795acbc6bdeafb6614d1706d8f39f4de5130fdc25bb987352933",
+  "test_used": false
+}

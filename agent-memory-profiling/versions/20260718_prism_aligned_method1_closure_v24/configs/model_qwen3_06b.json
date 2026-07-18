@@ -1,0 +1,8 @@
+{
+  "embedding_repo": "Qwen/Qwen3-Embedding-0.6B",
+  "reranker_repo": "Qwen/Qwen3-Reranker-0.6B",
+  "dtype": "bfloat16",
+  "attention": "sdpa",
+  "max_length": 512,
+  "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it."
+}

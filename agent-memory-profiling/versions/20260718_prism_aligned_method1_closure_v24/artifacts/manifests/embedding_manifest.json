@@ -1,0 +1,39 @@
+{
+  "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it.",
+  "max_length": 512,
+  "model_dir": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B",
+  "model_repo": "Qwen/Qwen3-Embedding-0.6B",
+  "records": {
+    "memory": {
+      "dimension": 1024,
+      "dtype": "float32",
+      "ids_path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/memory_ids.json",
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/memory.npy",
+      "rows": 42034
+    },
+    "queries_development": {
+      "dimension": 1024,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/queries_development.npy",
+      "rows": 290
+    },
+    "queries_test": {
+      "dimension": 1024,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/queries_test.npy",
+      "rows": 290
+    },
+    "queries_train": {
+      "dimension": 1024,
+      "path": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20260718_prism_aligned_method1_closure_v24/inputs/embeddings/queries_train.npy",
+      "rows": 1355
+    }
+  },
+  "runtime": {
+    "actual_device": "cuda:0",
+    "dimension": 1024,
+    "dtype": "torch.bfloat16",
+    "instruction": "Given a question about a user's history, retrieve memory records that provide the evidence needed to answer it.",
+    "max_length": 512,
+    "model_dir": "/data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/models/models/Qwen3-Embedding-0.6B",
+    "requested_device": "cuda:0"
+  }
+}

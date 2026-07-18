@@ -1,0 +1,24 @@
+{
+  "config_hash": "65d3bba1339cf63ef019b151bfe07b0cc72c1aedcc609f536ceb14bd5faf5fdd",
+  "embedding_backend": "Qwen/Qwen3-Embedding-0.6B",
+  "fairness": [
+    "same visible namespace and causal cutoff",
+    "same memory/query embeddings",
+    "same Qwen3 reranker prompt, max length, dtype, and batch size",
+    "Ours edge activation and diffusion included in semantic_selection_ms"
+  ],
+  "main": {
+    "final_k": 5,
+    "frontier_c": 32,
+    "full_n": 128,
+    "seed_s": 16
+  },
+  "reranker_backend": "Qwen/Qwen3-Reranker-0.6B",
+  "sanity": {
+    "final_k": 5,
+    "frontier_c": 10,
+    "full_n": 20
+  },
+  "schema_version": "method1-v24-candidate-reference-1",
+  "test_read_status": "not_read"
+}
