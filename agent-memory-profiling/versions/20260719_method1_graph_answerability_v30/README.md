@@ -1,6 +1,6 @@
 # Method 1 v30: Causal Graph Answerability Refinement
 
-Status: `GATES_C_TO_F_PASSED_INCREMENTAL_PENDING`
+Status: `METHOD1_GRAPH_ONLY_OOF_CLOSED_AWAITING_FRESH`
 
 v30 continues the Graph-only Method 1 path after v28 passed Frontier Gate C
 but failed Qwen Gate D and v29 rejected linear graph/Qwen rank fusion. It does
@@ -50,4 +50,15 @@ is retained as a negative Access result. Graph methods were slower than
 Dense/IVF by 16-34 ms but had higher final quality, so neither baseline
 strictly dominated them; both remained much faster than Full-128.
 
-Gate G causal incremental replay is still required. Fresh is still locked.
+Gate G passed on 30,755 causal insertions, 148 exact query-boundary
+compactions, and 1,355 explicitly named frozen-policy co-retrieval events.
+Every external snapshot hash, candidate identity, layout check, and causal
+safety check matched with zero violations. Delta insertion P50/P95 was
+0.285/0.407 ms and mean write amplification was 1.021x. Compaction is
+accurately reported as a full exact boundary rebuild (mean 1.343 s), not as a
+local incremental compaction claim.
+
+Gates C-G are now closed on strict train OOF development evidence. LongMemEval,
+LoCoMo, MSC, and MemoryCD all have prior gold-bearing runs in this workspace,
+so none is eligible as a never-read fresh holdout. Fresh remains locked until a
+new compatible dataset can be frozen under the one-read protocol.

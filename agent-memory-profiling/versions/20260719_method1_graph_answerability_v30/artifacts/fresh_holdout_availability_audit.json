@@ -1,0 +1,14 @@
+{
+  "audit_scope": "local dataset names and prior run/manifests only; no new holdout gold was read",
+  "candidates": {
+    "LoCoMo": "ineligible: explicitly consumed and prohibited by the closure guide",
+    "LongMemEval": "ineligible: prior formal and motivation runs exist for LongMemEval-S and full LongMemEval",
+    "MSC": "ineligible: prior formal replay and reranking runs exist",
+    "MemoryCD": "ineligible: prior real-data candidate-frontier and Qwen task-quality runs exist"
+  },
+  "fresh_authorized": false,
+  "fresh_config_status": "NOT_FROZEN",
+  "fresh_gold_consumed_by_this_audit": false,
+  "schema_version": "method1-v30-fresh-availability-audit-1",
+  "status": "NO_ELIGIBLE_UNREAD_LOCAL_HOLDOUT"
+}

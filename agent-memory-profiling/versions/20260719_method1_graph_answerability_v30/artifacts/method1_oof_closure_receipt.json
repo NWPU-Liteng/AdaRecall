@@ -1,0 +1,16 @@
+{
+  "fresh_authorized": false,
+  "gate_c_frontier_receipt_sha256": "65c392580a23a38041c8cb5788e140ab2d365a384be08860fbf33643464574d6",
+  "gate_c_passed": true,
+  "gate_d_corrected_qwen_receipt_sha256": "ad5c252c891b2e4b701a28e609bd2b74815d7710fbe332cceb64767fee7ada16",
+  "gate_d_passed": true,
+  "gate_e_f_layout_receipt_sha256": "39a0f67f0e780993920a0a1bd82403e75237b79acde995be15d17d7aa5b4e741",
+  "gate_e_passed_semantic": true,
+  "gate_f_passed_semantic": true,
+  "gate_g_incremental_aggregate_sha256": "eed0c36f50af025ce13b87dd30a0c0687de5914960ce918dbc65b995d8d864b6",
+  "gate_g_passed": true,
+  "lexical_control_retained": true,
+  "schema_version": "method1-graph-only-oof-closure-1",
+  "status": "METHOD1_GRAPH_ONLY_OOF_CLOSED_AWAITING_FRESH",
+  "v27_provenance_conflict_manifest_sha256": "2029c0f7be498822ad8ee9647992fdff38f7952cd5921af5d5fc375fb611d999"
+}
