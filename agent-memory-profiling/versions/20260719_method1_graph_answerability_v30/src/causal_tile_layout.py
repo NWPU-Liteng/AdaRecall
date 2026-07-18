@@ -106,3 +106,19 @@ def candidate_identity_fingerprint(memory_ids: list[str]) -> str:
     import hashlib
 
     return hashlib.sha256("\n".join(memory_ids).encode("utf-8")).hexdigest()
+
+
+def layout_fingerprint(layout: TileLayout, memory_ids: Sequence[str]) -> str:
+    import hashlib
+
+    if len(memory_ids) != len(layout.tile_by_local_position):
+        raise ValueError("layout fingerprint memory count mismatch")
+    digest = hashlib.sha256()
+    digest.update(layout.name.encode("utf-8"))
+    digest.update(str(layout.cutoff_order).encode("ascii"))
+    for memory_id, tile_id in zip(memory_ids, layout.tile_by_local_position):
+        digest.update(str(memory_id).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(str(int(tile_id)).encode("ascii"))
+        digest.update(b"\n")
+    return digest.hexdigest()

@@ -1,0 +1,37 @@
+schema_version: method1-v30-incremental-gate-g-1
+random_seed: 20260718
+scientific_scope: causal delta Tile updates with query-boundary exact full rebuild compaction
+frozen_inputs:
+  graph_config_sha256: d6252a2e669cb07226393d2bd6b90888f8973af8038dfaa4281b2b9174fb5e8b
+  frontier_run_id: v28_frontier_oof_20260719_attempt003_913cd3f
+  frontier_rows_sha256: 834b86286a88b9617632452dd72c9d824ac88ad1f3152eb77b52447b91520b98
+  frontier_snapshot_manifest_sha256: 982c1595fed5d0f6501c5bb7dfc3acf52dab2fb8a28b0d8afff6d7af09f5b88b
+  layout_run_id: v30_layout_io_e2e_20260719
+  layout_rows_sha256: 8813ce0f389bbb4015b1b4c69da8eaacc0b3eaa7d5be8e8a4c9beaeae284e1d0
+  layout_aggregate_sha256: c1d9ffa2b3edc762feb0441309b57978790e947a784f8cc47dfec297531faf54
+  layout_snapshot_manifest_sha256: f2271cccae56995c34a955be7f13920078213917df27088b66bcda5f804e6cec
+incremental:
+  memberships_per_memory: 3
+  delta_tile_capacity: 32
+  delta_tile_alignment_bytes: 4096
+  compaction_boundary: query_cutoff
+  compaction_mode: full_exact_boundary_rebuild
+  materialize_semantic_layout: true
+  remove_delta_and_compacted_stores_after_run: true
+agent_replay:
+  event_kind: co_retrieval
+  policy_source: frozen_qwen_top5
+  native_agent_access_claim: false
+gate_g:
+  expected_snapshot_count: 148
+  expected_query_count: 1355
+  expected_agent_event_count: 1355
+  expected_visible_insertions: 30755
+  exact_snapshot_hash_violations_max: 0
+  candidate_identity_violations_max: 0
+  layout_consistency_violations_max: 0
+  future_violations_max: 0
+  namespace_violations_max: 0
+  duplicate_violations_max: 0
+  past_snapshot_mutation_violations_max: 0
+fresh_authorized: false
