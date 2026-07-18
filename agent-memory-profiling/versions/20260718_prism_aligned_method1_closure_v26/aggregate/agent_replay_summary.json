@@ -1,0 +1,130 @@
+{
+  "namespace_count": 20,
+  "namespace_summary": {
+    "1": {
+      "candidate_recall_frontier": 0.3888888888888889,
+      "ndcg_at_10": 0.11404474499896114,
+      "query_count": 63,
+      "safety_violations": 0
+    },
+    "10": {
+      "candidate_recall_frontier": 0.3727477477477477,
+      "ndcg_at_10": 0.07707350530344173,
+      "query_count": 74,
+      "safety_violations": 0
+    },
+    "11": {
+      "candidate_recall_frontier": 0.37142857142857144,
+      "ndcg_at_10": 0.09138304791978762,
+      "query_count": 70,
+      "safety_violations": 0
+    },
+    "12": {
+      "candidate_recall_frontier": 0.46666666666666673,
+      "ndcg_at_10": 0.08460168710152366,
+      "query_count": 65,
+      "safety_violations": 0
+    },
+    "13": {
+      "candidate_recall_frontier": 0.46859903381642504,
+      "ndcg_at_10": 0.10949567874522437,
+      "query_count": 69,
+      "safety_violations": 0
+    },
+    "14": {
+      "candidate_recall_frontier": 0.4452380952380952,
+      "ndcg_at_10": 0.10431648550087334,
+      "query_count": 70,
+      "safety_violations": 0
+    },
+    "15": {
+      "candidate_recall_frontier": 0.40049751243781095,
+      "ndcg_at_10": 0.13890016574896227,
+      "query_count": 67,
+      "safety_violations": 0
+    },
+    "16": {
+      "candidate_recall_frontier": 0.3623188405797101,
+      "ndcg_at_10": 0.09289337651254578,
+      "query_count": 69,
+      "safety_violations": 0
+    },
+    "17": {
+      "candidate_recall_frontier": 0.4309523809523809,
+      "ndcg_at_10": 0.07655648475560378,
+      "query_count": 70,
+      "safety_violations": 0
+    },
+    "18": {
+      "candidate_recall_frontier": 0.37745098039215685,
+      "ndcg_at_10": 0.12433223636299374,
+      "query_count": 68,
+      "safety_violations": 0
+    },
+    "19": {
+      "candidate_recall_frontier": 0.38251366120218583,
+      "ndcg_at_10": 0.12497338339311581,
+      "query_count": 61,
+      "safety_violations": 0
+    },
+    "2": {
+      "candidate_recall_frontier": 0.4179487179487179,
+      "ndcg_at_10": 0.07635443094598078,
+      "query_count": 65,
+      "safety_violations": 0
+    },
+    "20": {
+      "candidate_recall_frontier": 0.41787439613526567,
+      "ndcg_at_10": 0.09972471102726779,
+      "query_count": 69,
+      "safety_violations": 0
+    },
+    "3": {
+      "candidate_recall_frontier": 0.4820512820512821,
+      "ndcg_at_10": 0.12601624794094793,
+      "query_count": 65,
+      "safety_violations": 0
+    },
+    "4": {
+      "candidate_recall_frontier": 0.33072916666666663,
+      "ndcg_at_10": 0.056465234999440055,
+      "query_count": 64,
+      "safety_violations": 0
+    },
+    "5": {
+      "candidate_recall_frontier": 0.4051282051282052,
+      "ndcg_at_10": 0.09824513979749303,
+      "query_count": 65,
+      "safety_violations": 0
+    },
+    "6": {
+      "candidate_recall_frontier": 0.38541666666666663,
+      "ndcg_at_10": 0.06174342351912129,
+      "query_count": 64,
+      "safety_violations": 0
+    },
+    "7": {
+      "candidate_recall_frontier": 0.31004901960784315,
+      "ndcg_at_10": 0.05612999780365551,
+      "query_count": 68,
+      "safety_violations": 0
+    },
+    "8": {
+      "candidate_recall_frontier": 0.3888888888888889,
+      "ndcg_at_10": 0.11636379023423607,
+      "query_count": 72,
+      "safety_violations": 0
+    },
+    "9": {
+      "candidate_recall_frontier": 0.3787878787878788,
+      "ndcg_at_10": 0.08929327409636692,
+      "query_count": 77,
+      "safety_violations": 0
+    }
+  },
+  "native_agent_access_claim": false,
+  "query_count": 1355,
+  "safety_violations": 0,
+  "source": "strict OOF adaptive-rule Qwen rows replayed in namespace streams",
+  "status": "PASS"
+}

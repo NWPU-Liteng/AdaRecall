@@ -1,0 +1,19 @@
+{
+  "promotable_methods": [
+    "adaptive_rule",
+    "adaptive_logistic",
+    "adaptive_all_graph"
+  ],
+  "selected_method": "adaptive_rule",
+  "selection_source": "train_strict_5fold_oof",
+  "status": "OOF_PROMOTED_TO_QWEN",
+  "tail_options": [
+    0,
+    2,
+    4,
+    8,
+    12
+  ],
+  "v24_test_read": false,
+  "v25_development_read": false
+}

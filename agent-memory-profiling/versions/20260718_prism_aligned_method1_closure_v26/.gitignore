@@ -1,0 +1,5 @@
+runs/*/query_results.jsonl
+runs/*/reranker_cache.jsonl
+artifacts/fresh/source/*.json
+__pycache__/
+*.pyc

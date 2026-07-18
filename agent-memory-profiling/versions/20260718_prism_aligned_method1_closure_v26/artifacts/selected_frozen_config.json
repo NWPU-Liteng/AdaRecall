@@ -1,0 +1,21 @@
+{
+  "status": "FROZEN_AFTER_TRAIN_OOF_BEFORE_FRESH_GOLD",
+  "selected_method": "lexical_c",
+  "frontier_candidate_count": 32,
+  "final_k": 5,
+  "lexical": {
+    "kind": "TF-IDF word ngrams",
+    "ngram_range": [1, 2],
+    "max_features": 60000,
+    "min_df": 2,
+    "max_df": 0.98
+  },
+  "reranker": "Qwen3-Reranker-0.6B local eager attention",
+  "selection_evidence": "MedMemoryBench train strict five-fold OOF only",
+  "semantic_enabled": false,
+  "history_enabled": false,
+  "adaptive_rule_status": "passed OOF gates but was inferior to Lexical-C",
+  "fresh_dataset": "LoCoMo",
+  "fresh_gold_read": false,
+  "retuning_after_fresh_read": false
+}

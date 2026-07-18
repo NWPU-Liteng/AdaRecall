@@ -1,0 +1,71 @@
+{
+  "features": 10,
+  "folds": {
+    "0": {
+      "heldout_ids_seen_in_training": 0,
+      "heldout_query_count": 280,
+      "model": "standardized_logistic",
+      "training_label_counts": {
+        "0": 454,
+        "12": 94,
+        "2": 275,
+        "4": 113,
+        "8": 139
+      },
+      "training_query_count": 1075
+    },
+    "1": {
+      "heldout_ids_seen_in_training": 0,
+      "heldout_query_count": 268,
+      "model": "standardized_logistic",
+      "training_label_counts": {
+        "0": 474,
+        "12": 98,
+        "2": 264,
+        "4": 112,
+        "8": 139
+      },
+      "training_query_count": 1087
+    },
+    "2": {
+      "heldout_ids_seen_in_training": 0,
+      "heldout_query_count": 270,
+      "model": "standardized_logistic",
+      "training_label_counts": {
+        "0": 470,
+        "12": 101,
+        "2": 272,
+        "4": 114,
+        "8": 128
+      },
+      "training_query_count": 1085
+    },
+    "3": {
+      "heldout_ids_seen_in_training": 0,
+      "heldout_query_count": 268,
+      "model": "standardized_logistic",
+      "training_label_counts": {
+        "0": 463,
+        "12": 101,
+        "2": 271,
+        "4": 118,
+        "8": 134
+      },
+      "training_query_count": 1087
+    },
+    "4": {
+      "heldout_ids_seen_in_training": 0,
+      "heldout_query_count": 269,
+      "model": "standardized_logistic",
+      "training_label_counts": {
+        "0": 463,
+        "12": 94,
+        "2": 270,
+        "4": 123,
+        "8": 136
+      },
+      "training_query_count": 1086
+    }
+  },
+  "kind": "multinomial_logistic_regression"
+}

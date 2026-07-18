@@ -1,0 +1,8 @@
+{
+  "duplicate_insert_rejected": true,
+  "insert_count": 100,
+  "new_incidence_rows_normalized": true,
+  "old_embedding_rows_unchanged": true,
+  "passed": true,
+  "positions_contiguous": true
+}

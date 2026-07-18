@@ -1,0 +1,37 @@
+{
+  "folds": {
+    "0": {
+      "excluded_matching_event_count": 280,
+      "heldout_event_remaining_count": 0,
+      "heldout_query_count": 280,
+      "passed": true
+    },
+    "1": {
+      "excluded_matching_event_count": 268,
+      "heldout_event_remaining_count": 0,
+      "heldout_query_count": 268,
+      "passed": true
+    },
+    "2": {
+      "excluded_matching_event_count": 270,
+      "heldout_event_remaining_count": 0,
+      "heldout_query_count": 270,
+      "passed": true
+    },
+    "3": {
+      "excluded_matching_event_count": 268,
+      "heldout_event_remaining_count": 0,
+      "heldout_query_count": 268,
+      "passed": true
+    },
+    "4": {
+      "excluded_matching_event_count": 269,
+      "heldout_event_remaining_count": 0,
+      "heldout_query_count": 269,
+      "passed": true
+    }
+  },
+  "gold_used_to_build_history": false,
+  "source_event_count": 1355,
+  "source_kind": "co_candidate_not_native_agent_access"
+}

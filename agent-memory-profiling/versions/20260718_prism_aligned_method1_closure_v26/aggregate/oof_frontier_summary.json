@@ -1,0 +1,1368 @@
+{
+  "cost": {
+    "candidate_reduction_vs_full": 0.75,
+    "frontier_candidate_count": 32,
+    "full_candidate_count": 128,
+    "lexical_offline_build_ms": 47423.215518007055,
+    "qwen_not_run_in_this_stage": true
+  },
+  "fold_count": 5,
+  "forbidden_split_reads": 0,
+  "graph_ablation": {
+    "all_graph_vs_adaptive_logistic_candidate_delta": {
+      "ci_95": [
+        -0.2332118696186962,
+        -0.18720633456334562
+      ],
+      "loss_rate": 0.25756457564575647,
+      "mean_delta": -0.21027060270602707,
+      "win_rate": 0.022878228782287822
+    },
+    "history_is_native_agent_access": false,
+    "history_vs_dense_candidate_delta": {
+      "ci_95": [
+        -0.0019710947109471072,
+        0.008733087330873308
+      ],
+      "loss_rate": 0.006642066420664207,
+      "mean_delta": 0.0033210332103321034,
+      "win_rate": 0.012546125461254613
+    },
+    "semantic_vs_dense_candidate_delta": {
+      "ci_95": [
+        -0.006273062730627306,
+        0.0018450184501845018
+      ],
+      "loss_rate": 0.006642066420664207,
+      "mean_delta": -0.002214022140221402,
+      "win_rate": 0.0036900369003690036
+    }
+  },
+  "history_diagnostics": {
+    "excluded_future_events": 33427,
+    "excluded_heldout_events": 367309,
+    "usable_edges": 3529
+  },
+  "methods": {
+    "adaptive_all_graph": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.12724477244772447,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.18339483394833947,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.07738095238095237,
+        "1": 0.0914179104477612,
+        "2": 0.09722222222222221,
+        "3": 0.06529850746268656,
+        "4": 0.0885997521685254
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.07194244604316546,
+        "inference_generation": 0.07992565055762081,
+        "multi_hop_clinical_deduction": 0.10560344827586207,
+        "multiple_choice": 0.05536332179930796,
+        "state_update": 0.07971014492753623,
+        "temporal_localization": 0.12452830188679245
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.06937269372693727,
+            0.09870848708487084
+          ],
+          "loss_rate": 0.007380073800738007,
+          "mean_delta": 0.08394833948339483,
+          "win_rate": 0.10848708487084871
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.08831488314883149,
+            0.12066420664206642
+          ],
+          "loss_rate": 0.010332103321033211,
+          "mean_delta": 0.10424354243542436,
+          "win_rate": 0.13579335793357933
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.04372693726937269,
+            -0.0023985239852398537
+          ],
+          "loss_rate": 0.10922509225092251,
+          "mean_delta": -0.022755227552275523,
+          "win_rate": 0.08560885608856089
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.07441574415744158,
+            -0.02902829028290283
+          ],
+          "loss_rate": 0.15498154981549817,
+          "mean_delta": -0.051414514145141456,
+          "win_rate": 0.09446494464944649
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "adaptive_logistic": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.3375153751537515,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.40608856088560885,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.2976190476190476,
+        "1": 0.3208955223880597,
+        "2": 0.27376543209876547,
+        "3": 0.2829601990049751,
+        "4": 0.2958488228004957
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.4568345323741007,
+        "inference_generation": 0.22862453531598512,
+        "multi_hop_clinical_deduction": 0.18247126436781608,
+        "multiple_choice": 0.1245674740484429,
+        "state_update": 0.2246376811594203,
+        "temporal_localization": 0.46037735849056605
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.27084870848708487,
+            0.3181442189421894
+          ],
+          "loss_rate": 0.007380073800738007,
+          "mean_delta": 0.2942189421894219,
+          "win_rate": 0.34317343173431736
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.3033210332103321,
+            0.3510455104551045
+          ],
+          "loss_rate": 0.007380073800738007,
+          "mean_delta": 0.32693726937269374,
+          "win_rate": 0.381549815498155
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.15879305043050432,
+            0.21611469864698646
+          ],
+          "loss_rate": 0.0974169741697417,
+          "mean_delta": 0.18751537515375152,
+          "win_rate": 0.3062730627306273
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.1407118696186962,
+            0.20227706027060272
+          ],
+          "loss_rate": 0.12767527675276752,
+          "mean_delta": 0.1712792127921279,
+          "win_rate": 0.3158671586715867
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "adaptive_rule": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.3990159901599016,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.4759532595325954,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.34285714285714286,
+        "1": 0.3917910447761194,
+        "2": 0.3453703703703704,
+        "3": 0.3712686567164179,
+        "4": 0.32806691449814124
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.6151079136690647,
+        "inference_generation": 0.2137546468401487,
+        "multi_hop_clinical_deduction": 0.23706896551724138,
+        "multiple_choice": 0.16262975778546712,
+        "state_update": 0.3115942028985507,
+        "temporal_localization": 0.5132075471698113
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.3303813038130381,
+            0.3804443419434194
+          ],
+          "loss_rate": 0.012546125461254613,
+          "mean_delta": 0.35571955719557197,
+          "win_rate": 0.4132841328413284
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.37164667896678966,
+            0.4222632226322263
+          ],
+          "loss_rate": 0.00959409594095941,
+          "mean_delta": 0.39680196801968026,
+          "win_rate": 0.45461254612546126
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.2188791512915129,
+            0.27804428044280444
+          ],
+          "loss_rate": 0.09225092250922509,
+          "mean_delta": 0.24901599015990158,
+          "win_rate": 0.36457564575645757
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.2104551045510455,
+            0.27287822878228785
+          ],
+          "loss_rate": 0.11660516605166052,
+          "mean_delta": 0.2411439114391144,
+          "win_rate": 0.37416974169741696
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "dense_c": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.04329643296432964,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.07915129151291513,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0,
+        "3": 0.0,
+        "4": 0.0
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.0,
+        "inference_generation": 0.0,
+        "multi_hop_clinical_deduction": 0.0,
+        "multiple_choice": 0.0,
+        "state_update": 0.0,
+        "temporal_localization": 0.0
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.12281672816728169,
+            -0.09126691266912669
+          ],
+          "loss_rate": 0.12546125461254612,
+          "mean_delta": -0.10670356703567034,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.17423124231242312,
+            -0.1380688806888069
+          ],
+          "loss_rate": 0.1859778597785978,
+          "mean_delta": -0.1556580565805658,
+          "win_rate": 0.0
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "full_n": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.15,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.23480934809348092,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.07053571428571428,
+        "1": 0.10634328358208955,
+        "2": 0.05123456790123456,
+        "3": 0.1349502487562189,
+        "4": 0.1722428748451053
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.0683453237410072,
+        "inference_generation": 0.07992565055762081,
+        "multi_hop_clinical_deduction": 0.008620689655172414,
+        "multiple_choice": 0.2528835063437139,
+        "state_update": 0.07246376811594203,
+        "temporal_localization": 0.07547169811320754
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.09144987699876998,
+            0.12263222632226324
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.10670356703567034,
+          "win_rate": 0.12546125461254612
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.13763837638376383,
+            0.17398677736777365
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.1556580565805658,
+          "win_rate": 0.1859778597785978
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "lexical_c": {
+      "absolute": {
+        "candidate_recall_final": 0.05977859778597786,
+        "candidate_recall_frontier": 0.6037515375153751,
+        "evidence_group_coverage_final": 0.10362853628536287,
+        "evidence_group_coverage_frontier": 0.6670971709717097,
+        "ndcg_at_10": 0.0395951635850758,
+        "precision_at_k": 0.015498154981549815
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.5345238095238095,
+        "1": 0.5963930348258707,
+        "2": 0.5685185185185185,
+        "3": 0.5671641791044776,
+        "4": 0.5368649318463444
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.8057553956834532,
+        "inference_generation": 0.4591078066914498,
+        "multi_hop_clinical_deduction": 0.5050287356321839,
+        "multiple_choice": 0.33679354094579006,
+        "state_update": 0.43478260869565216,
+        "temporal_localization": 0.7396226415094339
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.039360393603936034,
+            0.06309963099630997
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.05092250922509225,
+          "win_rate": 0.07232472324723248
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.5345633456334563,
+            0.5860393603936039
+          ],
+          "loss_rate": 0.013284132841328414,
+          "mean_delta": 0.5604551045510455,
+          "win_rate": 0.6376383763837639
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0736761992619926,
+            0.1043050430504305
+          ],
+          "loss_rate": 0.011808118081180811,
+          "mean_delta": 0.08868388683886838,
+          "win_rate": 0.12177121771217712
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.561869618696187,
+            0.613900676506765
+          ],
+          "loss_rate": 0.022878228782287822,
+          "mean_delta": 0.5879458794587945,
+          "win_rate": 0.6656826568265682
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.02702087137439058,
+            0.0426220830902466
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.034639529475379745,
+          "win_rate": 0.07601476014760147
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.010627306273062732,
+            0.016383763837638378
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.013431734317343175,
+          "win_rate": 0.07232472324723248
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.03911439114391144,
+            0.06297662976629766
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.05092250922509225,
+          "win_rate": 0.07232472324723248
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.42367619926199257,
+            0.4838268757687576
+          ],
+          "loss_rate": 0.06273062730627306,
+          "mean_delta": 0.4537515375153751,
+          "win_rate": 0.5571955719557196
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.07330873308733088,
+            0.10436654366543664
+          ],
+          "loss_rate": 0.011808118081180811,
+          "mean_delta": 0.08868388683886838,
+          "win_rate": 0.12177121771217712
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.4006765067650677,
+            0.4636531365313653
+          ],
+          "loss_rate": 0.08487084870848709,
+          "mean_delta": 0.43228782287822876,
+          "win_rate": 0.5490774907749078
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0269620213385254,
+            0.04275047401264254
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.034639529475379745,
+          "win_rate": 0.07601476014760147
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.010627306273062732,
+            0.016383763837638378
+          ],
+          "loss_rate": 0.0051660516605166054,
+          "mean_delta": 0.013431734317343175,
+          "win_rate": 0.07232472324723248
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "oof_history": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.04661746617466175,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.07822878228782287,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.009523809523809525,
+        "1": 0.0018656716417910447,
+        "2": 0.014814814814814815,
+        "3": 0.0012437810945273632,
+        "4": -0.011152416356877323
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": -0.0035971223021582736,
+        "inference_generation": 0.004956629491945477,
+        "multi_hop_clinical_deduction": 0.0028735632183908046,
+        "multiple_choice": 0.00980392156862745,
+        "state_update": 0.0,
+        "temporal_localization": 0.0037735849056603774
+      },
+      "nonnegative_fold_count": 4,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.0019710947109471072,
+            0.008733087330873308
+          ],
+          "loss_rate": 0.006642066420664207,
+          "mean_delta": 0.0033210332103321034,
+          "win_rate": 0.012546125461254613
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.007872078720787209,
+            0.006273062730627306
+          ],
+          "loss_rate": 0.014760147601476014,
+          "mean_delta": -0.0009225092250922509,
+          "win_rate": 0.014022140221402213
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.12011070110701107,
+            -0.08714637146371464
+          ],
+          "loss_rate": 0.12841328413284134,
+          "mean_delta": -0.10338253382533824,
+          "win_rate": 0.008856088560885609
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.17620079950799508,
+            -0.13751537515375153
+          ],
+          "loss_rate": 0.1904059040590406,
+          "mean_delta": -0.15658056580565805,
+          "win_rate": 0.006642066420664207
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "semantic": {
+      "absolute": {
+        "candidate_recall_final": 0.008856088560885609,
+        "candidate_recall_frontier": 0.04108241082410824,
+        "evidence_group_coverage_final": 0.014944649446494465,
+        "evidence_group_coverage_frontier": 0.07447724477244773,
+        "ndcg_at_10": 0.004955634109696062,
+        "precision_at_k": 0.002066420664206642
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.0017857142857142857,
+        "1": -0.0018656716417910447,
+        "2": -0.003703703703703704,
+        "3": 0.005597014925373134,
+        "4": -0.013011152416356878
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": -0.0035971223021582736,
+        "inference_generation": -0.0018587360594795538,
+        "multi_hop_clinical_deduction": -0.004310344827586207,
+        "multiple_choice": -0.0034602076124567475,
+        "state_update": 0.0,
+        "temporal_localization": 0.0
+      },
+      "nonnegative_fold_count": 2,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.006273062730627306,
+            0.0018450184501845018
+          ],
+          "loss_rate": 0.006642066420664207,
+          "mean_delta": -0.002214022140221402,
+          "win_rate": 0.0036900369003690036
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.01107011070110701,
+            0.0017220172201722018
+          ],
+          "loss_rate": 0.014760147601476014,
+          "mean_delta": -0.004674046740467405,
+          "win_rate": 0.008118081180811807
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.12515375153751537,
+            -0.09347939729397296
+          ],
+          "loss_rate": 0.12841328413284134,
+          "mean_delta": -0.10891758917589174,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.17939729397293971,
+            -0.1416359163591636
+          ],
+          "loss_rate": 0.19114391143911438,
+          "mean_delta": -0.1603321033210332,
+          "win_rate": 0.0007380073800738007
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0,
+            0.0
+          ],
+          "loss_rate": 0.0,
+          "mean_delta": 0.0,
+          "win_rate": 0.0
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    },
+    "v25_fixed": {
+      "absolute": {
+        "candidate_recall_final": 0.01943419434194342,
+        "candidate_recall_frontier": 0.09218942189421893,
+        "evidence_group_coverage_final": 0.03290282902829028,
+        "evidence_group_coverage_frontier": 0.15116851168511683,
+        "ndcg_at_10": 0.010305452363554863,
+        "precision_at_k": 0.004428044280442804
+      },
+      "candidate_delta_by_fold": {
+        "0": 0.01994047619047619,
+        "1": 0.05534825870646766,
+        "2": 0.03518518518518519,
+        "3": 0.0708955223880597,
+        "4": 0.0644361833952912
+      },
+      "candidate_delta_by_query_type": {
+        "entity_exact_match": 0.02158273381294964,
+        "inference_generation": 0.024163568773234202,
+        "multi_hop_clinical_deduction": 0.010057471264367814,
+        "multiple_choice": 0.14042675893886966,
+        "state_update": 0.007246376811594203,
+        "temporal_localization": 0.04150943396226415
+      },
+      "nonnegative_fold_count": 5,
+      "paired_vs_dense": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.005412054120541205,
+            0.016236162361623615
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.01057810578105781,
+          "win_rate": 0.012546125461254613
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            0.03757533825338252,
+            0.06051660516605166
+          ],
+          "loss_rate": 0.0036900369003690036,
+          "mean_delta": 0.048892988929889296,
+          "win_rate": 0.06420664206642067
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.011439114391143911,
+            0.02496924969249692
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.017958179581795818,
+          "win_rate": 0.02214022140221402
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            0.05824108241082411,
+            0.08579335793357933
+          ],
+          "loss_rate": 0.008118081180811807,
+          "mean_delta": 0.07201722017220172,
+          "win_rate": 0.09667896678966789
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0028958709696789826,
+            0.008052213095984136
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.005349818253858801,
+          "win_rate": 0.015498154981549815
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0011808118081180813,
+            0.003542435424354244
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.0023616236162361626,
+          "win_rate": 0.012546125461254613
+        }
+      },
+      "paired_vs_full": {
+        "candidate_recall_final": {
+          "ci_95": [
+            0.005535055350553505,
+            0.016236162361623615
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.01057810578105781,
+          "win_rate": 0.012546125461254613
+        },
+        "candidate_recall_frontier": {
+          "ci_95": [
+            -0.07072570725707258,
+            -0.04526137761377618
+          ],
+          "loss_rate": 0.07896678966789668,
+          "mean_delta": -0.05781057810578105,
+          "win_rate": 0.008118081180811807
+        },
+        "evidence_group_coverage_final": {
+          "ci_95": [
+            0.011439114391143911,
+            0.02521832718327179
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.017958179581795818,
+          "win_rate": 0.02214022140221402
+        },
+        "evidence_group_coverage_frontier": {
+          "ci_95": [
+            -0.09889452644526446,
+            -0.06888068880688807
+          ],
+          "loss_rate": 0.1121771217712177,
+          "mean_delta": -0.08364083640836409,
+          "win_rate": 0.00959409594095941
+        },
+        "ndcg_at_10": {
+          "ci_95": [
+            0.0028937821147262525,
+            0.00809726154391741
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.005349818253858801,
+          "win_rate": 0.015498154981549815
+        },
+        "precision_at_k": {
+          "ci_95": [
+            0.0011808118081180813,
+            0.0036900369003690036
+          ],
+          "loss_rate": 0.0007380073800738007,
+          "mean_delta": 0.0023616236162361626,
+          "win_rate": 0.012546125461254613
+        }
+      },
+      "safety_violations": {
+        "cross_namespace": 0,
+        "duplicates": 0,
+        "future_memory": 0
+      }
+    }
+  },
+  "oracle_label_counts": {
+    "0": 581,
+    "12": 122,
+    "2": 338,
+    "4": 145,
+    "8": 169
+  },
+  "promotable_methods": [
+    "adaptive_rule",
+    "adaptive_logistic",
+    "adaptive_all_graph"
+  ],
+  "query_count": 1355,
+  "runtime_seconds": 127.4683248589281,
+  "scientific_scope": "train strict five-fold OOF; v24 test and v25 development not read",
+  "selected_method": "adaptive_rule",
+  "status": "OOF_PROMOTED_TO_QWEN",
+  "tail_counts": {
+    "adaptive_logistic": {
+      "0": 242,
+      "12": 291,
+      "2": 348,
+      "4": 178,
+      "8": 296
+    },
+    "adaptive_rule": {
+      "0": 12,
+      "12": 451,
+      "2": 60,
+      "4": 448,
+      "8": 384
+    }
+  }
+}

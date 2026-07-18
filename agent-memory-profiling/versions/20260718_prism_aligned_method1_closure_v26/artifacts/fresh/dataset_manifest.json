@@ -1,0 +1,27 @@
+{
+  "schema_version": "method1-v26-fresh-source-manifest-1",
+  "dataset": "LoCoMo",
+  "repository": "https://github.com/snap-research/locomo",
+  "repository_commit": "3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376",
+  "source_url": "https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json",
+  "source_file": "artifacts/fresh/source/locomo10.json",
+  "source_size_bytes": 2805274,
+  "source_sha256": "79fa87e90f04081343b8c8debecb80a9a6842b76a7aa537dc9fdf651ea698ff4",
+  "downloaded_at_utc": "2026-07-18T11:57:03Z",
+  "license": "CC-BY-NC-4.0",
+  "license_url": "https://github.com/snap-research/locomo/blob/3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376/LICENSE.txt",
+  "gold_semantically_read": false,
+  "prelock_operations": [
+    "download opaque bytes",
+    "record file size",
+    "compute SHA256"
+  ],
+  "independence": {
+    "different_dataset": true,
+    "different_authors": true,
+    "different_conversations": true,
+    "different_annotations": true,
+    "aligned_with_medmemorybench": false,
+    "previous_gold_reads_by_v24_v25_v26": 0
+  }
+}

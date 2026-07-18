@@ -1,0 +1,64 @@
+{
+  "schema_version": "method1-v26-fresh-holdout-freeze-1",
+  "dataset": {
+    "name": "LoCoMo",
+    "version": "snap-research/locomo@3eb6f2c585f5e1699204e3c3bdf7adc5c28cb376",
+    "source_url": "https://raw.githubusercontent.com/snap-research/locomo/main/data/locomo10.json",
+    "license": "CC-BY-NC-4.0",
+    "paper": "Evaluating Very Long-Term Conversational Memory of LLM Agents, ACL 2024",
+    "independence": "different dataset authors, conversations, domain distribution, and annotations; no aligned MedMemoryBench examples"
+  },
+  "adapter": {
+    "namespace": "sample_id",
+    "memory_unit": "one dialog turn",
+    "memory_id": "dia_id",
+    "memory_text": "speaker + text + optional blip_caption",
+    "arrival_order": "chronological session number then turn order",
+    "query_cutoff": "end of the complete released conversation",
+    "query_text": "qa.question",
+    "gold_memory_ids": "qa.evidence dialog IDs",
+    "inclusion": "QA records with a non-empty evidence list",
+    "exclusion": "QA records without dialog-level evidence; these are not retrieval-grounded"
+  },
+  "frozen_method": {
+    "name": "lexical_c_safety_frontier",
+    "source_selection": "MedMemoryBench train strict five-fold OOF only",
+    "full_n": 128,
+    "dense_seed": 16,
+    "frontier_c": 32,
+    "final_k": 5,
+    "tail_options": [0, 2, 4, 8, 12],
+    "tfidf_ngram_range": [1, 2],
+    "tfidf_max_features": 60000,
+    "tfidf_min_df": 2,
+    "tfidf_max_df": 0.98,
+    "adaptive_rule_ablation": {
+      "high_confidence": 0.12,
+      "medium_confidence": 0.06,
+      "low_confidence": 0.025,
+      "low_agreement": 0.20,
+      "medium_agreement": 0.40
+    },
+    "selection_reason": "highest strict-OOF Qwen nDCG among safe promoted 32-candidate methods",
+    "semantic_enabled": false,
+    "history_enabled": false,
+    "reranker": "Qwen3-Reranker-0.6B local eager attention",
+    "embedding": "Qwen3-Embedding-0.6B local eager attention"
+  },
+  "baselines": ["full_n", "dense_c", "lexical_c"],
+  "bootstrap_samples": 10000,
+  "gate": {
+    "candidate_recall_delta_mean_min": 0.0,
+    "candidate_recall_ci_lower_min": 0.0,
+    "final_group_coverage_delta_min": 0.0,
+    "ndcg_dense_mean_min": 0.0,
+    "ndcg_dense_ci_lower_min": -0.005,
+    "ndcg_full_ci_lower_min": -0.010,
+    "candidate_reduction_min": 0.75,
+    "require_loss_rate_le_win_rate": true,
+    "require_positive_net_latency_gain": true,
+    "require_zero_safety_violations": true
+  },
+  "formal_runs_allowed": 1,
+  "retuning_after_read": false
+}
