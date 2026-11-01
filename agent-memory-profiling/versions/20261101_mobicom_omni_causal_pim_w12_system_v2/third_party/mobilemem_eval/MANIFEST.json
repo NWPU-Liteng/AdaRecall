@@ -1,0 +1,46 @@
+{
+  "repository": "zjunlp/MemBase",
+  "commit": "a9ba9495d48541d3e68588ff097294cc7a1201bc",
+  "files": {
+    "LICENSE": {
+      "git_blob_sha1": "e213f97fd1ecfb64ebcde4cb5eb66f8c34fa7f8b",
+      "sha256": "379c3ae903e21a26b5280f83aedffbe6b98a2ecc95b7918952efa3e86c698a1b"
+    },
+    "membase/datasets/mobilemem.py": {
+      "git_blob_sha1": "bd48592b26fef3a9828b4950a7c86d96f553cf3f",
+      "sha256": "a3b5e3f12f5469319deb6c0d62bbd1f828b641349fa7f9f1c15e4146ee6b413a"
+    },
+    "membase/datasets/base.py": {
+      "git_blob_sha1": "aa913fa93253528355cd6643cdb18d64cb0c312c",
+      "sha256": "253ede771adc0416e76774aeb59d007ca1c0e05bfa520f07d82fed872a021448"
+    },
+    "membase/evaluation/f1.py": {
+      "git_blob_sha1": "6584cded5f48651e9cf22381a09ebec32920d424",
+      "sha256": "8a860549c0f3e2b8a9de79c58216fee355b8b7afe13e128cadee9db02bdb5ee1"
+    },
+    "membase/evaluation/rouge.py": {
+      "git_blob_sha1": "a46cc5cf4a9700bb6ff0bb4687bcf1b6d0a3f024",
+      "sha256": "287f90be9875f79e75faaadf1f3b55a9d6e937fbd808c64bb7ac80fe79547fee"
+    },
+    "membase/evaluation/base.py": {
+      "git_blob_sha1": "dae6a26e1fc58ce9acbfd5028b8e15c9ca3a6d11",
+      "sha256": "93ca856e9e191817eb286470e04521850f2078d3ae9af0c9734257ae07b1324d"
+    },
+    "membase/evaluation/llm_judge.py": {
+      "git_blob_sha1": "658b1edf61a54d6ea3938c0ba78da9dbe5e52d86",
+      "sha256": "1b209022745bdeae18555c894e2fae513b960359327905291c28483f6c5789fd"
+    },
+    "membase/inference_utils/prompts.py": {
+      "git_blob_sha1": "7b78ef5a59bb34f84e005c80c06a08b2f902007a",
+      "sha256": "9d81ef30abfec4024ab157617403bb8fa408f2de5a5a324287cec0b0cef6e5af"
+    },
+    "membase/inference_utils/operators.py": {
+      "git_blob_sha1": "259e9a7d4e18a02f746b1d3476dd5b880c614726",
+      "sha256": "db041d7f5b858a2f1a433eb36a284328fe710bbb431801c4d60aec8da5777a7b"
+    },
+    "examples/evaluate_memory_systems_on_mobilemem/README.md": {
+      "git_blob_sha1": "57f1f4e8732b17a1247dc225ea2f569fe7d91f8d",
+      "sha256": "dc5e9d7d08b9fcf411d924ff089defd94dd2ba84801f0080cdc34fbec43d0dfa"
+    }
+  }
+}

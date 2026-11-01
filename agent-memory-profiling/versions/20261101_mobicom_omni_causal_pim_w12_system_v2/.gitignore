@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+artifacts/
+results/
+regression/golden_v1_run1/
+regression/golden_v1_run2/
+regression/golden_v2_default/

@@ -1,0 +1,32 @@
+{
+  "schema": "mobilemem-omni-main-cohort-v1",
+  "manifests_sha256": "55ac5a68ad40f076af7528b602eb362b26cfc2a74b4cd126336578d842391346",
+  "prepared_audit_sha256": "68fb29119d19a97dc33440e567122c504825023fe62e6e28d538a8a8e45dc19d",
+  "question_count_by_user": {
+    "0": 3,
+    "1": 3
+  },
+  "question_ids_by_user": {
+    "0": [
+      "0_q_1033",
+      "0_q_109",
+      "0_q_1162"
+    ],
+    "1": [
+      "1_q_104",
+      "1_q_1166",
+      "1_q_1188"
+    ]
+  },
+  "serving_splits": [
+    "development"
+  ],
+  "boundary": "question IDs and timestamps only; no answer, type, evidence, or label fields are copied",
+  "evaluation_label_files_read": [],
+  "subset": {
+    "name": "regression_golden_v1",
+    "source_subset": "pilot112_v1",
+    "selection_rule": "two development users, first three question_ids per user in lexicographic order"
+  },
+  "questions": 6
+}

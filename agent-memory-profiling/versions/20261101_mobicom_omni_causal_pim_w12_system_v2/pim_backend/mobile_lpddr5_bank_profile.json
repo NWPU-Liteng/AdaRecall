@@ -1,0 +1,46 @@
+{
+  "schema_version": "lpddr-bank-pim-fixed-profile-v1",
+  "name": "lpddr5_6400_2ch_x16_bank_pim_uncalibrated",
+  "calibration_status": "architecture_assumptions_not_device_calibrated",
+  "source_contract": "method2_pim_feasibility/mobile_lpddr_pim_profiles.yaml",
+  "lpddr_source": "attacc_simulator-main/ramulator2/src/dram/impl/LPDDR5.cpp",
+  "organization": "two x16 16Gb devices; 4GiB physical; 2GiB PIM pool; full-model residency unvalidated",
+  "physical_capacity_bytes": 4294967296,
+  "physical_capacity_basis": "two x16 16Gb devices; PIM pool is a reserved subset of this modeled 4GiB physical space",
+  "dram_standard": "LPDDR5_6400",
+  "interface_width_bits": 32,
+  "data_rate_mtps": 6400,
+  "peak_bandwidth_decimal_gb_s": 25.6,
+  "external_service_decimal_gb_s": 12.8,
+  "external_service_basis": "conservative RD16/WR16 32-byte transaction; nBL16=nCCD=4 CK from checked-in preset; command-limited service, not measured bandwidth",
+  "timing_source": "LPDDR5_6400 preset: CK1250ps, nRCD15, nCL20, nRPpb15, nRRD4, nFAW16; 16Gb tRFCab280ns, tREFI3906ns",
+  "assumed_parameters": [
+    "bank_internal_bytes_per_cycle", "pim_macs_per_bank_cycle", "local_buffer_bytes_per_bank",
+    "host_macs_per_cycle", "host_softmax_elements_per_cycle", "host_command_cycles", "host_fence_cycles",
+    "pim_capacity_bytes", "host_background_bytes_per_cycle", "round_robin_token_placement",
+    "phase_serialization", "row_batch_service", "all_rank_synchronized_refresh",
+    "local_topk_one_comparison_per_cycle"
+  ],
+  "config": {
+    "channels": 2, "banks_per_channel": 16, "bank_groups": 4,
+    "clock_hz": 800000000.0, "external_bytes_per_channel_cycle": 16,
+    "transfer_bytes": 32, "burst_cycles": 4, "column_command_cycles": 4,
+    "bank_internal_bytes_per_cycle": 16, "row_bytes": 2048,
+    "t_rcd": 15, "t_cas": 20, "t_rp": 15, "t_rrd": 4, "t_faw": 16,
+    "refresh_interval": 3125, "refresh_cycles": 224,
+    "pim_macs_per_bank_cycle": 16, "host_macs_per_cycle": 512,
+    "host_softmax_elements_per_cycle": 32,
+    "host_command_cycles": 1600, "host_fence_cycles": 400,
+    "pim_capacity_bytes": 2147483648, "local_buffer_bytes_per_bank": 65536,
+    "host_background_bytes_per_cycle": 0.0
+  },
+  "boundaries": [
+    "fixed uncalibrated profile, no positive-speedup tuning or parameter sweep",
+    "host reference is fused streaming GQA, one command, KV read once, compute/memory overlap",
+    "bank PIM serializes row service and MACs; softmax and cross-bank reduction stay on host",
+    "PIM supports BF16 operands/FP32 accumulation as a custom logic assumption, not existing silicon",
+    "phase/resource cost approximation, not cycle-accurate Ramulator LPDDRBankPIM",
+    "refresh/row conflicts approximated; no calibrated power/area/thermal claim",
+    "LPDDR5X lacks measured target parameters; do not relabel this profile LPDDR5X or Jetson"
+  ]
+}
