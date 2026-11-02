@@ -15,6 +15,7 @@ def _row(answer='same', candidates=('a', 'b')):
         'question_id': '0_q_1',
         'person_id': '0',
         'answer': answer,
+        'extensions': {'config': {}, 'sha256': 'a' * 64},
         'proof_plan': {
             'accepted_object_ids': ['text:1'],
             'proof_status': 'ok',
@@ -69,6 +70,19 @@ class RegressionCheckTests(unittest.TestCase):
             failures, reported = compare(root / 'a', root / 'b')
             self.assertEqual(failures, [])
             self.assertEqual(len(reported), 1)
+
+    def test_extensions_contract_is_explicitly_ignored(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            first = _row()
+            second = _row()
+            second['extensions'] = {'config': {'stage_profiler': 'on'},
+                                    'sha256': 'b' * 64}
+            _write_run(root / 'a', first)
+            _write_run(root / 'b', second)
+            failures, reported = compare(root / 'a', root / 'b')
+            self.assertEqual(failures, [])
+            self.assertEqual(reported, [])
 
 
 if __name__ == '__main__':

@@ -1,4 +1,32 @@
 schema: mobilemem-omni-main-experiment-v1
+extensions:
+  visibility_protocol: history_end
+  as_of_rule: session_end_before_question
+  operation_executor: off
+  witness_values: off
+  stage_profiler: off
+  workload_trace: off
+  progressive_topk:
+    lm_head: off
+    lm_head_shadow_every: 8
+    retrieval: off
+    bits: 12
+    group_size: 128
+    plane_schedule: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    eps_rel: 1.0e-9
+  candidate_dump: null
+  calibration:
+    calibrator_path: null
+    calibrator_sha256: null
+    candidate_policy: fixed48
+    alpha: 0.1
+    min_per_demand: 4
+  join_algorithm: dfs_maxmin
+  noisy_or:
+    max_witnesses_per_demand: 3
+    levels: 20
+    fill_redundancy: false
+  vision_feature_cache: off
 subset:
   name: pilot112_v1
   audit: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/subsets/pilot112_v1/subset_audit.json

@@ -16,6 +16,9 @@ COMPARE_FIELDS = (
     'demand_candidates',
     'query_contract',
 )
+IGNORED_FIELDS = (
+    'extensions',
+)
 
 
 def _load_rows(run_dir: Path) -> dict[str, dict]:
@@ -101,6 +104,8 @@ def compare(dir_a: Path, dir_b: Path) -> tuple[list[str], list[str]]:
         value_a = _comparable(rows_a[question_id])
         value_b = _comparable(rows_b[question_id])
         for field in COMPARE_FIELDS:
+            if field in IGNORED_FIELDS:
+                continue
             left, right = value_a[field], value_b[field]
             if _canonical(left) == _canonical(right):
                 continue

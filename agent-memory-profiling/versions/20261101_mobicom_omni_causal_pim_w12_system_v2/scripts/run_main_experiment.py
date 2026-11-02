@@ -12,6 +12,7 @@ import sys
 import yaml
 
 from build_main_cohort import build as build_cohort
+from extensions_config import load_extensions
 from omni_prepare import prepare
 
 
@@ -22,6 +23,7 @@ def load_config(path: Path) -> dict:
     config = yaml.safe_load(path.read_text())
     if not isinstance(config, dict):
         raise ValueError('main experiment configuration must be a mapping')
+    load_extensions(config)
     return config
 
 
@@ -61,6 +63,7 @@ def serve_one(config: dict, user_id: str, gpu: str, *, shard_index: int = 0,
     pim = config.get('pim', {})
     w12 = pim.get('w12', {}) if isinstance(pim, dict) else {}
     analysis = config.get('analysis', {})
+    extensions_json = load_extensions(config).to_json()
     run_root = Path(paths['run_root'])
     run_root.mkdir(parents=True, exist_ok=True)
     output = run_root / f'user_{user_id}_shard_{shard_index}.json'
@@ -80,7 +83,8 @@ def serve_one(config: dict, user_id: str, gpu: str, *, shard_index: int = 0,
                '--max-images', str(serving['max_images']),
                '--planner-time-limit', str(serving['planner_time_limit']),
                '--shard-index', str(shard_index), '--shard-count', str(shard_count),
-               '--allowed-splits', *serving['splits'], '--query-contract']
+               '--allowed-splits', *serving['splits'], '--query-contract',
+               '--extensions-json', extensions_json]
     if serving.get('question_ids_file'):
         command.extend(['--question-ids-file', str(serving['question_ids_file'])])
     if analysis.get('multi_witness_shadow', False):

@@ -50,6 +50,7 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
 from pim_backend.functional_decode import materialize_w12a16_primary
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
+from extensions_config import load_extensions
 from label_read_guard import install_label_read_guard
 
 
@@ -254,9 +255,16 @@ def main():
                         choices=(8, 16, 32, 64, 128, 256), default=128)
     parser.add_argument('--w12-release-source', action='store_true')
     parser.add_argument('--w12-allow-decode-fallback', action='store_true')
+    parser.add_argument('--extensions-json',
+                        help='canonical JSON for the validated extensions block')
     parser.add_argument('--allowed-splits', nargs='+', default=['development'],
                         choices=['development', 'validation', 'holdout'])
     args = parser.parse_args()
+    raw_extensions = json.loads(args.extensions_json) if args.extensions_json else {}
+    if not isinstance(raw_extensions, dict):
+        raise ValueError('extensions JSON must be an object')
+    extensions = load_extensions({'extensions': raw_extensions})
+    extensions_contract = extensions.output_contract()
     args.reader_quantization = resolve_reader_quantization(
         args.w12_functional_route, args.reader_quantization,
         args.lm_head_functional_mode)
@@ -408,6 +416,8 @@ def main():
                 != args.w12a16_group_size
                 or checkpoint.get('w12_release_source', False)
                 != args.w12_release_source
+                or (checkpoint.get('extensions') or {}).get('sha256')
+                != extensions_contract['sha256']
                 or checkpoint.get('cohort_sha256') != file_digest(args.cohort)):
             raise ValueError('partial checkpoint does not match the frozen request stream')
         rows = checkpoint.get('rows', [])
@@ -1276,6 +1286,7 @@ def main():
                 'person_id': args.user_id, 'question_ids': question_ids, 'rows': rows,
                 'shard_index': args.shard_index, 'shard_count': args.shard_count,
                 'capacity_capture_only': True,
+                'extensions': extensions_contract,
                 'cohort_sha256': file_digest(args.cohort),
                 'evaluation_label_files_read': []})
             print(json.dumps({'question_id': question_id, 'position': position + 1,
@@ -1370,6 +1381,7 @@ def main():
         write_json(partial_path, {'complete': False,
             'person_id': args.user_id, 'question_ids': question_ids, 'rows': rows,
             'shard_index': args.shard_index, 'shard_count': args.shard_count,
+            'extensions': extensions_contract,
             'pre_reader_operator_profile': args.pre_reader_operator_profile,
             'reader_quantization': args.reader_quantization,
             'w12_functional_route': args.w12_functional_route,
@@ -1414,6 +1426,7 @@ def main():
         'reader_w12a16_group_size': (args.w12a16_group_size
                                      if args.reader_quantization == 'w12a16'
                                      else None),
+        'extensions': extensions_contract,
         'reader_quantization_materialization': reader_quantization_materialization,
         'w12_functional_route': args.w12_functional_route,
         'w12_numeric_mode': args.w12_numeric_mode,
