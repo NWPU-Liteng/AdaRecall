@@ -50,6 +50,7 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
 from pim_backend.functional_decode import materialize_w12a16_primary
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
+from label_read_guard import install_label_read_guard
 
 
 READER_SYSTEM = ('你是端侧长期多模态记忆助手。只依据本次输入中给出的原始对话和原图回答。'
@@ -191,6 +192,7 @@ def load_persistent_replay(path, person_id):
 
 
 def main():
+    install_label_read_guard()
     parser = argparse.ArgumentParser()
     parser.add_argument('--prepared', type=Path, required=True)
     parser.add_argument('--image-archive', type=Path, required=True)
