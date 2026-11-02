@@ -143,13 +143,15 @@ def _profiled_operator_events(profiler, *, phase, profiled_forward_calls):
 def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=None,
            profile_operator_kernels=False, profile_decode_forward_calls=4,
            profile_reader=False, stage_profiler=None, stage_prefix=None,
-           n_images=0):
+           n_images=0, lm_head_shadow=None, lm_head_shadow_phase=None):
     import torch
 
     if isinstance(n_images, bool) or not isinstance(n_images, int) or n_images < 0:
         raise ValueError('n_images must be a non-negative integer')
     if stage_profiler is not None and not stage_prefix:
         raise ValueError('stage_prefix is required with a stage profiler')
+    if lm_head_shadow is not None and not lm_head_shadow_phase:
+        raise ValueError('lm_head shadow phase is required when shadowing')
     profiling = bool(profile_reader or stage_profiler is not None)
     started = time.perf_counter()
     inputs = inputs.to('cuda:0')
@@ -249,6 +251,21 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
                             if needs_mask else valid_vocab_size)
                 elif profiling:
                     grammar_allowed_counts.append(valid_vocab_size)
+                shadow_allowed = None
+                shadow_forced = False
+                shadow_scheduled = False
+                if lm_head_shadow is not None:
+                    if grammar_matcher is not None:
+                        shadow_allowed = lm_head_shadow.allowed_from_bitmask(
+                            grammar_mask)
+                        shadow_forced = int(shadow_allowed.sum().item()) == 1
+                        shadow_scheduled = lm_head_shadow.should_validate(
+                            position, shadow_forced)
+                    else:
+                        shadow_scheduled = lm_head_shadow.should_validate(
+                            position, False)
+                        if shadow_scheduled:
+                            shadow_allowed = lm_head_shadow.full_allowed()
                 token = scores.argmax(-1, keepdim=True)
                 if decode_timing is not None:
                     now = time.perf_counter()
@@ -256,6 +273,12 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
                     stage_started = now
                 token_value = int(token.item())
                 tokens.append(token_value)
+                if shadow_scheduled:
+                    lm_head_shadow.observe(
+                        phase=lm_head_shadow_phase,
+                        actual_token=token_value,
+                        allowed=shadow_allowed,
+                        forced=shadow_forced)
                 if decode_timing is not None:
                     now = time.perf_counter()
                     decode_timing['token_sync_seconds'] += now - stage_started
@@ -349,7 +372,8 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
 def structured_call(model, processor, system, payload, *, max_tokens=512, budget=8192,
                     json_schema=None, trace=None, profile_operator_kernels=False,
                     profile_decode_forward_calls=4, profile_reader=False,
-                    stage_profiler=None, stage_prefix=None, n_images=0):
+                    stage_profiler=None, stage_prefix=None, n_images=0,
+                    lm_head_shadow=None, lm_head_shadow_phase=None):
     started = time.perf_counter()
     prepare_started = time.perf_counter()
     inputs = prepare_inputs(processor, [{'role': 'system', 'content': system},
@@ -382,7 +406,9 @@ def structured_call(model, processor, system, payload, *, max_tokens=512, budget
                     profile_operator_kernels=profile_operator_kernels,
                     profile_decode_forward_calls=profile_decode_forward_calls,
                     profile_reader=profile_reader, stage_profiler=stage_profiler,
-                    stage_prefix=stage_prefix, n_images=n_images)
+                    stage_prefix=stage_prefix, n_images=n_images,
+                    lm_head_shadow=lm_head_shadow,
+                    lm_head_shadow_phase=lm_head_shadow_phase)
     postprocess_started = time.perf_counter()
     try:
         result['parsed'] = parse_object(result['answer']) if result['stop_reason'] in {'eos', 'json_complete'} else None

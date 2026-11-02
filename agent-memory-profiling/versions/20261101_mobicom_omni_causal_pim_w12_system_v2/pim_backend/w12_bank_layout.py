@@ -209,6 +209,34 @@ class W12BankLayout:
                          "reconstruction and MAC, not bank hardware"),
         }
 
+    def export_codes_and_scales(self):
+        """Return a read-only, bit-exact export of all logical bank rows."""
+        codes = torch.empty(
+            (self.rows, self.columns), dtype=torch.int16,
+            device=self.storage.device)
+        scales = torch.empty(
+            (self.rows, self.groups), dtype=torch.float32,
+            device=self.storage.device)
+        with torch.no_grad():
+            for row_round in range(self.rounds):
+                slot_begin = row_round * self.tile_rows
+                decoded = self._decode_tile_codes(
+                    slot_begin, 0, self.active_banks)
+                decoded_scales = self.group_scales[
+                    0:self.active_banks,
+                    slot_begin:slot_begin + self.tile_rows]
+                first = row_round * self.active_banks * self.tile_rows
+                valid = min(self.rows - first, decoded.shape[0] * decoded.shape[1])
+                if valid <= 0:
+                    break
+                codes[first:first + valid] = decoded.reshape(
+                    -1, self.columns)[:valid]
+                scales[first:first + valid] = decoded_scales.reshape(
+                    -1, self.groups)[:valid]
+        codes.requires_grad_(False)
+        scales.requires_grad_(False)
+        return codes, scales
+
     def _decode_tile_codes(self, slot_begin, bank_begin, bank_end):
         planes = self.storage[
             bank_begin:bank_end, slot_begin:slot_begin + self.tile_rows,

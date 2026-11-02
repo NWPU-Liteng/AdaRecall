@@ -52,6 +52,7 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
                                             plan_evidence_state_prefilter)
 from pim_backend.functional_decode import materialize_w12a16_primary
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
+from pim_backend.progressive_lm_head import ProgressiveLmHeadShadow
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
 from extensions_config import load_extensions
 from label_read_guard import install_label_read_guard
@@ -512,6 +513,24 @@ def main():
                         if args.lm_head_functional_mode != 'off' else None)
     if lm_head_dispatch is not None:
         lm_head_dispatch.__enter__()
+    progressive_lm_head_shadow = None
+    if extensions.progressive_topk.lm_head == 'shadow':
+        if w12_dispatch is None:
+            raise ValueError('progressive lm_head shadow requires the W12 bank route')
+        lm_head_wrapper = w12_dispatch.modules.get('lm_head')
+        if lm_head_wrapper is None:
+            raise ValueError('progressive lm_head shadow requires a W12 lm_head module')
+        if (extensions.progressive_topk.bits != 12
+                or extensions.progressive_topk.group_size != args.w12a16_group_size):
+            raise ValueError('progressive lm_head bits/group_size must match the W12 layout')
+        progressive_lm_head_shadow = ProgressiveLmHeadShadow(
+            lm_head_wrapper,
+            vocab_rows=lm_head_wrapper.out_features,
+            valid_vocab_size=len(processor.tokenizer),
+            shadow_every=extensions.progressive_topk.lm_head_shadow_every,
+            plane_schedule=extensions.progressive_topk.plane_schedule,
+            eps_rel=extensions.progressive_topk.eps_rel,
+        ).__enter__()
     render_cache = {}
     startup_seconds = time.perf_counter() - started
 
@@ -634,7 +653,9 @@ def main():
                 {'question': query, 'output_contract': 'JSON only'}, max_tokens=1024,
                 budget=args.input_budget, json_schema=parser_schema,
                 enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
-                profile_reader=stage_profiler is not None)
+                profile_reader=stage_profiler is not None,
+                lm_head_shadow=progressive_lm_head_shadow,
+                lm_head_shadow_phase='contract_parse')
             if profile_stage is not None:
                 profile_stage.add_reader_profile(parse_result['reader_stage_profile'])
         w12_after_parser = w12_snapshot()
@@ -896,7 +917,9 @@ def main():
                     grounding_payload, max_tokens=4096,
                     budget=args.input_budget, json_schema=witness_schema,
                     enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
-                    profile_reader=stage_profiler is not None)
+                    profile_reader=stage_profiler is not None,
+                    lm_head_shadow=progressive_lm_head_shadow,
+                    lm_head_shadow_phase='witness_construct')
                 if profile_stage is not None:
                     profile_stage.add_reader_profile(
                         grounding_result['reader_stage_profile'])
@@ -991,7 +1014,9 @@ def main():
                     reader, processor, multi_witness_prompt, grounding_payload,
                     max_tokens=4096, budget=args.input_budget, json_schema=witness_schema,
                     enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
-                    profile_reader=stage_profiler is not None)
+                    profile_reader=stage_profiler is not None,
+                    lm_head_shadow=progressive_lm_head_shadow,
+                    lm_head_shadow_phase='witness_construct')
                 if profile_stage is not None:
                     profile_stage.add_reader_profile(
                         shadow_result['reader_stage_profile'])
@@ -1079,7 +1104,9 @@ def main():
                             max_tokens=4096, budget=args.input_budget, json_schema=witness_schema,
                             enabled=args.pre_reader_operator_profile,
                             lm_head_dispatch=lm_head_dispatch,
-                            profile_reader=stage_profiler is not None)
+                            profile_reader=stage_profiler is not None,
+                            lm_head_shadow=progressive_lm_head_shadow,
+                            lm_head_shadow_phase='witness_construct')
                         if profile_stage is not None:
                             profile_stage.add_reader_profile(
                                 local_result['reader_stage_profile'])
@@ -1526,7 +1553,9 @@ def main():
                            profile_reader=stage_profiler is not None,
                            stage_profiler=stage_profiler,
                            stage_prefix='answer' if stage_profiler is not None else None,
-                           n_images=len(loaded))
+                           n_images=len(loaded),
+                           lm_head_shadow=progressive_lm_head_shadow,
+                           lm_head_shadow_phase='answer')
         w12_after_reader = w12_snapshot()
         w12_stage_dispatch = None
         if w12_dispatch is not None:
@@ -1619,6 +1648,12 @@ def main():
     w12_stage_summary = aggregate_w12_stage_dispatch(rows)
     w12_dispatch_summary = (w12_dispatch.summary()
                             if w12_dispatch is not None else None)
+    progressive_lm_head_summary = (
+        progressive_lm_head_shadow.summary()
+        if progressive_lm_head_shadow is not None
+        else ProgressiveLmHeadShadow.disabled_summary())
+    if progressive_lm_head_shadow is not None:
+        progressive_lm_head_shadow.__exit__(None, None, None)
     if w12_dispatch is not None:
         w12_dispatch.__exit__(None, None, None)
     if lm_head_dispatch is not None:
@@ -1691,6 +1726,7 @@ def main():
                                          'performance_comparable': None}),
         'reader_w12_bank_materialization': w12_materialization,
         'w12_stage_dispatch': w12_stage_summary,
+        'progressive_lm_head_stats': progressive_lm_head_summary,
         'proof_query_shadow_enabled': args.proof_query_shadow,
         'evidence_state_prefilter_shadow_enabled': args.evidence_state_prefilter_shadow,
         'multi_witness_shadow_enabled': args.multi_witness_shadow,

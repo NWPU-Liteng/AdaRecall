@@ -6,7 +6,8 @@ import torch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from pim_backend.functional_decode import Int12WeightOnlyContract
+from pim_backend.functional_decode import (Int12WeightOnlyContract,
+                                           quantize_signed_groups)
 from pim_backend.w12_bank_layout import W12BankLayout
 
 
@@ -101,6 +102,33 @@ class W12BankLayoutTests(unittest.TestCase):
             layout.gemv(torch.randn(128, dtype=torch.float32))
         with self.assertRaises(ValueError):
             layout.linear(torch.randn(3, 64, dtype=torch.bfloat16))
+
+    def test_export_codes_and_scales_matches_bank_storage_bitwise(self):
+        torch.manual_seed(29)
+        weight = torch.randn(301, 256, dtype=torch.bfloat16)
+        layout = W12BankLayout(
+            weight, group_size=64, bank_count=4, tile_rows=16)
+        expected_codes, expected_scales, _ = quantize_signed_groups(
+            weight, group_size=64, weight_bits=12)
+
+        codes, scales = layout.export_codes_and_scales()
+
+        self.assertEqual(codes.dtype, torch.int16)
+        self.assertEqual(scales.dtype, torch.float32)
+        self.assertEqual(codes.shape, (301, 256))
+        self.assertEqual(scales.shape, (301, 4))
+        self.assertFalse(codes.requires_grad)
+        self.assertFalse(scales.requires_grad)
+        torch.testing.assert_close(codes, expected_codes, rtol=0, atol=0)
+        torch.testing.assert_close(scales, expected_scales, rtol=0, atol=0)
+
+        codes[0, 0] ^= 1
+        scales[0, 0] = 0
+        exported_again, exported_scales_again = layout.export_codes_and_scales()
+        torch.testing.assert_close(
+            exported_again, expected_codes, rtol=0, atol=0)
+        torch.testing.assert_close(
+            exported_scales_again, expected_scales, rtol=0, atol=0)
 
 
 if __name__ == '__main__':
