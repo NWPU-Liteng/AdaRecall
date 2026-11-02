@@ -53,6 +53,9 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
 from pim_backend.functional_decode import materialize_w12a16_primary
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.progressive_lm_head import ProgressiveLmHeadShadow
+from pim_backend.progressive_retrieval import (aggregate_retrieval_stats,
+                                               select_dense_candidates)
+from pim_backend.progressive_topk import quantize_plane_major
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
 from extensions_config import load_extensions
 from label_read_guard import install_label_read_guard
@@ -374,6 +377,18 @@ def main():
     vectors = np.load(args.index / 'vectors.npy')
     base_records = records
     base_vectors = vectors
+    progressive_retrieval_mode = extensions.progressive_topk.retrieval
+    progressive_retrieval_matrix = None
+    if progressive_retrieval_mode != 'off':
+        if (extensions.progressive_topk.bits != 12
+                or extensions.progressive_topk.group_size != 128):
+            raise ValueError('progressive retrieval requires bits=12 and group_size=128')
+        if (vectors.ndim != 2
+                or vectors.shape[1] % extensions.progressive_topk.group_size):
+            raise ValueError('progressive retrieval vectors must align to groups')
+        progressive_retrieval_matrix = quantize_plane_major(
+            vectors, bits=extensions.progressive_topk.bits,
+            group_size=extensions.progressive_topk.group_size)
     source = json.loads((args.index / 'source.json').read_text())
     objects = source['objects']
     image_costs = {key: int(value) for key, value in json.loads((args.index / 'image_costs.json').read_text()).items()}
@@ -561,6 +576,8 @@ def main():
         visible_index_seconds = 0.0
         visible_index_mode = 'static_full_history'
         visible_session_ids = None
+        progressive_row_mask = None
+        progressive_index_map = None
         replay = None
         visible_record_count = len(base_records)
         visible_vector_bytes = int(base_vectors.nbytes)
@@ -595,6 +612,8 @@ def main():
                 }
             if args.capture_reader_inputs:
                 row['input_path'] = None
+            if progressive_retrieval_mode != 'off':
+                row['progressive_retrieval_demands'] = []
             rows.append(row)
             completed_ids.add(question_id)
             write_json(partial_path, {'complete': False,
@@ -626,10 +645,21 @@ def main():
                 ], dtype=bool)
                 records = [record for record, selected in zip(base_records, keep) if selected]
                 vectors = base_vectors[keep]
+                if progressive_retrieval_mode != 'off':
+                    progressive_row_mask = keep
+                    progressive_index_map = np.full(
+                        len(base_records), -1, dtype=np.int64)
+                    progressive_index_map[keep] = np.arange(
+                        int(keep.sum()), dtype=np.int64)
                 visible_index_mode = 'dynamic_visible_filter'
             else:
                 records = base_records
                 vectors = base_vectors
+                if progressive_retrieval_mode != 'off':
+                    progressive_row_mask = np.asarray([
+                        str(record.get('session_id')) in visible_session_ids
+                        for record in base_records
+                    ], dtype=bool)
                 visible_index_mode = 'dynamic_visible_mask'
             visible_index_seconds = time.perf_counter() - filter_started
             visible_record_count = int(sum(
@@ -683,6 +713,7 @@ def main():
         query_vector_seconds = time.perf_counter() - query_vector_started
         with profile_scope('dense_retrieval') as profile_stage:
             candidate_pool_records = []
+            question_retrieval_demands = []
             dense_search_started = time.perf_counter()
             candidate_width = 48
             for demand_index, demand_vector in enumerate(vectors_for_query):
@@ -694,33 +725,42 @@ def main():
                         str(record.get('session_id')) not in visible_session_ids
                         for record in records
                     ], dtype=bool)] = -np.inf
-                finite = np.isfinite(scores)
                 required_kind = demand.get('evidence_scope', {}).get('kind')
+                required_kind_mask = None
+                base_required_kind_mask = None
                 if required_kind in {'source_text', 'image_locator'}:
-                    modality = np.asarray([record.get('kind') == required_kind
-                                           for record in records], dtype=bool)
-                    primary = np.flatnonzero(finite & modality)
-                    primary = primary[np.argsort(-scores[primary])][:min(32, candidate_width)]
-                    remaining = np.flatnonzero(finite)
-                    remaining = remaining[np.argsort(-scores[remaining])]
-                    order = list(primary)
-                    seen = set(int(value) for value in primary)
-                    for value in remaining:
-                        if int(value) not in seen:
-                            order.append(int(value))
-                            seen.add(int(value))
-                        if len(order) >= candidate_width:
-                            break
-                    order = np.asarray(order[:candidate_width], dtype=np.int64)
-                else:
-                    order = np.argsort(-scores)
-                    order = order[np.isfinite(scores[order])][:candidate_width]
+                    required_kind_mask = np.asarray([
+                        record.get('kind') == required_kind
+                        for record in records
+                    ], dtype=bool)
+                    base_required_kind_mask = np.asarray([
+                        record.get('kind') == required_kind
+                        for record in base_records
+                    ], dtype=bool)
+                order, order_scores, retrieval_stats = select_dense_candidates(
+                    scores, mode=progressive_retrieval_mode,
+                    required_kind_mask=required_kind_mask,
+                    candidate_width=candidate_width,
+                    matrix=progressive_retrieval_matrix, query=demand_vector,
+                    progressive_required_kind_mask=base_required_kind_mask,
+                    progressive_row_mask=progressive_row_mask,
+                    index_map=progressive_index_map,
+                    plane_schedule=extensions.progressive_topk.plane_schedule,
+                    eps_rel=extensions.progressive_topk.eps_rel)
+                if retrieval_stats is not None:
+                    question_retrieval_demands.append({
+                        **retrieval_stats,
+                        'question_id': question_id,
+                        'demand_id': demand['demand_id'],
+                        'demand_index': demand_index,
+                        'required_kind': required_kind,
+                    })
                 for retrieval_rank, rank in enumerate(order):
                     base = records[int(rank)]
                     candidate_pool_records.append({**base, 'witness_id': f"{base['record_id']}#d{demand_index}",
                         'demand_id': demand['demand_id'], 'base_record_id': base['record_id'],
                         'query_rank': int(rank), 'retrieval_rank': retrieval_rank,
-                        'score': float(scores[int(rank)]),
+                        'score': float(order_scores[retrieval_rank]),
                         'bindings': base.get('bindings', {}),
                         'source_relations': base.get('source_relations', []),
                         'evidence_metadata': evidence_state_by_record.get(base['record_id'])})
@@ -1510,6 +1550,8 @@ def main():
                 }),
                 'evaluation_label_files_read': [],
             }
+            if progressive_retrieval_mode != 'off':
+                row['progressive_retrieval_demands'] = question_retrieval_demands
             rows.append(row)
             completed_ids.add(question_id)
             write_json(partial_path, {'complete': False,
@@ -1615,6 +1657,8 @@ def main():
                 'runtime_labels_read': False,
             }),
             'evaluation_label_files_read': [], 'request_index': position}
+        if progressive_retrieval_mode != 'off':
+            row['progressive_retrieval_demands'] = question_retrieval_demands
         if stage_profile_enabled:
             row['stage_profile'] = stage_profiler.as_dict(
                 request_wall_ms=service_seconds * 1000.0)
@@ -1652,6 +1696,17 @@ def main():
         progressive_lm_head_shadow.summary()
         if progressive_lm_head_shadow is not None
         else ProgressiveLmHeadShadow.disabled_summary())
+    progressive_retrieval_demands = [
+        demand
+        for row in rows
+        for demand in row.get('progressive_retrieval_demands', [])
+    ]
+    progressive_retrieval_summary = aggregate_retrieval_stats(
+        progressive_retrieval_mode, progressive_retrieval_demands,
+        bits=extensions.progressive_topk.bits,
+        group_size=extensions.progressive_topk.group_size,
+        codes_sha256=(progressive_retrieval_matrix.codes_sha256
+                      if progressive_retrieval_matrix is not None else None))
     if progressive_lm_head_shadow is not None:
         progressive_lm_head_shadow.__exit__(None, None, None)
     if w12_dispatch is not None:
@@ -1727,6 +1782,7 @@ def main():
         'reader_w12_bank_materialization': w12_materialization,
         'w12_stage_dispatch': w12_stage_summary,
         'progressive_lm_head_stats': progressive_lm_head_summary,
+        'progressive_retrieval_stats': progressive_retrieval_summary,
         'proof_query_shadow_enabled': args.proof_query_shadow,
         'evidence_state_prefilter_shadow_enabled': args.evidence_state_prefilter_shadow,
         'multi_witness_shadow_enabled': args.multi_witness_shadow,
