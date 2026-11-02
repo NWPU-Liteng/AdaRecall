@@ -37,7 +37,7 @@ from omni_proof_query_contract import (QUERY_CONTRACT_PROMPT, QUERY_CONTRACT_SCH
                                        parse_query_contract, reader_context,
                                        render_operation_plan, retrieval_views)
 from audit_proof_direction import selected_jsonl
-from omni_proof_sources import image_source_header, materialize
+from omni_proof_sources import image_source_header, materialize, visible_sessions
 from omni_provenance_optimizer import FrozenRelevanceModel
 from pim_backend.evidence_frontier import (build_frontier_levels, candidates_for_frontier_level,
                                            compile_candidate_frontier)
@@ -193,6 +193,30 @@ def load_persistent_replay(path, person_id):
     return queries
 
 
+def no_visible_history_row(*, person_id, question_id, query, request_index,
+                           service_seconds, visibility_protocol):
+    return {
+        'person_id': person_id, 'question_id': question_id,
+        'question_sha256': hashlib.sha256(query.encode()).hexdigest(),
+        'answer': '', 'answer_sha256': hashlib.sha256(b'').hexdigest(),
+        'answer_token_ids': [], 'stop_reason': 'no_visible_history',
+        'status': 'no_visible_history', 'visibility_protocol': visibility_protocol,
+        'n_visible_sessions': 0, 'service_seconds': service_seconds,
+        'ttft_seconds': 0.0, 'prefill_seconds': 0.0, 'decode_seconds': 0.0,
+        'input_tokens': 0, 'images': [], 'accepted_atom_ids': [],
+        'materialized_object_ids': [], 'execution_events': [],
+        'proof_plan': {
+            'proof_status': 'no_visible_history',
+            'selection_mode': 'no_visible_history',
+            'semantic_proof': False, 'accepted_object_ids': [],
+            'selected_records': [], 'query_parse': {
+                'status': 'not_run_no_visible_history'},
+        },
+        'evaluation_label_files_read': [], 'request_index': request_index,
+        'persistent_replay': {'enabled': False, 'runtime_labels_read': False},
+    }
+
+
 def main():
     install_label_read_guard()
     parser = argparse.ArgumentParser()
@@ -301,9 +325,24 @@ def main():
     args.output.parent.mkdir(parents=True, exist_ok=True)
     started = time.perf_counter()
     if args.allowed_splits == ['development']:
-        authorize_development_users(args.prepared, [args.user_id])
+        serving_audit = authorize_development_users(args.prepared, [args.user_id])
     else:
-        authorize_users(args.prepared, [args.user_id], allowed_splits=set(args.allowed_splits))
+        serving_audit = authorize_users(
+            args.prepared, [args.user_id], allowed_splits=set(args.allowed_splits))
+    graph_path = args.prepared / 'omni_graph.json'
+    if file_digest(graph_path) != serving_audit['artifacts_sha256']['omni_graph.json']:
+        raise ValueError('serving graph identity changed')
+    authorized_graphs = [
+        value for value in json.loads(graph_path.read_text())
+        if str(value.get('person_id')) == str(args.user_id)]
+    if len(authorized_graphs) != 1 or str(
+            authorized_graphs[0].get('person_id')) != str(args.user_id):
+        raise ValueError('authorized omni graph missing for user')
+    graph = authorized_graphs[0]
+    if graph.get('label_free') is not True:
+        raise ValueError('omni graph is not label-free')
+    graph_session_ids = frozenset(
+        str(session['session_id']) for session in graph['sessions'])
     index_meta = json.loads((args.index / 'index.json').read_text())
     if not index_meta.get('complete') or index_meta['person_id'] != args.user_id:
         raise ValueError('complete proof index for this user required')
@@ -488,13 +527,63 @@ def main():
         visible_index_seconds = 0.0
         visible_index_mode = 'static_full_history'
         visible_session_ids = None
+        replay = None
         visible_record_count = len(base_records)
         visible_vector_bytes = int(base_vectors.nbytes)
+        if extensions.visibility_protocol == 'as_of_question':
+            question_visible_session_ids = visible_sessions(graph, manifest)
+        else:
+            question_visible_session_ids = graph_session_ids
+        n_visible_sessions = len(question_visible_session_ids)
         if replay_queries is not None:
             replay = replay_queries[question_id]
             if replay['query_text'] != query:
                 raise ValueError(f'replay/manifest query mismatch for {question_id}')
             visible_session_ids = set(map(str, replay['visible_session_ids']))
+        if extensions.visibility_protocol == 'as_of_question':
+            visible_session_ids = (set(question_visible_session_ids)
+                                   if visible_session_ids is None else
+                                   visible_session_ids & set(question_visible_session_ids))
+        if (extensions.visibility_protocol == 'as_of_question'
+                and n_visible_sessions == 0):
+            row = no_visible_history_row(
+                person_id=args.user_id, question_id=question_id, query=query,
+                request_index=position, service_seconds=time.perf_counter() - request_started,
+                visibility_protocol=extensions.visibility_protocol)
+            if replay is not None:
+                row['persistent_replay'] = {
+                    'enabled': True,
+                    'visible_index_mode': args.visible_index_mode,
+                    'visible_session_count': 0,
+                    'visible_record_count': 0,
+                    'full_record_count': len(base_records),
+                    'runtime_labels_read': False,
+                }
+            if args.capture_reader_inputs:
+                row['input_path'] = None
+            rows.append(row)
+            completed_ids.add(question_id)
+            write_json(partial_path, {'complete': False,
+                'person_id': args.user_id, 'question_ids': question_ids, 'rows': rows,
+                'shard_index': args.shard_index, 'shard_count': args.shard_count,
+                'capacity_capture_only': bool(args.capture_reader_inputs),
+                'extensions': extensions_contract,
+                'pre_reader_operator_profile': args.pre_reader_operator_profile,
+                'reader_quantization': args.reader_quantization,
+                'w12_functional_route': args.w12_functional_route,
+                'w12_numeric_mode': args.w12_numeric_mode,
+                'w12_bank_count': args.w12_bank_count,
+                'w12_tile_rows': args.w12_tile_rows,
+                'w12_host_contract_rows': args.w12_host_contract_rows,
+                'w12a16_group_size': args.w12a16_group_size,
+                'w12_release_source': args.w12_release_source,
+                'cohort_sha256': file_digest(args.cohort),
+                'evaluation_label_files_read': []})
+            print(json.dumps({'question_id': question_id, 'position': position + 1,
+                              'status': 'no_visible_history', 'images': 0,
+                              'input_tokens': 0}, ensure_ascii=False), flush=True)
+            continue
+        if visible_session_ids is not None:
             filter_started = time.perf_counter()
             if args.visible_index_mode == 'filter':
                 keep = np.asarray([
@@ -513,7 +602,7 @@ def main():
                 str(record.get('session_id')) in visible_session_ids for record in base_records
             ))
             visible_vector_bytes = int(visible_record_count * base_vectors.shape[1] * base_vectors.dtype.itemsize)
-            if args.maintenance_progress:
+            if replay is not None and args.maintenance_progress:
                 write_json(args.maintenance_progress, {
                     'person_id': args.user_id,
                     'question_id': question_id,
@@ -1070,7 +1159,8 @@ def main():
             identity = tuple(sorted(object_ids))
             if identity in render_cache:
                 return render_cache[identity]
-            selected = materialize(objects, identity)
+            selected = materialize(objects, identity,
+                                   visible_session_ids=visible_session_ids)
             loaded = []
             for ref in selected['images']:
                 image_identity = ref['image_sha256']
@@ -1281,7 +1371,9 @@ def main():
                 source_hints[source_record['image_object_id']] = source_record['image_source']
             source_hints.update(item.get('source_hints', {}))
         with profile_scope('materialize') as profile_stage:
-            materialized = materialize(objects, plan['accepted_object_ids'], source_hints)
+            materialized = materialize(
+                objects, plan['accepted_object_ids'], source_hints,
+                visible_session_ids=visible_session_ids)
             loaded = []
             for ref in materialized['images']:
                 identity = ref['image_sha256']
@@ -1326,6 +1418,9 @@ def main():
                 'person_id': args.user_id,
                 'question_id': question_id,
                 'request_index': position,
+                'status': 'ok',
+                'visibility_protocol': extensions.visibility_protocol,
+                'n_visible_sessions': n_visible_sessions,
                 'input_path': str(capture_path),
                 'input_tokens': int(inputs.input_ids.shape[1]),
                 'image_count': len(loaded),
@@ -1415,6 +1510,8 @@ def main():
             'question_sha256': hashlib.sha256(query.encode()).hexdigest(), 'answer': generated['answer'],
             'answer_sha256': hashlib.sha256(generated['answer'].encode()).hexdigest(),
             'answer_token_ids': generated['answer_token_ids'], 'stop_reason': generated['stop_reason'],
+            'status': 'ok', 'visibility_protocol': extensions.visibility_protocol,
+            'n_visible_sessions': n_visible_sessions,
             'service_seconds': service_seconds,
             'ttft_seconds': generation_started - request_started + generated['first_token_from_reader_start_seconds'],
             'prefill_seconds': generated['prefill_seconds'],

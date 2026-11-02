@@ -116,6 +116,27 @@ def build_stats(run_dir):
 
     proof_status = _counts(plan.get('proof_status') for plan in plans)
     selection_mode = _counts(plan.get('selection_mode') for plan in plans)
+    visibility_status = _counts(row.get('status') for row in rows)
+    visibility_protocols = _counts(
+        row.get('visibility_protocol') for row in rows)
+    n_visible_sessions = []
+    missing_n_visible_sessions = 0
+    for row in rows:
+        value = row.get('n_visible_sessions')
+        if value is None:
+            missing_n_visible_sessions += 1
+            continue
+        number = _number(value, 'n_visible_sessions')
+        if number < 0 or not number.is_integer():
+            raise ValueError('n_visible_sessions must be a non-negative integer')
+        n_visible_sessions.append(int(number))
+    visibility = {
+        'protocols': visibility_protocols,
+        'status': visibility_status,
+        'no_visible_history': visibility_status.get('no_visible_history', 0),
+        'n_visible_sessions': distribution(n_visible_sessions),
+        'rows_missing_n_visible_sessions': missing_n_visible_sessions,
+    }
     parse_status = _counts(
         (plan.get('query_parse') or {}).get('status')
         if isinstance(plan.get('query_parse'), dict) else None
@@ -272,6 +293,7 @@ def build_stats(run_dir):
         'users': sorted({str(row.get('person_id')) for row in rows}),
         'proof_status': proof_status,
         'selection_mode': selection_mode,
+        'visibility': visibility,
         'answer_mode': answer_mode,
         'answer_mode_contextual_ratio': contextual / len(rows),
         'parse_status': parse_status,
@@ -309,6 +331,20 @@ def render_markdown(stats):
         add('proof_status', name, value)
     for name, value in stats['selection_mode'].items():
         add('selection_mode', name, value)
+    for name, value in stats['visibility']['protocols'].items():
+        add('visibility', f'protocol.{name}', value)
+    for name, value in stats['visibility']['status'].items():
+        add('visibility', f'status.{name}', value)
+    add('visibility', 'no_visible_history',
+        stats['visibility']['no_visible_history'])
+    add('visibility', 'rows_missing_n_visible_sessions',
+        stats['visibility']['rows_missing_n_visible_sessions'])
+    visible = stats['visibility']['n_visible_sessions']
+    if visible is None:
+        add('visibility', 'n_visible_sessions.count', 0)
+    else:
+        for metric in ('mean', 'p50', 'p90', 'min', 'max'):
+            add('visibility', f'n_visible_sessions.{metric}', visible[metric])
     for name, value in stats['answer_mode'].items():
         add('answer_mode', name, value)
     add('answer_mode', 'contextual_ratio', stats['answer_mode_contextual_ratio'])

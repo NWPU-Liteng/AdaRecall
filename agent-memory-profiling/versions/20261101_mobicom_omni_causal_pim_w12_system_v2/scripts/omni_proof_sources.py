@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import json
 
+from omni_prepare import parse_time
 from omni_proof_runtime import checksum
 from omni_provenance_optimizer import build_provenance_hyperedges
 
@@ -11,6 +12,71 @@ def timed_atom(atom):
     interval = f"{atom.get('visibility_start', 'unknown')}..{atom.get('visibility_end', 'unknown')}"
     return (f"[{atom['session_id']}][{atom['atom_id']}][{atom['role']}]"
             f"[session_interval={interval}; not_turn_timestamp] {atom['content']}")
+
+
+def _session_visibility_end(session):
+    values = []
+    for field in ('visibility_end', 'end_time'):
+        value = session.get(field)
+        if value is None:
+            continue
+        if not isinstance(value, str) or not value:
+            raise ValueError(f'session {field} must be a non-empty string')
+        values.append((field, parse_time(value)))
+    if not values:
+        raise ValueError('session visibility_end/end_time missing')
+    if any(value != values[0][1] for _, value in values[1:]):
+        raise ValueError('session visibility_end and end_time disagree')
+    return values[0][1]
+
+
+def visible_sessions(graph, question):
+    """Return sessions whose complete visibility interval ends by the question time."""
+    if not isinstance(graph, dict) or not isinstance(graph.get('sessions'), list):
+        raise ValueError('omni graph sessions missing')
+    if not isinstance(question, dict):
+        raise ValueError('question must be an object')
+    timestamp = question.get('effective_timestamp')
+    if not isinstance(timestamp, str) or not timestamp:
+        raise ValueError('question effective_timestamp missing')
+    cutoff = parse_time(timestamp)
+    visible = set()
+    for session in graph['sessions']:
+        if not isinstance(session, dict):
+            raise ValueError('omni graph session must be an object')
+        session_id = session.get('session_id')
+        if not isinstance(session_id, str) or not session_id:
+            raise ValueError('omni graph session identity missing')
+        if session_id in visible:
+            raise ValueError(f'duplicate omni graph session: {session_id}')
+        if _session_visibility_end(session) <= cutoff:
+            visible.add(session_id)
+    return frozenset(visible)
+
+
+def object_is_visible(obj, visible_session_ids):
+    """Apply the text/image object visibility rule under a session set."""
+    if not isinstance(obj, dict):
+        raise ValueError('source object must be an object')
+    visible_session_ids = frozenset(map(str, visible_session_ids))
+    kind = obj.get('kind')
+    if kind == 'text':
+        session_id = obj.get('session_id')
+        if not isinstance(session_id, str) or not session_id:
+            raise ValueError('text object session missing')
+        return session_id in visible_session_ids
+    if kind == 'image':
+        sources = obj.get('sources')
+        if not isinstance(sources, list) or not sources:
+            raise ValueError('image object sources missing')
+        session_ids = []
+        for source in sources:
+            session_id = source.get('session_id') if isinstance(source, dict) else None
+            if not isinstance(session_id, str) or not session_id:
+                raise ValueError('image source session missing')
+            session_ids.append(session_id)
+        return any(session_id in visible_session_ids for session_id in session_ids)
+    raise ValueError(f'unknown source object kind: {kind}')
 
 
 def build_sources(graph, image_hashes):
@@ -84,19 +150,35 @@ def build_sources(graph, image_hashes):
             'boundary': 'one primary atom per text record; neighboring turns are optional source context, not forced materialization; session time is not per-turn event time'}
 
 
-def materialize(objects, object_ids, source_hints=None):
+def materialize(objects, object_ids, source_hints=None, visible_session_ids=None):
     source_hints = source_hints or {}
-    selected = [objects[identity] for identity in set(object_ids)]
+    identities = sorted(set(object_ids))
+    selected = [objects[identity] for identity in identities]
+    if visible_session_ids is not None:
+        visible_session_ids = frozenset(map(str, visible_session_ids))
+        forbidden = [identity for identity, value in zip(identities, selected)
+                     if not object_is_visible(value, visible_session_ids)]
+        if forbidden:
+            raise ValueError('attempted to materialize invisible object(s): '
+                             + ','.join(forbidden))
     texts = sorted((value for value in selected if value['kind'] == 'text'),
                    key=lambda value: (value['ordinal'], value['object_id']))
     images = sorted((value for value in selected if value['kind'] == 'image'),
                     key=lambda value: (value['sources'][0]['ordinal'], value['object_id']))
     refs = []
     for image in images:
-        source = source_hints.get(image['object_id'], image['sources'][0])
+        sources = image['sources']
+        if visible_session_ids is not None:
+            sources = [source for source in sources
+                       if str(source['session_id']) in visible_session_ids]
+        source = source_hints.get(image['object_id'])
+        if (source is None
+                or (visible_session_ids is not None
+                    and str(source.get('session_id')) not in visible_session_ids)):
+            source = sources[0]
         refs.append({**source['image_ref'], 'source_atom_id': source['atom_id'],
                      'source_session_id': source['session_id'], 'object_id': image['object_id'],
-                     'image_sha256': image['source_sha256'], 'all_observable_sources': image['sources']})
+                     'image_sha256': image['source_sha256'], 'all_observable_sources': sources})
     return {'text': '\n'.join(value['text'] for value in texts), 'images': refs,
             'accepted_atom_ids': [value['atom_id'] for value in texts],
             'materialized_object_ids': sorted(set(object_ids))}

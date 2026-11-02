@@ -175,6 +175,48 @@ def create_fixture(root, *, rows=None, labels=None, objects=None):
 
 
 class EvalEvidenceRecallTests(unittest.TestCase):
+    def test_as_of_future_history_dependence_is_counted(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = create_fixture(Path(directory))
+            graph = [{
+                'person_id': '0', 'label_free': True,
+                'sessions': [
+                    {'session_id': '0_1', 'end_time': '2025-01-01 10:00:00'},
+                    {'session_id': '0_2', 'end_time': '2025-01-02 10:00:00'},
+                    {'session_id': '0_3', 'end_time': '2025-01-03 10:00:00'},
+                    {'session_id': '0_4', 'end_time': '2025-01-04 10:00:00'},
+                ],
+                'atoms': [],
+            }]
+            fixture['graph'].write_text(json.dumps(graph))
+            write_jsonl(fixture['prepared'] / 'manifests.jsonl', [
+                {'question_id': '0_q_1', 'person_id': '0',
+                 'effective_timestamp': '2025-01-01 12:00:00'},
+                {'question_id': '0_q_2', 'person_id': '0',
+                 'effective_timestamp': '2025-01-03 12:00:00'},
+                {'question_id': '0_q_3', 'person_id': '0',
+                 'effective_timestamp': '2025-01-03 12:00:00'},
+                {'question_id': '0_q_4', 'person_id': '0',
+                 'effective_timestamp': '2025-01-03 12:00:00'},
+            ])
+
+            report = build_report(fixture['run_dir'], fixture['labels'])
+
+        self.assertEqual(report['future_history_evidence']['status'],
+                         'computed_from_as_of_question')
+        self.assertEqual(
+            report['future_history_evidence']['questions_evaluated'], 4)
+        self.assertEqual(
+            report['future_history_evidence']
+            ['questions_depending_on_future_history'], 1)
+        self.assertEqual(
+            report['future_history_evidence']['invisible_labeled_session_units'], 1)
+        questions = {row['question_id']: row for row in report['questions']}
+        self.assertEqual(questions['0_q_1']['invisible_labeled_session_ids'],
+                         ['0_2'])
+        self.assertTrue(questions['0_q_1']['depends_on_future_history'])
+        self.assertFalse(questions['0_q_2']['depends_on_future_history'])
+
     def test_recall_uses_source_mapping_and_requested_groupings(self):
         with tempfile.TemporaryDirectory() as directory:
             fixture = create_fixture(Path(directory))

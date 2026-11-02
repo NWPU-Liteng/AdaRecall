@@ -315,6 +315,30 @@ class ReportRunStatsTests(unittest.TestCase):
         self.assertEqual(join['missing_support_gap'], 1)
         self.assertIsNone(join['support_gap'])
 
+    def test_visibility_and_no_visible_history_are_counted(self):
+        first = make_row('0_q_1', make_plan())
+        first.update({'status': 'ok', 'visibility_protocol': 'as_of_question',
+                      'n_visible_sessions': 3})
+        second = make_row('0_q_2', make_plan(
+            proof_status='no_visible_history', selection_mode='no_visible_history',
+            parse_status='not_run_no_visible_history'))
+        second.update({'status': 'no_visible_history',
+                       'visibility_protocol': 'as_of_question',
+                       'n_visible_sessions': 0})
+
+        with tempfile.TemporaryDirectory() as directory:
+            write_shard(directory, 'user_0_shard_0.json', [first, second])
+            visibility = build_stats(directory)['visibility']
+
+        self.assertEqual(visibility['protocols'], {'as_of_question': 2})
+        self.assertEqual(visibility['status'], {
+            'no_visible_history': 1, 'ok': 1})
+        self.assertEqual(visibility['no_visible_history'], 1)
+        self.assertEqual(visibility['rows_missing_n_visible_sessions'], 0)
+        self.assertEqual(visibility['n_visible_sessions']['count'], 2)
+        self.assertEqual(visibility['n_visible_sessions']['min'], 0)
+        self.assertEqual(visibility['n_visible_sessions']['max'], 3)
+
     def test_invalid_shapes_raise_clear_errors(self):
         with tempfile.TemporaryDirectory() as directory:
             write_shard(directory, 'user_0_shard_0.json', [{

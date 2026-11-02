@@ -8,6 +8,8 @@ import json
 import math
 from pathlib import Path
 
+from omni_proof_sources import visible_sessions
+
 
 SCHEMA = 'omni-evidence-recall-v1'
 
@@ -79,8 +81,37 @@ def load_graph(labels_path, graph_path=None):
         session_ids = {str(session.get('session_id')) for session in sessions}
         if None in session_ids or 'None' in session_ids:
             raise ValueError(f'omni graph session identity missing: {person_id}')
-        graphs[person_id] = session_ids
+        if len(session_ids) != len(sessions):
+            raise ValueError(f'duplicate omni graph session: {person_id}')
+        graphs[person_id] = graph
     return graphs, graph_path
+
+
+def load_manifests(labels_path, manifests_path=None):
+    labels_path = Path(labels_path)
+    manifests_path = (Path(manifests_path) if manifests_path
+                      else labels_path.parent / 'manifests.jsonl')
+    if not manifests_path.is_file():
+        return None, manifests_path
+    audit_path = labels_path.parent / 'audit.json'
+    if audit_path.is_file():
+        expected = json.loads(audit_path.read_text()).get('artifacts_sha256', {})
+        if (expected.get('manifests.jsonl')
+                and digest(manifests_path) != expected['manifests.jsonl']):
+            raise ValueError('manifests.jsonl does not match prepared audit')
+    manifests = {}
+    for manifest in read_jsonl(manifests_path):
+        question_id = manifest.get('question_id')
+        person_id = manifest.get('person_id')
+        timestamp = manifest.get('effective_timestamp')
+        if (not isinstance(question_id, str) or person_id is None
+                or not isinstance(timestamp, str) or not timestamp):
+            raise ValueError(f'manifest identity or timestamp missing: {manifests_path}')
+        identity = (str(person_id), question_id)
+        if identity in manifests:
+            raise ValueError(f'duplicate manifest: {identity}')
+        manifests[identity] = manifest
+    return manifests, manifests_path
 
 
 def load_run(run_dir):
@@ -272,7 +303,8 @@ def accepted_evidence(row, source, graph_sessions):
     return sessions, images
 
 
-def evaluate_question(label, row, source, graph_sessions, image_ref_map):
+def evaluate_question(label, row, source, graph_sessions, image_ref_map,
+                      visible_session_ids=None):
     labeled_sessions = _string_set(
         label.get('source_session_ids'), 'source_session_ids')
     image_refs = label.get('evidence_image_refs')
@@ -300,6 +332,13 @@ def evaluate_question(label, row, source, graph_sessions, image_ref_map):
     image_hits = len(labeled_images & accepted_images)
     mapped_sessions = len(labeled_sessions) - len(unmapped_sessions)
     mapped_images = len(labeled_images)
+    if visible_session_ids is None:
+        invisible_labeled_sessions = None
+        depends_on_future_history = None
+    else:
+        invisible_labeled_sessions = sorted(
+            (labeled_sessions & set(graph_sessions)) - set(visible_session_ids))
+        depends_on_future_history = bool(invisible_labeled_sessions)
     session_recall = session_hits / mapped_sessions if mapped_sessions else None
     image_recall = (image_hits / len(labeled_images)
                     if labeled_images else None)
@@ -323,6 +362,8 @@ def evaluate_question(label, row, source, graph_sessions, image_ref_map):
         'image_mapped_units': mapped_images,
         'session_hits': session_hits,
         'session_recall': session_recall,
+        'invisible_labeled_session_ids': invisible_labeled_sessions,
+        'depends_on_future_history': depends_on_future_history,
         'image_hits': image_hits,
         'image_recall': image_recall,
         'mapping_failures': {
@@ -360,11 +401,24 @@ def aggregate(rows):
         for name in ('session_ids', 'image_refs')
     }
     failures['total'] = failures['session_ids'] + failures['image_refs']
+    evaluated_future = [row for row in rows
+                        if row['depends_on_future_history'] is not None]
     return {
         'questions': len(rows),
         'evidence_recall_session': _recall_summary(rows, 'session'),
         'evidence_recall_image': _recall_summary(rows, 'image'),
         'mapping_failures': failures,
+        'future_history_evidence': {
+            'questions_evaluated': len(evaluated_future),
+            'questions_depending_on_future_history': sum(
+                row['depends_on_future_history'] is True
+                for row in evaluated_future),
+            'labeled_session_units': sum(
+                row['session_mapped_units'] for row in evaluated_future),
+            'invisible_labeled_session_units': sum(
+                len(row['invisible_labeled_session_ids'])
+                for row in evaluated_future),
+        },
     }
 
 
@@ -375,9 +429,12 @@ def _grouped(rows, key):
     return {name: aggregate(groups[name]) for name in sorted(groups)}
 
 
-def build_report(run_dir, labels_path, index_root=None, graph_path=None):
+def build_report(run_dir, labels_path, index_root=None, graph_path=None,
+                 manifests_path=None):
     labels = load_labels(labels_path)
     graphs, graph_path = load_graph(labels_path, graph_path=graph_path)
+    manifests, manifests_path = load_manifests(
+        labels_path, manifests_path=manifests_path)
     run_paths, rows, run_index_hashes = load_run(run_dir)
     source_root, source_paths = resolve_source_indexes(
         labels_path, index_root, run_index_hashes)
@@ -394,9 +451,18 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None):
             raise ValueError(f'run question has no label: {identity}')
         if person_id not in graphs:
             raise ValueError(f'run user has no omni graph: {person_id}')
+        graph = graphs[person_id]
+        graph_sessions = {
+            str(session.get('session_id')) for session in graph['sessions']}
+        visible_session_ids = None
+        if manifests is not None:
+            manifest = manifests.get(identity)
+            if manifest is None:
+                raise ValueError(f'run question has no manifest: {identity}')
+            visible_session_ids = visible_sessions(graph, manifest)
         results.append(evaluate_question(
-            label, row, sources[person_id], graphs[person_id],
-            image_ref_maps[person_id]))
+            label, row, sources[person_id], graph_sessions,
+            image_ref_maps[person_id], visible_session_ids=visible_session_ids))
 
     overall = aggregate(results)
     by_proof_status = _grouped(results, 'proof_status')
@@ -424,6 +490,8 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None):
         'run_dir': str(Path(run_dir).resolve()),
         'labels': str(Path(labels_path).resolve()),
         'graph': str(graph_path.resolve()),
+        'manifests': (str(Path(manifests_path).resolve())
+                      if manifests is not None else None),
         'source_root': str(Path(source_root).resolve()),
         'source_indexes': source_provenance,
         'source_files': [path.name for path in run_paths],
@@ -437,6 +505,11 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None):
         'evidence_recall_session': overall['evidence_recall_session'],
         'evidence_recall_image': overall['evidence_recall_image'],
         'mapping_failures': overall['mapping_failures'],
+        'future_history_evidence': {
+            'status': ('computed_from_as_of_question' if manifests is not None
+                       else 'skipped_no_manifests'),
+            **overall['future_history_evidence'],
+        },
         'by_proof_status': by_proof_status,
         'by_question_type': by_question_type,
         'by_proof_status_and_question_type': by_both,
@@ -451,9 +524,9 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None):
 
 
 def write_report(run_dir, labels_path, *, index_root=None, graph_path=None,
-                 output=None):
+                 manifests_path=None, output=None):
     report = build_report(run_dir, labels_path, index_root=index_root,
-                          graph_path=graph_path)
+                          graph_path=graph_path, manifests_path=manifests_path)
     output = Path(output) if output else Path(run_dir) / 'evidence_recall.json'
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(output.suffix + '.tmp')
@@ -469,17 +542,20 @@ def main(argv=None):
     parser.add_argument('--labels', type=Path, required=True)
     parser.add_argument('--index-root', type=Path)
     parser.add_argument('--graph', type=Path)
+    parser.add_argument('--manifests', type=Path)
     parser.add_argument('--output', type=Path)
     args = parser.parse_args(argv)
     output, report = write_report(
         args.run_dir, args.labels, index_root=args.index_root,
-        graph_path=args.graph, output=args.output)
+        graph_path=args.graph, manifests_path=args.manifests,
+        output=args.output)
     print(output)
     print(json.dumps({
         'questions': len(report['questions']),
         'evidence_recall_session': report['evidence_recall_session'],
         'evidence_recall_image': report['evidence_recall_image'],
         'mapping_failures': report['mapping_failures'],
+        'future_history_evidence': report['future_history_evidence'],
         'candidate_recall_session': report['candidate_recall_session']['status'],
     }, ensure_ascii=False))
 
