@@ -15,7 +15,7 @@ from report_run_stats import (SCHEMA, build_stats, distribution,
 def make_plan(*, proof_status='verified', selection_mode='proof_join',
               answer_mode='structured', parse_status='ok', optimal=None,
               support_gap=None, failed_strict_search=None, grounding=None,
-              shadow=None, final_render=None):
+              shadow=None, final_render=None, operation_execution=None):
     plan = {
         'proof_status': proof_status,
         'selection_mode': selection_mode,
@@ -34,6 +34,8 @@ def make_plan(*, proof_status='verified', selection_mode='proof_join',
         plan['multi_witness_shadow'] = shadow
     if final_render is not None:
         plan['final_render'] = final_render
+    if operation_execution is not None:
+        plan['operation_execution'] = operation_execution
     return plan
 
 
@@ -339,6 +341,36 @@ class ReportRunStatsTests(unittest.TestCase):
         self.assertEqual(visibility['n_visible_sessions']['min'], 0)
         self.assertEqual(visibility['n_visible_sessions']['max'], 3)
 
+    def test_operation_status_and_kind_are_counted(self):
+        rows = [
+            make_row('0_q_1', make_plan(operation_execution={
+                'op0': {'status': 'ok', 'kind': 'difference', 'result': {}},
+                'op1': {'status': 'not_executable', 'kind': 'comparison',
+                        'result': None, 'reason': 'missing'},
+            })),
+            make_row('0_q_2', make_plan(operation_execution={})),
+            make_row('0_q_3', make_plan()),
+        ]
+        with tempfile.TemporaryDirectory() as directory:
+            write_shard(directory, 'user_0_shard_0.json', rows)
+            stats = build_stats(directory)
+
+        operations = stats['operation_execution']
+        self.assertEqual(operations['rows_with_execution'], 2)
+        self.assertEqual(operations['rows_missing'], 1)
+        self.assertEqual(operations['total'], 2)
+        self.assertEqual(operations['by_status'], {
+            'not_executable': 1, 'ok': 1})
+        self.assertEqual(operations['by_kind'], {
+            'comparison': 1, 'difference': 1})
+        self.assertEqual(operations['by_kind_status'], {
+            'comparison': {'not_executable': 1},
+            'difference': {'ok': 1},
+        })
+        markdown = render_markdown(stats)
+        self.assertIn('| operation_execution | status.ok | 1 |', markdown)
+        self.assertIn('| operation_execution | kind.difference | 1 |', markdown)
+
     def test_invalid_shapes_raise_clear_errors(self):
         with tempfile.TemporaryDirectory() as directory:
             write_shard(directory, 'user_0_shard_0.json', [{
@@ -351,6 +383,12 @@ class ReportRunStatsTests(unittest.TestCase):
                 grounding={'rejections': 'not-a-list'}))
             write_shard(directory, 'user_0_shard_0.json', [row])
             with self.assertRaisesRegex(ValueError, 'rejection source'):
+                build_stats(directory)
+
+        with tempfile.TemporaryDirectory() as directory:
+            row = make_row('0_q_1', make_plan(operation_execution=[]))
+            write_shard(directory, 'user_0_shard_0.json', [row])
+            with self.assertRaisesRegex(ValueError, 'operation_execution must be an object'):
                 build_stats(directory)
 
         with tempfile.TemporaryDirectory() as directory:

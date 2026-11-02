@@ -28,8 +28,11 @@ from omni_witness_descriptor import (audit_descriptor_frontiers,
                                      validate_descriptor_index)
 from omni_proof_lifecycle import compile_lifecycle
 from omni_proof_backend import choose_backend
-from omni_proof_grounding import (WITNESS_PROMPT, compact_record, expand_compact_sources,
-                                   validate_witnesses, WITNESS_SCHEMA)
+from omni_proof_grounding import (WITNESS_PROMPT, WITNESS_SCHEMA,
+                                   WITNESS_VALUES_INSTRUCTION,
+                                   WITNESS_VALUES_PROMPT, WITNESS_VALUES_SCHEMA,
+                                   compact_record, expand_compact_sources,
+                                   validate_witnesses)
 from omni_proof_runtime import (authorize_development_users, authorize_users, file_digest, greedy, load_reader,
                                 prepare_inputs, structured_call, write_json)
 from residual_profile import ReaderOperatorTrace
@@ -52,6 +55,7 @@ from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
 from extensions_config import load_extensions
 from label_read_guard import install_label_read_guard
+from operation_executor import execute as execute_operations, render_execution_results
 from stage_profiler import StageProfiler
 
 
@@ -290,6 +294,17 @@ def main():
         raise ValueError('extensions JSON must be an object')
     extensions = load_extensions({'extensions': raw_extensions})
     extensions_contract = extensions.output_contract()
+    witness_values_enabled = extensions.witness_values == 'on'
+    operation_executor_enabled = extensions.operation_executor == 'on'
+    witness_prompt = WITNESS_VALUES_PROMPT if witness_values_enabled else WITNESS_PROMPT
+    witness_schema = WITNESS_VALUES_SCHEMA if witness_values_enabled else WITNESS_SCHEMA
+    multi_witness_prompt = MULTI_WITNESS_PROMPT
+    independent_witness_prompt = INDEPENDENT_WITNESS_PROMPT
+    if witness_values_enabled:
+        multi_witness_prompt = MULTI_WITNESS_PROMPT.replace(
+            '严禁解释、长引用、回答问题或新增字段。', WITNESS_VALUES_INSTRUCTION)
+        independent_witness_prompt = INDEPENDENT_WITNESS_PROMPT.replace(
+            '严禁解释、长引用、回答问题或新增字段。', WITNESS_VALUES_INSTRUCTION)
     stage_profile_enabled = extensions.stage_profiler == 'on'
     workload_trace_enabled = extensions.workload_trace == 'on'
     profiling_enabled = stage_profile_enabled or workload_trace_enabled
@@ -861,7 +876,7 @@ def main():
                         payload['original_question'] = query
                     proposal_started = time.perf_counter()
                     proposal_inputs = prepare_inputs(processor, [
-                        {'role': 'system', 'content': WITNESS_PROMPT},
+                        {'role': 'system', 'content': witness_prompt},
                         {'role': 'user', 'content': json.dumps(payload, ensure_ascii=False)}])
                     grounding_budget_prepare_seconds += time.perf_counter() - proposal_started
                     if proposal_inputs.input_ids.shape[1] > args.input_budget:
@@ -877,9 +892,9 @@ def main():
             if args.query_contract:
                 grounding_payload['original_question'] = query
             with profile_scope('witness_construct') as profile_stage:
-                grounding_result = structured_call_with_profile(reader, processor, WITNESS_PROMPT,
+                grounding_result = structured_call_with_profile(reader, processor, witness_prompt,
                     grounding_payload, max_tokens=4096,
-                    budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                    budget=args.input_budget, json_schema=witness_schema,
                     enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
                     profile_reader=stage_profiler is not None)
                 if profile_stage is not None:
@@ -973,8 +988,8 @@ def main():
             multi_witness_started = time.perf_counter()
             with profile_scope('witness_construct') as profile_stage:
                 shadow_result = structured_call_with_profile(
-                    reader, processor, MULTI_WITNESS_PROMPT, grounding_payload,
-                    max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                    reader, processor, multi_witness_prompt, grounding_payload,
+                    max_tokens=4096, budget=args.input_budget, json_schema=witness_schema,
                     enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
                     profile_reader=stage_profiler is not None)
                 if profile_stage is not None:
@@ -1060,8 +1075,8 @@ def main():
                         local_payload['original_question'] = query
                     with profile_scope('witness_construct') as profile_stage:
                         local_result = structured_call_with_profile(
-                            reader, processor, INDEPENDENT_WITNESS_PROMPT, local_payload,
-                            max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                            reader, processor, independent_witness_prompt, local_payload,
+                            max_tokens=4096, budget=args.input_budget, json_schema=witness_schema,
                             enabled=args.pre_reader_operator_profile,
                             lm_head_dispatch=lm_head_dispatch,
                             profile_reader=stage_profiler is not None)
@@ -1137,6 +1152,20 @@ def main():
             grounding_result = {'parsed': {'witnesses': []}, 'answer': '',
                                 'reader_seconds': 0., 'stop_reason': 'not_applicable_contextual',
                                 'answer_token_ids': []}
+        operation_execution = None
+        reader_operation_plan = operation_plan
+        if operation_executor_enabled:
+            operations = (query_contract['operations']
+                          if query_contract and query_contract['status'] == 'ok' else [])
+            witnesses_by_demand = {demand['demand_id']: [] for demand in demands}
+            for witness in grounded_witnesses:
+                witnesses_by_demand[witness['demand_id']].append(witness)
+            operation_execution = execute_operations(
+                operations, witnesses_by_demand, objects, graph)
+            execution_text = render_execution_results(operation_execution)
+            if execution_text:
+                reader_operation_plan = (operation_plan + '\n\n' + execution_text
+                                         if operation_plan else execution_text)
         w12_after_grounding = w12_snapshot()
         grounding_seconds = time.perf_counter() - grounding_started
         if proof_query_shadow is not None:
@@ -1151,7 +1180,8 @@ def main():
                 evidence_state_prefilter_shadow, frontier_audit, witness_records)
         plan_started = time.perf_counter()
         empty_messages = [{'role': 'system', 'content': READER_SYSTEM}, {'role': 'user', 'content': [
-            {'type': 'text', 'text': reader_context(query, manifest['effective_timestamp'], '', operation_plan)}]}]
+            {'type': 'text', 'text': reader_context(
+                query, manifest['effective_timestamp'], '', reader_operation_plan)}]}]
         fixed_inputs = prepare_inputs(processor, empty_messages)
         fixed_prompt_tokens = int(fixed_inputs.input_ids.shape[1])
 
@@ -1168,7 +1198,7 @@ def main():
                     image_cache[image_identity] = load_image(args.image_archive, ref)
                 loaded.append(image_cache[image_identity][0])
             content = [{'type': 'text', 'text': reader_context(
-                query, manifest['effective_timestamp'], selected['text'], operation_plan)}]
+                query, manifest['effective_timestamp'], selected['text'], reader_operation_plan)}]
             for ref, image in zip(selected['images'], loaded):
                 content.append({'type': 'text', 'text': image_source_header(ref)})
                 content.append({'type': 'image', 'image': image})
@@ -1247,8 +1277,21 @@ def main():
         if args.query_contract:
             plan['query_contract'] = query_contract
             plan['query_operations'] = query_contract['operations']
-            plan['reader_operation_plan'] = operation_plan
+            plan['reader_operation_plan'] = reader_operation_plan
             plan['operations_require_source_witnesses'] = False
+        if operation_executor_enabled:
+            plan['operation_execution'] = operation_execution or {}
+        if witness_values_enabled:
+            plan['witness_values'] = {
+                'prompt_sha256': digest_bytes(witness_prompt.encode('utf-8')),
+                'multi_witness_prompt_sha256': digest_bytes(
+                    multi_witness_prompt.encode('utf-8')),
+                'independent_witness_prompt_sha256': digest_bytes(
+                    independent_witness_prompt.encode('utf-8')),
+                'schema_sha256': digest_bytes(json.dumps(
+                    witness_schema, ensure_ascii=False, sort_keys=True,
+                    separators=(',', ':')).encode('utf-8')),
+            }
         plan['required_demand_ids'] = [demand['demand_id'] for demand in demands]
         plan['proof_hypergraph'] = {
             'and_edges': [{'head': 'query', 'tail': [demand['demand_id'] for demand in demands],
@@ -1382,7 +1425,8 @@ def main():
                 if image_cache[identity][1] != identity:
                     raise ValueError('selected source image bytes differ from pinned content identity')
                 loaded.append(image_cache[identity][0])
-            context = reader_context(query, manifest['effective_timestamp'], materialized['text'], operation_plan)
+            context = reader_context(query, manifest['effective_timestamp'],
+                                     materialized['text'], reader_operation_plan)
             content = [{'type': 'text', 'text': context}]
             for ref, image in zip(materialized['images'], loaded):
                 content.append({'type': 'text', 'text': image_source_header(ref)})

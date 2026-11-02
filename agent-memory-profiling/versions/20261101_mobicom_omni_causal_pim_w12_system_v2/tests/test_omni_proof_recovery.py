@@ -6,7 +6,9 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1] / 'scripts'
 sys.path.insert(0, str(ROOT))
 
-from omni_proof_grounding import expand_compact_sources, validate_witnesses
+from omni_proof_grounding import (WITNESS_SCHEMA, WITNESS_VALUES_SCHEMA,
+                                  expand_compact_sources, validate_witnesses,
+                                  witness_schema)
 from omni_proof_join import solve_witness_join
 from omni_proof_planner import QUERY_GRAPH_SCHEMA, parse_query_graph, select_retrieval_package
 from omni_proof_grounding import WITNESS_SCHEMA
@@ -69,6 +71,68 @@ class ProofRecoveryTests(unittest.TestCase):
             [], {'r0': record}, objects)
         self.assertFalse(accepted)
         self.assertEqual(rejected[0]['reason'], 'unlocated_claim')
+
+    def test_values_schema_is_opt_in_and_bounded(self):
+        self.assertNotIn('values', WITNESS_SCHEMA['properties']['witnesses']
+                         ['items']['properties'])
+        enabled = witness_schema(True)
+        values = enabled['properties']['witnesses']['items']['properties']['values']
+        self.assertEqual(values['maxItems'], 8)
+        self.assertEqual(values['items']['properties']['type']['enum'], [
+            'date', 'datetime', 'number', 'duration', 'count', 'text'])
+        self.assertEqual(WITNESS_VALUES_SCHEMA, enabled)
+        self.assertNotIn('values', WITNESS_SCHEMA['properties']['witnesses']
+                         ['items']['properties'])
+
+    def test_values_must_be_verbatim_and_rejections_are_nonfatal(self):
+        text = 'The project started on 2025-01-01.'
+        objects = {'text:a': {'kind': 'text', 'raw_text': text}}
+        record = {'record_id': 'r0', 'kind': 'source_text', 'object_ids': ['text:a']}
+        aliases = {**record, 'record_id': 'r0'}
+        proposal = {'witnesses': [{'demand_id': 'd0', 'record_ids': ['r0'],
+            'anchors': [{'record_id': 'r0', 'text_index': 0}],
+            'bindings': [],
+            'source_relations': [],
+            'values': [
+                {'name': 'd0.start', 'type': 'date', 'value': '2025-01-01',
+                 'record_id': 'r0', 'text_index': 0},
+                {'name': 'd0.fake', 'type': 'date', 'value': '2025-01-02',
+                 'record_id': 'r0', 'text_index': 0},
+            ]}]}
+        expanded = expand_compact_sources(proposal, {'r0': aliases}, objects)
+        accepted, rejected = validate_witnesses(
+            expanded, [{'demand_id': 'd0', 'variables': []}], [], {'r0': aliases}, objects)
+        self.assertFalse(rejected)
+        self.assertEqual(len(accepted), 1)
+        witness = accepted[0]
+        self.assertEqual([value['value'] for value in witness['values']], ['2025-01-01'])
+        self.assertEqual(len(witness['value_sources']), 1)
+        self.assertIn('text:a', witness['object_ids'])
+        self.assertIn('unlocated_value', witness['discarded_optional_fields'])
+
+    def test_value_source_object_changes_witness_identity(self):
+        objects = {
+            'text:a': {'kind': 'text', 'raw_text': 'Met on 2025-01-01.'},
+            'text:b': {'kind': 'text', 'raw_text': 'Also on 2025-01-01.'},
+        }
+        records = {
+            'r0': {'record_id': 'r0', 'kind': 'source_text', 'object_ids': ['text:a']},
+            'r1': {'record_id': 'r1', 'kind': 'source_text', 'object_ids': ['text:b']},
+        }
+        first = {'witnesses': [{'demand_id': 'd0', 'record_ids': ['r0'],
+            'anchors': [{'record_id': 'r0', 'text_index': 0}], 'bindings': [],
+            'source_relations': [], 'values': [{'name': 'd0.date', 'type': 'date',
+                'value': '2025-01-01', 'record_id': 'r0', 'text_index': 0}]}]}
+        second = {'witnesses': [{'demand_id': 'd0', 'record_ids': ['r1'],
+            'anchors': [{'record_id': 'r1', 'text_index': 0}], 'bindings': [],
+            'source_relations': [], 'values': [{'name': 'd0.date', 'type': 'date',
+                'value': '2025-01-01', 'record_id': 'r1', 'text_index': 0}]}]}
+        demands = [{'demand_id': 'd0', 'variables': []}]
+        first_witness = validate_witnesses(
+            expand_compact_sources(first, records, objects), demands, [], records, objects)[0][0]
+        second_witness = validate_witnesses(
+            expand_compact_sources(second, records, objects), demands, [], records, objects)[0][0]
+        self.assertNotEqual(first_witness['witness_id'], second_witness['witness_id'])
 
     def test_join_charges_shared_object_once(self):
         demands = [{'demand_id': 'a'}, {'demand_id': 'b'}]

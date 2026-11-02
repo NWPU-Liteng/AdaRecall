@@ -183,6 +183,12 @@ def _branch(item, *, verification_state, semantic_sufficiency, candidate_rank=No
         raise ValueError('witness branch object identities required')
     bindings = _normalize_bindings(item.get('bindings'))
     source_relations = _normalize_relations(item.get('source_relations'))
+    values = item.get('values', [])
+    if not isinstance(values, list):
+        raise ValueError('witness branch values must be a list')
+    value_sources = item.get('value_sources', values)
+    if not isinstance(value_sources, list):
+        raise ValueError('witness branch value sources must be a list')
     record_ids = item.get('retrieval_record_ids', item.get('record_ids'))
     if record_ids is None:
         base_record_id = item.get('base_record_id')
@@ -195,8 +201,10 @@ def _branch(item, *, verification_state, semantic_sufficiency, candidate_rank=No
         payload = {'demand_id': demand_id, 'object_ids': sorted(object_ids),
                    'bindings': bindings, 'source_relations': source_relations,
                    'record_ids': sorted(record_ids)}
+        if values:
+            payload['values'] = values
         identity = 'w:' + hashlib.sha256(_canonical(payload).encode()).hexdigest()
-    return {
+    branch = {
         'witness_id': identity,
         'demand_id': demand_id,
         'object_ids': list(dict.fromkeys(object_ids)),
@@ -210,11 +218,16 @@ def _branch(item, *, verification_state, semantic_sufficiency, candidate_rank=No
         'semantic_sufficiency': semantic_sufficiency,
         'candidate_rank': candidate_rank,
     }
+    if values:
+        branch['values'] = list(values)
+        branch['value_sources'] = list(value_sources)
+    return branch
 
 
 def _dedup_key(branch):
     return (branch['demand_id'], tuple(sorted(branch['object_ids'])),
-            _canonical(branch['bindings']), tuple(branch['source_relations']))
+            _canonical(branch['bindings']), tuple(branch['source_relations']),
+            _canonical(branch.get('values', [])))
 
 
 def compile_witness_domains(demands, witnesses, candidates=(), *,

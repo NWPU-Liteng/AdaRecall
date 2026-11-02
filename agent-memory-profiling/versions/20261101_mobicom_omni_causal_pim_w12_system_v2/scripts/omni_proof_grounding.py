@@ -1,6 +1,7 @@
 """Validate model-proposed source spans, image regions and explicit bindings."""
 from __future__ import annotations
 
+from copy import deepcopy
 import json
 
 from omni_proof_runtime import checksum
@@ -24,6 +25,15 @@ WITNESS_PROMPT = (
     '"text_index":0,"quote":"极短的逐字关系片段"}。无关系时置空数组。'
     '候选中的邻近原文只提供来源上下文，不自动纳入证明；需要时用相应text_index明确引用。'
     '无法定位则不输出见证。严禁解释、长引用、回答问题和新增字段。')
+
+
+WITNESS_VALUES_INSTRUCTION = (
+    '若问题需要计算，请在 values 中逐字摘出参与计算的日期/数字/时长，并标注类型；'
+    '每项为 {"name":"d0.date","type":"date|datetime|number|duration|count|text",'
+    '"value":"原文逐字值","record_id":"r0","text_index":0}。'
+    '除values外，严禁解释、长引用、回答问题或新增字段。')
+WITNESS_VALUES_PROMPT = WITNESS_PROMPT.replace(
+    '严禁解释、长引用、回答问题或新增字段。', WITNESS_VALUES_INSTRUCTION)
 
 
 WITNESS_SCHEMA = {
@@ -57,6 +67,32 @@ WITNESS_SCHEMA = {
                     'quote': {'type': 'string', 'minLength': 1, 'maxLength': 192}}}}}}}}}
 
 
+VALUE_ITEM_SCHEMA = {
+    'type': 'object',
+    'required': ['name', 'type', 'value', 'record_id', 'text_index'],
+    'additionalProperties': False,
+    'properties': {
+        'name': {'type': 'string', 'minLength': 1, 'maxLength': 32},
+        'type': {'type': 'string',
+                 'enum': ['date', 'datetime', 'number', 'duration', 'count', 'text']},
+        'value': {'type': 'string', 'minLength': 1, 'maxLength': 64},
+        'record_id': {'type': 'string', 'minLength': 1, 'maxLength': 12},
+        'text_index': {'type': 'integer', 'minimum': 0, 'maximum': 15},
+    },
+}
+
+
+def witness_schema(include_values=False):
+    schema = deepcopy(WITNESS_SCHEMA)
+    if include_values:
+        schema['properties']['witnesses']['items']['properties']['values'] = {
+            'type': 'array', 'maxItems': 8, 'items': deepcopy(VALUE_ITEM_SCHEMA)}
+    return schema
+
+
+WITNESS_VALUES_SCHEMA = witness_schema(True)
+
+
 def available_objects(record):
     return list(dict.fromkeys(record['object_ids'] + record.get('retrieval_context_object_ids', [])))
 
@@ -80,7 +116,7 @@ def expand_compact_sources(proposal, aliases, objects):
             result['witnesses'].append(witness)
             continue
         expanded = dict(witness)
-        for field in ('anchors', 'bindings', 'source_relations'):
+        for field in ('anchors', 'bindings', 'source_relations', 'values'):
             entries = witness.get(field, [])
             if not isinstance(entries, list):
                 expanded[field] = entries
@@ -172,6 +208,28 @@ def validate_witnesses(proposal, demands, relations, aliases, objects):
             binding_sources.append(binding)
         if required_variables - set(bindings):
             reason = 'missing_required_binding'
+        values, value_sources = [], []
+        proposed_values = item.get('values', [])
+        if not isinstance(proposed_values, list):
+            proposed_values = []
+            optional_rejections.append('invalid_values')
+        if len(proposed_values) > 8:
+            proposed_values = proposed_values[:8]
+            optional_rejections.append('too_many_values')
+        for value in proposed_values:
+            if (not isinstance(value, dict)
+                    or not isinstance(value.get('name'), str) or not value['name']
+                    or value.get('type') not in {
+                        'date', 'datetime', 'number', 'duration', 'count', 'text'}
+                    or not isinstance(value.get('value'), str) or not value['value']
+                    or not quote_anchor({**value, 'quote': value['value']}, selected)
+                    or objects[value['object_id']]['kind'] != 'text'):
+                optional_rejections.append('unlocated_value')
+                continue
+            value = {key: value[key] for key in
+                     ('name', 'type', 'value', 'record_id', 'text_index', 'object_id')}
+            values.append(value)
+            value_sources.append(value)
         source_relations, relation_sources = [], []
         proposed_relations = item.get('source_relations', [])
         if not isinstance(proposed_relations, list):
@@ -190,10 +248,15 @@ def validate_witnesses(proposal, demands, relations, aliases, objects):
             rejected.append({'proposal_index': index, 'reason': reason})
             continue
         record_ids = sorted({record['record_id'] for record in selected.values()})
-        object_ids = sorted({anchor['object_id'] for anchor in anchors + binding_sources + relation_sources})
-        identity = checksum(json.dumps({'demand': item['demand_id'], 'records': record_ids,
-            'bindings': bindings, 'anchors': anchors, 'source_relations': source_relations}, sort_keys=True))
-        accepted.append({'witness_id': 'w:' + identity, 'demand_id': item['demand_id'],
+        object_ids = sorted({anchor['object_id'] for anchor in
+                             anchors + binding_sources + relation_sources + value_sources})
+        identity_payload = {'demand': item['demand_id'], 'records': record_ids,
+            'bindings': bindings, 'anchors': anchors,
+            'source_relations': source_relations}
+        if values:
+            identity_payload['values'] = values
+        identity = checksum(json.dumps(identity_payload, sort_keys=True))
+        witness = {'witness_id': 'w:' + identity, 'demand_id': item['demand_id'],
             'record_ids': record_ids, 'object_ids': object_ids, 'bindings': bindings,
             'binding_sources': binding_sources, 'anchors': anchors,
             'discarded_optional_fields': optional_rejections,
@@ -204,6 +267,10 @@ def validate_witnesses(proposal, demands, relations, aliases, objects):
             'source_relations': source_relations, 'relation_sources': relation_sources,
             'grounding_status': 'source_located_not_semantically_verified',
             'image_locator_status': 'original_image_required' if any(
-                objects[identity]['kind'] == 'image' for identity in object_ids) else None})
+                objects[identity]['kind'] == 'image' for identity in object_ids) else None}
+        if values:
+            witness['values'] = values
+            witness['value_sources'] = value_sources
+        accepted.append(witness)
     unique = {item['witness_id']: item for item in accepted}
     return list(unique.values()), rejected

@@ -208,6 +208,42 @@ def build_stats(run_dir):
                       for name in sorted(rejection_by_source)},
     }
 
+    operation_status = Counter()
+    operation_kind = Counter()
+    operation_kind_status = defaultdict(Counter)
+    operation_rows = 0
+    operation_total = 0
+    for plan in plans:
+        if 'operation_execution' not in plan:
+            continue
+        execution = plan.get('operation_execution')
+        if not isinstance(execution, dict):
+            raise ValueError('operation_execution must be an object')
+        operation_rows += 1
+        for operation_id, entry in execution.items():
+            if not isinstance(entry, dict):
+                raise ValueError(
+                    f'operation_execution entry must be an object: {operation_id}')
+            status = entry.get('status')
+            kind = entry.get('kind')
+            operation_status[str(status) if status is not None else 'missing'] += 1
+            operation_kind[str(kind) if kind is not None else 'missing'] += 1
+            operation_kind_status[str(kind) if kind is not None else 'missing'][
+                str(status) if status is not None else 'missing'] += 1
+            operation_total += 1
+    operation_execution = {
+        'rows_with_execution': operation_rows,
+        'rows_missing': len(rows) - operation_rows,
+        'total': operation_total,
+        'by_status': {name: operation_status[name]
+                      for name in sorted(operation_status)},
+        'by_kind': {name: operation_kind[name]
+                    for name in sorted(operation_kind)},
+        'by_kind_status': {
+            kind: {name: counts[name] for name in sorted(counts)}
+            for kind, counts in sorted(operation_kind_status.items())},
+    }
+
     omitted_values = []
     omitted_missing = 0
     for plan in plans:
@@ -300,6 +336,7 @@ def build_stats(run_dir):
         'parse_status_non_ok_ratio': non_ok_parse / len(rows),
         'join': join,
         'witness_rejections': witness_rejections,
+        'operation_execution': operation_execution,
         'omitted_whole_record_ids_due_to_context': omitted,
         'final_evidence': final_evidence,
         'stage_profile': stage_profile,
@@ -370,6 +407,16 @@ def render_markdown(stats):
         add('witness_rejections', f'reason.{name}', value)
     for name, value in rejections['by_source'].items():
         add('witness_rejections', f'source.{name}', value)
+
+    operations = stats['operation_execution']
+    add('operation_execution', 'rows_with_execution',
+        operations['rows_with_execution'])
+    add('operation_execution', 'rows_missing', operations['rows_missing'])
+    add('operation_execution', 'total', operations['total'])
+    for name, value in operations['by_status'].items():
+        add('operation_execution', f'status.{name}', value)
+    for name, value in operations['by_kind'].items():
+        add('operation_execution', f'kind.{name}', value)
 
     omitted = stats['omitted_whole_record_ids_due_to_context']
     add('omitted_whole_record_ids', 'rows_with_value', omitted['rows_with_value'])

@@ -42,6 +42,15 @@ class MultiWitnessTests(unittest.TestCase):
         states = [item['verification_state'] for item in domains['d0']]
         self.assertEqual(states, [SOURCE_LOCATED, CANDIDATE_ONLY, CANDIDATE_ONLY])
 
+    def test_source_located_branch_preserves_typed_values(self):
+        item = witness('w0', 'd0', ['o0'])
+        item['values'] = [{'name': 'd0.date', 'type': 'date', 'value': '2025-01-01',
+                           'record_id': 'w0', 'text_index': 0, 'object_id': 'o0'}]
+        item['value_sources'] = list(item['values'])
+        domains = compile_witness_domains([demand('d0')], [item])
+        self.assertEqual(domains['d0'][0]['values'], item['values'])
+        self.assertEqual(domains['d0'][0]['value_sources'], item['value_sources'])
+
     def test_min_cost_solver_uses_or_alternative(self):
         demands = [demand('d0')]
         domains = {'d0': [
