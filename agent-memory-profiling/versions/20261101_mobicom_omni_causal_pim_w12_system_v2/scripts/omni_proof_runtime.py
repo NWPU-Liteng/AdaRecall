@@ -7,6 +7,8 @@ from pathlib import Path
 import time
 from contextlib import nullcontext
 
+from stage_profiler import allowed_token_count, summarize_grammar_allowed
+
 
 def checksum(value):
     return hashlib.sha256(value.encode() if isinstance(value, str) else value).hexdigest()
@@ -139,26 +141,47 @@ def _profiled_operator_events(profiler, *, phase, profiled_forward_calls):
 
 
 def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=None,
-           profile_operator_kernels=False, profile_decode_forward_calls=4):
+           profile_operator_kernels=False, profile_decode_forward_calls=4,
+           profile_reader=False, stage_profiler=None, stage_prefix=None,
+           n_images=0):
     import torch
 
+    if isinstance(n_images, bool) or not isinstance(n_images, int) or n_images < 0:
+        raise ValueError('n_images must be a non-negative integer')
+    if stage_profiler is not None and not stage_prefix:
+        raise ValueError('stage_prefix is required with a stage profiler')
+    profiling = bool(profile_reader or stage_profiler is not None)
     started = time.perf_counter()
     inputs = inputs.to('cuda:0')
     torch.cuda.synchronize()
+    input_tokens = int(inputs.input_ids.shape[1])
+    valid_vocab_size = len(processor.tokenizer)
     if trace is not None:
         trace.phase = 'prefill'
     prefill_profiler = (torch.profiler.profile(
         activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
         record_shapes=True) if profile_operator_kernels else nullcontext())
-    with prefill_profiler as active_prefill_profiler:
-        with torch.inference_mode():
-            output = model(**inputs, use_cache=True, logits_to_keep=1)
-        torch.cuda.synchronize()
+    prefill_stage = (stage_profiler.stage(f'{stage_prefix}_prefill')
+                     if stage_profiler is not None else nullcontext(None))
+    with prefill_stage as prefill_span:
+        prefill_forward_started = time.perf_counter()
+        with prefill_profiler as active_prefill_profiler:
+            with torch.inference_mode():
+                output = model(**inputs, use_cache=True, logits_to_keep=1)
+            torch.cuda.synchronize()
+        prefill_forward_seconds = time.perf_counter() - prefill_forward_started
+        if prefill_span is not None:
+            prefill_span.set_metrics({
+                'prefill_tokens': input_tokens,
+                'n_images': n_images,
+                'decode_tokens': 0,
+                'grammar_forced_tokens': 0,
+                'grammar_allowed_mean': None,
+            })
     prefill = time.perf_counter() - started
     prefill_live_inputs = [{'name': name, 'shape': list(value.shape), 'dtype': str(value.dtype),
         'logical_bytes': value.numel() * value.element_size(), 'consumer': 'prefill'}
         for name, value in inputs.items() if isinstance(value, torch.Tensor)]
-    input_tokens = int(inputs.input_ids.shape[1])
     released = []
     for name in ('pixel_values', 'image_grid_thw'):
         if name in inputs:
@@ -180,8 +203,8 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
         'forward_launch_seconds': 0.0,
         'loop_total_seconds': 0.0,
     } if trace is not None else None)
-    decode_started = time.perf_counter()
     grammar_mask = None
+    grammar_allowed_counts = [] if profiling else None
     profiled_decode_forwards = 0
     decode_profiler = (torch.profiler.profile(
         activities=[torch.profiler.ProfilerActivity.CPU, torch.profiler.ProfilerActivity.CUDA],
@@ -189,73 +212,97 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
         schedule=torch.profiler.schedule(wait=0, warmup=0,
                                          active=profile_decode_forward_calls, repeat=1))
         if profile_operator_kernels else nullcontext())
-    with decode_profiler as active_decode_profiler:
-        for position in range(max_tokens):
-            loop_started = time.perf_counter()
-            stage_started = loop_started
-            scores = output.logits[:, -1, :]
-            if decode_timing is not None:
-                now = time.perf_counter()
-                decode_timing['logit_slice_seconds'] += now - stage_started
-                stage_started = now
-            if grammar_matcher is not None:
-                import xgrammar as xgr
+    decode_stage = (stage_profiler.stage(f'{stage_prefix}_decode')
+                    if stage_profiler is not None else nullcontext(None))
+    with decode_stage as decode_span:
+        decode_started = time.perf_counter()
+        with decode_profiler as active_decode_profiler:
+            for position in range(max_tokens):
+                loop_started = time.perf_counter()
+                stage_started = loop_started
+                scores = output.logits[:, -1, :]
+                if decode_timing is not None:
+                    now = time.perf_counter()
+                    decode_timing['logit_slice_seconds'] += now - stage_started
+                    stage_started = now
+                if grammar_matcher is not None:
+                    import xgrammar as xgr
 
-                if grammar_mask is None:
-                    grammar_mask = xgr.allocate_token_bitmask(1, scores.shape[-1])
-                needs_mask = grammar_matcher.fill_next_token_bitmask(grammar_mask)
+                    if grammar_mask is None:
+                        grammar_mask = xgr.allocate_token_bitmask(1, scores.shape[-1])
+                    needs_mask = grammar_matcher.fill_next_token_bitmask(grammar_mask)
+                    if decode_timing is not None:
+                        now = time.perf_counter()
+                        decode_timing['grammar_fill_seconds'] += now - stage_started
+                        stage_started = now
+                    if needs_mask:
+                        xgr.apply_token_bitmask_inplace(scores, grammar_mask.to(scores.device),
+                                                        vocab_size=scores.shape[-1])
+                    if decode_timing is not None:
+                        now = time.perf_counter()
+                        decode_timing['grammar_apply_seconds'] += now - stage_started
+                        stage_started = now
+                    if profiling:
+                        grammar_allowed_counts.append(
+                            allowed_token_count(grammar_mask, scores.shape[-1],
+                                                valid_vocab_size)
+                            if needs_mask else valid_vocab_size)
+                elif profiling:
+                    grammar_allowed_counts.append(valid_vocab_size)
+                token = scores.argmax(-1, keepdim=True)
                 if decode_timing is not None:
                     now = time.perf_counter()
-                    decode_timing['grammar_fill_seconds'] += now - stage_started
+                    decode_timing['argmax_launch_seconds'] += now - stage_started
                     stage_started = now
-                if needs_mask:
-                    xgr.apply_token_bitmask_inplace(scores, grammar_mask.to(scores.device),
-                                                    vocab_size=scores.shape[-1])
+                token_value = int(token.item())
+                tokens.append(token_value)
                 if decode_timing is not None:
                     now = time.perf_counter()
-                    decode_timing['grammar_apply_seconds'] += now - stage_started
+                    decode_timing['token_sync_seconds'] += now - stage_started
                     stage_started = now
-            token = scores.argmax(-1, keepdim=True)
-            if decode_timing is not None:
-                now = time.perf_counter()
-                decode_timing['argmax_launch_seconds'] += now - stage_started
-                stage_started = now
-            token_value = int(token.item())
-            tokens.append(token_value)
-            if decode_timing is not None:
-                now = time.perf_counter()
-                decode_timing['token_sync_seconds'] += now - stage_started
-                stage_started = now
-            if grammar_matcher is not None and not grammar_matcher.accept_token(tokens[-1]):
-                raise RuntimeError('constrained JSON decoder rejected its selected token')
-            if decode_timing is not None:
-                now = time.perf_counter()
-                decode_timing['grammar_accept_seconds'] += now - stage_started
-                stage_started = now
-            if position == 0:
-                first_token_seconds = time.perf_counter() - started
-            if grammar_matcher is not None and grammar_matcher.is_terminated():
-                reason = 'json_complete'
-                break
-            if tokens[-1] in stops:
-                reason = 'eos'
-                break
-            if position + 1 < max_tokens:
-                with torch.inference_mode():
-                    output = model(input_ids=token, past_key_values=cache,
-                                   use_cache=True, logits_to_keep=1)
-                cache = output.past_key_values
+                if grammar_matcher is not None and not grammar_matcher.accept_token(tokens[-1]):
+                    raise RuntimeError('constrained JSON decoder rejected its selected token')
                 if decode_timing is not None:
                     now = time.perf_counter()
-                    decode_timing['forward_launch_seconds'] += now - stage_started
-                if (active_decode_profiler is not None
-                        and profiled_decode_forwards < profile_decode_forward_calls):
-                    profiled_decode_forwards += 1
-                    active_decode_profiler.step()
-            if decode_timing is not None:
-                decode_timing['loop_total_seconds'] += time.perf_counter() - loop_started
-    torch.cuda.synchronize()
-    decode = time.perf_counter() - decode_started
+                    decode_timing['grammar_accept_seconds'] += now - stage_started
+                    stage_started = now
+                if position == 0:
+                    first_token_seconds = time.perf_counter() - started
+                if grammar_matcher is not None and grammar_matcher.is_terminated():
+                    reason = 'json_complete'
+                    break
+                if tokens[-1] in stops:
+                    reason = 'eos'
+                    break
+                if position + 1 < max_tokens:
+                    with torch.inference_mode():
+                        output = model(input_ids=token, past_key_values=cache,
+                                       use_cache=True, logits_to_keep=1)
+                    cache = output.past_key_values
+                    if decode_timing is not None:
+                        now = time.perf_counter()
+                        decode_timing['forward_launch_seconds'] += now - stage_started
+                    if (active_decode_profiler is not None
+                            and profiled_decode_forwards < profile_decode_forward_calls):
+                        profiled_decode_forwards += 1
+                        active_decode_profiler.step()
+                if decode_timing is not None:
+                    decode_timing['loop_total_seconds'] += time.perf_counter() - loop_started
+        torch.cuda.synchronize()
+        decode = time.perf_counter() - decode_started
+        grammar_summary = (summarize_grammar_allowed(grammar_allowed_counts)
+                           if profiling else {'grammar_forced_tokens': 0,
+                                              'grammar_allowed_mean': None})
+        grammar_forced_tokens = grammar_summary['grammar_forced_tokens']
+        grammar_allowed_mean = grammar_summary['grammar_allowed_mean']
+        if decode_span is not None:
+            decode_span.set_metrics({
+                'prefill_tokens': input_tokens,
+                'n_images': n_images,
+                'decode_tokens': len(tokens),
+                'grammar_forced_tokens': grammar_forced_tokens,
+                'grammar_allowed_mean': grammar_allowed_mean,
+            })
     operator_profile = None
     if profile_operator_kernels:
         operator_profile = {
@@ -277,7 +324,7 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
                                      'GPU work, while forward-launch is asynchronous issue time')
     else:
         decode_timing = None
-    return {'answer': processor.tokenizer.decode(tokens, skip_special_tokens=True).strip(),
+    result = {'answer': processor.tokenizer.decode(tokens, skip_special_tokens=True).strip(),
             'answer_token_ids': tokens, 'stop_reason': reason,
             'prefill_seconds': prefill, 'decode_seconds': decode,
             'decode_phase_profile': decode_timing,
@@ -286,11 +333,23 @@ def greedy(model, processor, inputs, *, max_tokens, trace=None, grammar_matcher=
             'first_token_from_reader_start_seconds': first_token_seconds,
             'reader_seconds': time.perf_counter() - started,
             'operator_profile': operator_profile}
+    if profiling:
+        result['reader_stage_profile'] = {
+            'prefill_wall_ms': prefill_forward_seconds * 1000.0,
+            'decode_wall_ms': decode * 1000.0,
+            'prefill_tokens': input_tokens,
+            'n_images': n_images,
+            'decode_tokens': len(tokens),
+            'grammar_forced_tokens': grammar_forced_tokens,
+            'grammar_allowed_mean': grammar_allowed_mean,
+        }
+    return result
 
 
 def structured_call(model, processor, system, payload, *, max_tokens=512, budget=8192,
                     json_schema=None, trace=None, profile_operator_kernels=False,
-                    profile_decode_forward_calls=4):
+                    profile_decode_forward_calls=4, profile_reader=False,
+                    stage_profiler=None, stage_prefix=None, n_images=0):
     started = time.perf_counter()
     prepare_started = time.perf_counter()
     inputs = prepare_inputs(processor, [{'role': 'system', 'content': system},
@@ -321,7 +380,9 @@ def structured_call(model, processor, system, payload, *, max_tokens=512, budget
     result = greedy(model, processor, inputs, max_tokens=max_tokens, trace=trace,
                     grammar_matcher=matcher,
                     profile_operator_kernels=profile_operator_kernels,
-                    profile_decode_forward_calls=profile_decode_forward_calls)
+                    profile_decode_forward_calls=profile_decode_forward_calls,
+                    profile_reader=profile_reader, stage_profiler=stage_profiler,
+                    stage_prefix=stage_prefix, n_images=n_images)
     postprocess_started = time.perf_counter()
     try:
         result['parsed'] = parse_object(result['answer']) if result['stop_reason'] in {'eos', 'json_complete'} else None

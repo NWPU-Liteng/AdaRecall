@@ -52,6 +52,7 @@ from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.w12_functional_dispatch import W12FunctionalDispatch
 from extensions_config import load_extensions
 from label_read_guard import install_label_read_guard
+from stage_profiler import StageProfiler
 
 
 READER_SYSTEM = ('你是端侧长期多模态记忆助手。只依据本次输入中给出的原始对话和原图回答。'
@@ -265,6 +266,9 @@ def main():
         raise ValueError('extensions JSON must be an object')
     extensions = load_extensions({'extensions': raw_extensions})
     extensions_contract = extensions.output_contract()
+    stage_profile_enabled = extensions.stage_profiler == 'on'
+    workload_trace_enabled = extensions.workload_trace == 'on'
+    profiling_enabled = stage_profile_enabled or workload_trace_enabled
     args.reader_quantization = resolve_reader_quantization(
         args.w12_functional_route, args.reader_quantization,
         args.lm_head_functional_mode)
@@ -473,6 +477,13 @@ def main():
         manifest = manifests[question_id]
         query = manifest['question']
         request_started = time.perf_counter()
+        stage_profiler = (StageProfiler(w12_dispatch=w12_dispatch)
+                          if profiling_enabled else None)
+
+        def profile_scope(name):
+            return (stage_profiler.stage(name) if stage_profiler is not None
+                    else nullcontext(None))
+
         w12_request_started = w12_snapshot()
         visible_index_seconds = 0.0
         visible_index_mode = 'static_full_history'
@@ -514,10 +525,14 @@ def main():
                 })
         parser_prompt = QUERY_CONTRACT_PROMPT if args.query_contract else PARSER_SYSTEM
         parser_schema = QUERY_CONTRACT_SCHEMA if args.query_contract else QUERY_GRAPH_SCHEMA
-        parse_result = structured_call_with_profile(reader, processor, parser_prompt,
-            {'question': query, 'output_contract': 'JSON only'}, max_tokens=1024,
-            budget=args.input_budget, json_schema=parser_schema,
-            enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch)
+        with profile_scope('contract_parse') as profile_stage:
+            parse_result = structured_call_with_profile(reader, processor, parser_prompt,
+                {'question': query, 'output_contract': 'JSON only'}, max_tokens=1024,
+                budget=args.input_budget, json_schema=parser_schema,
+                enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
+                profile_reader=stage_profiler is not None)
+            if profile_stage is not None:
+                profile_stage.add_reader_profile(parse_result['reader_stage_profile'])
         w12_after_parser = w12_snapshot()
         query_vector_started = time.perf_counter()
         if args.query_contract:
@@ -533,73 +548,93 @@ def main():
         demand_texts = (retrieval_views(query, query_contract) if args.query_contract
                         else [demand['text'] for demand in demands])
         retrieval_by_demand = dict(zip((demand['demand_id'] for demand in demands), demand_texts))
-        vectors_for_query = query_vectors(demand_texts, tokenizer, embedder)
+        with profile_scope('query_embed') as profile_stage:
+            vectors_for_query = query_vectors(demand_texts, tokenizer, embedder)
+            if profile_stage is not None:
+                profile_stage.set_metrics({
+                    'query_count': len(demand_texts),
+                    'embedding_dimension': int(vectors_for_query.shape[1]),
+                })
         query_vector_seconds = time.perf_counter() - query_vector_started
-        candidate_pool_records = []
-        dense_search_started = time.perf_counter()
-        candidate_width = 48
-        for demand_index, demand_vector in enumerate(vectors_for_query):
-            demand = demands[demand_index]
-            scores = vectors @ demand_vector
-            if replay_queries is not None and args.visible_index_mode == 'mask':
-                scores = scores.copy()
-                scores[np.asarray([
-                    str(record.get('session_id')) not in visible_session_ids
-                    for record in records
-                ], dtype=bool)] = -np.inf
-            finite = np.isfinite(scores)
-            required_kind = demand.get('evidence_scope', {}).get('kind')
-            if required_kind in {'source_text', 'image_locator'}:
-                modality = np.asarray([record.get('kind') == required_kind
-                                       for record in records], dtype=bool)
-                primary = np.flatnonzero(finite & modality)
-                primary = primary[np.argsort(-scores[primary])][:min(32, candidate_width)]
-                remaining = np.flatnonzero(finite)
-                remaining = remaining[np.argsort(-scores[remaining])]
-                order = list(primary)
-                seen = set(int(value) for value in primary)
-                for value in remaining:
-                    if int(value) not in seen:
-                        order.append(int(value))
-                        seen.add(int(value))
-                    if len(order) >= candidate_width:
-                        break
-                order = np.asarray(order[:candidate_width], dtype=np.int64)
-            else:
-                order = np.argsort(-scores)
-                order = order[np.isfinite(scores[order])][:candidate_width]
-            for retrieval_rank, rank in enumerate(order):
-                base = records[int(rank)]
-                candidate_pool_records.append({**base, 'witness_id': f"{base['record_id']}#d{demand_index}",
-                    'demand_id': demand['demand_id'], 'base_record_id': base['record_id'],
-                    'query_rank': int(rank), 'retrieval_rank': retrieval_rank,
-                    'score': float(scores[int(rank)]),
-                    'bindings': base.get('bindings', {}),
-                    'source_relations': base.get('source_relations', []),
-                    'evidence_metadata': evidence_state_by_record.get(base['record_id'])})
-        dense_search_seconds = time.perf_counter() - dense_search_started
-        reranker_started = time.perf_counter()
-        for demand in demands:
-            candidates = [record for record in candidate_pool_records
-                          if record['demand_id'] == demand['demand_id']]
-            values = reranker.score(retrieval_by_demand[demand['demand_id']],
-                                    [record['retrieval_text'] for record in candidates])
-            for record, score in zip(candidates, values):
-                record['retrieval_cosine'] = record['score']
-                record['score'] = float(score)
-        reranker_seconds = time.perf_counter() - reranker_started
+        with profile_scope('dense_retrieval') as profile_stage:
+            candidate_pool_records = []
+            dense_search_started = time.perf_counter()
+            candidate_width = 48
+            for demand_index, demand_vector in enumerate(vectors_for_query):
+                demand = demands[demand_index]
+                scores = vectors @ demand_vector
+                if replay_queries is not None and args.visible_index_mode == 'mask':
+                    scores = scores.copy()
+                    scores[np.asarray([
+                        str(record.get('session_id')) not in visible_session_ids
+                        for record in records
+                    ], dtype=bool)] = -np.inf
+                finite = np.isfinite(scores)
+                required_kind = demand.get('evidence_scope', {}).get('kind')
+                if required_kind in {'source_text', 'image_locator'}:
+                    modality = np.asarray([record.get('kind') == required_kind
+                                           for record in records], dtype=bool)
+                    primary = np.flatnonzero(finite & modality)
+                    primary = primary[np.argsort(-scores[primary])][:min(32, candidate_width)]
+                    remaining = np.flatnonzero(finite)
+                    remaining = remaining[np.argsort(-scores[remaining])]
+                    order = list(primary)
+                    seen = set(int(value) for value in primary)
+                    for value in remaining:
+                        if int(value) not in seen:
+                            order.append(int(value))
+                            seen.add(int(value))
+                        if len(order) >= candidate_width:
+                            break
+                    order = np.asarray(order[:candidate_width], dtype=np.int64)
+                else:
+                    order = np.argsort(-scores)
+                    order = order[np.isfinite(scores[order])][:candidate_width]
+                for retrieval_rank, rank in enumerate(order):
+                    base = records[int(rank)]
+                    candidate_pool_records.append({**base, 'witness_id': f"{base['record_id']}#d{demand_index}",
+                        'demand_id': demand['demand_id'], 'base_record_id': base['record_id'],
+                        'query_rank': int(rank), 'retrieval_rank': retrieval_rank,
+                        'score': float(scores[int(rank)]),
+                        'bindings': base.get('bindings', {}),
+                        'source_relations': base.get('source_relations', []),
+                        'evidence_metadata': evidence_state_by_record.get(base['record_id'])})
+            dense_search_seconds = time.perf_counter() - dense_search_started
+            if profile_stage is not None:
+                profile_stage.set_metrics({
+                    'matrix_shape': [int(vectors.shape[0]), int(vectors.shape[1])],
+                    'demand_count': len(demands),
+                    'candidate_pool_count': len(candidate_pool_records),
+                })
+        with profile_scope('rerank') as profile_stage:
+            reranker_started = time.perf_counter()
+            for demand in demands:
+                candidates = [record for record in candidate_pool_records
+                              if record['demand_id'] == demand['demand_id']]
+                values = reranker.score(retrieval_by_demand[demand['demand_id']],
+                                        [record['retrieval_text'] for record in candidates])
+                for record, score in zip(candidates, values):
+                    record['retrieval_cosine'] = record['score']
+                    record['score'] = float(score)
+            reranker_seconds = time.perf_counter() - reranker_started
+            if profile_stage is not None:
+                profile_stage.set_metrics({
+                    'reranked_demand_count': len(demands),
+                    'reranked_candidate_count': len(candidate_pool_records),
+                })
         if args.evidence_state_prefilter_shadow:
             witness_records = [record for record in candidate_pool_records
                                if record['retrieval_rank'] < 48]
         else:
             witness_records = candidate_pool_records
-        frontier_started = time.perf_counter()
-        grounding_frontier = compile_candidate_frontier(witness_records, question_id=question_id)
-        grounding_route = plan_evidence_route(grounding_frontier)
-        frontier_levels = build_frontier_levels(
-            grounding_frontier,
-            seed_per_demand=args.candidate_frontier_seed_per_demand)
-        frontier_compile_seconds = time.perf_counter() - frontier_started
+        with profile_scope('dense_retrieval'):
+            frontier_started = time.perf_counter()
+            grounding_frontier = compile_candidate_frontier(witness_records, question_id=question_id)
+            grounding_route = plan_evidence_route(grounding_frontier)
+            frontier_levels = build_frontier_levels(
+                grounding_frontier,
+                seed_per_demand=args.candidate_frontier_seed_per_demand)
+            frontier_compile_seconds = time.perf_counter() - frontier_started
         parse_vector_seconds = time.perf_counter() - request_started
         grounding_started = time.perf_counter()
         grounding_attempts = []
@@ -752,10 +787,15 @@ def main():
                 grounding_payload['query_operations'] = operation_plan
             if args.query_contract:
                 grounding_payload['original_question'] = query
-            grounding_result = structured_call_with_profile(reader, processor, WITNESS_PROMPT,
-                grounding_payload, max_tokens=4096,
-                budget=args.input_budget, json_schema=WITNESS_SCHEMA,
-                enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch)
+            with profile_scope('witness_construct') as profile_stage:
+                grounding_result = structured_call_with_profile(reader, processor, WITNESS_PROMPT,
+                    grounding_payload, max_tokens=4096,
+                    budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                    enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
+                    profile_reader=stage_profiler is not None)
+                if profile_stage is not None:
+                    profile_stage.add_reader_profile(
+                        grounding_result['reader_stage_profile'])
             grounding_reader_seconds += grounding_result.get('reader_seconds', 0.0)
             grounding_validation_started = time.perf_counter()
             grounded, grounding_rejections = validate_witnesses(expand_compact_sources(
@@ -842,10 +882,15 @@ def main():
         if (args.multi_witness_shadow
                 and not (args.query_contract and query_contract['answer_mode'] == 'contextual')):
             multi_witness_started = time.perf_counter()
-            shadow_result = structured_call_with_profile(
-                reader, processor, MULTI_WITNESS_PROMPT, grounding_payload,
-                max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
-                enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch)
+            with profile_scope('witness_construct') as profile_stage:
+                shadow_result = structured_call_with_profile(
+                    reader, processor, MULTI_WITNESS_PROMPT, grounding_payload,
+                    max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                    enabled=args.pre_reader_operator_profile, lm_head_dispatch=lm_head_dispatch,
+                    profile_reader=stage_profiler is not None)
+                if profile_stage is not None:
+                    profile_stage.add_reader_profile(
+                        shadow_result['reader_stage_profile'])
             shadow_grounded, shadow_rejections = validate_witnesses(
                 expand_compact_sources(shadow_result.get('parsed'), grounding_aliases, objects),
                 demands, relations, grounding_aliases, objects)
@@ -924,11 +969,16 @@ def main():
                         local_payload['query_operations'] = operation_plan
                     if args.query_contract:
                         local_payload['original_question'] = query
-                    local_result = structured_call_with_profile(
-                        reader, processor, INDEPENDENT_WITNESS_PROMPT, local_payload,
-                        max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
-                        enabled=args.pre_reader_operator_profile,
-                        lm_head_dispatch=lm_head_dispatch)
+                    with profile_scope('witness_construct') as profile_stage:
+                        local_result = structured_call_with_profile(
+                            reader, processor, INDEPENDENT_WITNESS_PROMPT, local_payload,
+                            max_tokens=4096, budget=args.input_budget, json_schema=WITNESS_SCHEMA,
+                            enabled=args.pre_reader_operator_profile,
+                            lm_head_dispatch=lm_head_dispatch,
+                            profile_reader=stage_profiler is not None)
+                        if profile_stage is not None:
+                            profile_stage.add_reader_profile(
+                                local_result['reader_stage_profile'])
                     search_reader_seconds += local_result.get('reader_seconds', 0.0)
                     search_output_tokens += len(local_result.get('answer_token_ids', []))
                     local_grounded, local_rejections = validate_witnesses(
@@ -1062,8 +1112,15 @@ def main():
             exact['feasible'] = exact['feasible'] and text_tokens <= args.total_text_tokens and len(image_objects) <= args.max_images
             return exact
 
-        plan = solve_witness_join(demands, grounded_witnesses, relations, evaluate,
-                                  time_limit=args.planner_time_limit, max_states=100000)
+        with profile_scope('join') as profile_stage:
+            plan = solve_witness_join(demands, grounded_witnesses, relations, evaluate,
+                                      time_limit=args.planner_time_limit, max_states=100000)
+            if profile_stage is not None:
+                profile_stage.set_metrics({
+                    'feasible': bool(plan['feasible']),
+                    'demand_count': len(demands),
+                    'witness_count': len(grounded_witnesses),
+                })
         proof_source = 'grounded_witnesses'
         evidence_records = []
         if not plan['feasible'] or parse_status != 'ok':
@@ -1223,24 +1280,31 @@ def main():
             if source_record and source_record.get('image_source'):
                 source_hints[source_record['image_object_id']] = source_record['image_source']
             source_hints.update(item.get('source_hints', {}))
-        materialized = materialize(objects, plan['accepted_object_ids'], source_hints)
-        loaded = []
-        for ref in materialized['images']:
-            identity = ref['image_sha256']
-            if identity not in image_cache:
-                image_cache[identity] = load_image(args.image_archive, ref)
-            if image_cache[identity][1] != identity:
-                raise ValueError('selected source image bytes differ from pinned content identity')
-            loaded.append(image_cache[identity][0])
-        context = reader_context(query, manifest['effective_timestamp'], materialized['text'], operation_plan)
-        content = [{'type': 'text', 'text': context}]
-        for ref, image in zip(materialized['images'], loaded):
-            content.append({'type': 'text', 'text': image_source_header(ref)})
-            content.append({'type': 'image', 'image': image})
-        image_bytes = {ref['image_sha256']: image.width * image.height * 3
-                       for ref, image in zip(materialized['images'], loaded)}
-        messages = [{'role': 'system', 'content': READER_SYSTEM}, {'role': 'user', 'content': content}]
-        inputs = prepare_inputs(processor, messages, loaded)
+        with profile_scope('materialize') as profile_stage:
+            materialized = materialize(objects, plan['accepted_object_ids'], source_hints)
+            loaded = []
+            for ref in materialized['images']:
+                identity = ref['image_sha256']
+                if identity not in image_cache:
+                    image_cache[identity] = load_image(args.image_archive, ref)
+                if image_cache[identity][1] != identity:
+                    raise ValueError('selected source image bytes differ from pinned content identity')
+                loaded.append(image_cache[identity][0])
+            context = reader_context(query, manifest['effective_timestamp'], materialized['text'], operation_plan)
+            content = [{'type': 'text', 'text': context}]
+            for ref, image in zip(materialized['images'], loaded):
+                content.append({'type': 'text', 'text': image_source_header(ref)})
+                content.append({'type': 'image', 'image': image})
+            image_bytes = {ref['image_sha256']: image.width * image.height * 3
+                           for ref, image in zip(materialized['images'], loaded)}
+            messages = [{'role': 'system', 'content': READER_SYSTEM}, {'role': 'user', 'content': content}]
+            inputs = prepare_inputs(processor, messages, loaded)
+            if profile_stage is not None:
+                profile_stage.set_metrics({
+                    'materialized_object_count': len(materialized['materialized_object_ids']),
+                    'image_count': len(loaded),
+                    'processor_input_tokens': int(inputs.input_ids.shape[1]),
+                })
         if inputs.input_ids.shape[1] > args.input_budget:
             raise ValueError(f'final processor input exceeds budget for {question_id}')
         plan['final_render'] = {'input_tokens': int(inputs.input_ids.shape[1]),
@@ -1319,7 +1383,11 @@ def main():
                             {'phase': 'reader_prefill', 'object_ids': plan['accepted_object_ids'],
                              'consumer': 'decode', 'backend': 'host', 'input_allocations': []},]
         generation_started = time.perf_counter()
-        generated = greedy(reader, processor, inputs, max_tokens=args.max_new_tokens)
+        generated = greedy(reader, processor, inputs, max_tokens=args.max_new_tokens,
+                           profile_reader=stage_profiler is not None,
+                           stage_profiler=stage_profiler,
+                           stage_prefix='answer' if stage_profiler is not None else None,
+                           n_images=len(loaded))
         w12_after_reader = w12_snapshot()
         w12_stage_dispatch = None
         if w12_dispatch is not None:
@@ -1342,11 +1410,12 @@ def main():
             raise RuntimeError('reader input token count changed after backend planning')
         released_images = len(loaded)
         del loaded, image_cache, inputs
+        service_seconds = time.perf_counter() - request_started
         row = {'person_id': args.user_id, 'question_id': question_id,
             'question_sha256': hashlib.sha256(query.encode()).hexdigest(), 'answer': generated['answer'],
             'answer_sha256': hashlib.sha256(generated['answer'].encode()).hexdigest(),
             'answer_token_ids': generated['answer_token_ids'], 'stop_reason': generated['stop_reason'],
-            'service_seconds': time.perf_counter() - request_started,
+            'service_seconds': service_seconds,
             'ttft_seconds': generation_started - request_started + generated['first_token_from_reader_start_seconds'],
             'prefill_seconds': generated['prefill_seconds'],
             'decode_seconds': generated['decode_seconds'], 'input_tokens': generated['input_tokens'],
@@ -1376,6 +1445,17 @@ def main():
                 'runtime_labels_read': False,
             }),
             'evaluation_label_files_read': [], 'request_index': position}
+        if stage_profile_enabled:
+            row['stage_profile'] = stage_profiler.as_dict(
+                request_wall_ms=service_seconds * 1000.0)
+        if workload_trace_enabled:
+            stage_profiler.write_workload_trace(
+                args.output.parent / 'trace' / args.user_id / f'{question_id}.json',
+                person_id=args.user_id, question_id=question_id,
+                question_sha256=row['question_sha256'],
+                request_wall_ms=service_seconds * 1000.0,
+                dense_retrieval_shape=[int(vectors.shape[0]), int(vectors.shape[1])],
+                image_count=len(materialized['images']))
         rows.append(row)
         completed_ids.add(question_id)
         write_json(partial_path, {'complete': False,
