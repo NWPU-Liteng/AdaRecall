@@ -18,6 +18,9 @@ from transformers import AutoModel, AutoTokenizer
 from omni_proof_planner import (PARSER_PROMPT, QUERY_GRAPH_SCHEMA, parse_query_graph,
                                 select_retrieval_package)
 from omni_proof_join import solve_witness_join
+from omni_proof_join_noisy_or import (candidate_modality,
+                                      calibrated_probability,
+                                      solve_configured_witness_join)
 from omni_multi_witness import (INDEPENDENT_WITNESS_PROMPT, MULTI_WITNESS_PROMPT,
                                 audit_multi_witness, branch_source_families,
                                 has_independent_branch_pair, independent_of_existing,
@@ -304,7 +307,8 @@ def main():
     extensions_contract = extensions.output_contract()
     candidate_calibrator = None
     candidate_policy_tau = None
-    if extensions.calibration.candidate_policy == 'conformal':
+    if (extensions.calibration.candidate_policy == 'conformal'
+            or extensions.join_algorithm == 'noisy_or_saturate'):
         candidate_calibrator = load_calibrator(
             extensions.calibration.calibrator_path,
             extensions.calibration.calibrator_sha256)
@@ -1353,18 +1357,54 @@ def main():
             exact['feasible'] = exact['feasible'] and text_tokens <= args.total_text_tokens and len(image_objects) <= args.max_images
             return exact
 
+        candidate_records_by_demand_base = {
+            (record['demand_id'], record['base_record_id']): record
+            for record in witness_records
+        }
+
+        def noisy_or_probability(witness):
+            record_ids = witness.get('retrieval_record_ids')
+            if not isinstance(record_ids, list) or not record_ids:
+                raise ValueError('noisy-or witness retrieval_record_ids required')
+            probabilities = []
+            for record_id in record_ids:
+                record = candidate_records_by_demand_base.get(
+                    (witness['demand_id'], record_id))
+                if record is None:
+                    raise ValueError(
+                        f'noisy-or witness record is absent from candidates: {record_id}')
+                probabilities.append(calibrated_probability(
+                    candidate_calibrator, candidate_modality(record['kind']),
+                    record['score']))
+            return min(probabilities)
+
         with profile_scope('join') as profile_stage:
-            plan = solve_witness_join(demands, grounded_witnesses, relations, evaluate,
-                                      time_limit=args.planner_time_limit, max_states=100000)
+            if (extensions.join_algorithm == 'noisy_or_saturate'
+                    and parse_status == 'ok'):
+                plan = solve_configured_witness_join(
+                    extensions.join_algorithm, demands, grounded_witnesses,
+                    relations, evaluate, probability=noisy_or_probability,
+                    levels=extensions.noisy_or.levels,
+                    max_witnesses_per_demand=(
+                        extensions.noisy_or.max_witnesses_per_demand),
+                    fill_redundancy=extensions.noisy_or.fill_redundancy,
+                    time_limit=args.planner_time_limit)
+            else:
+                plan = solve_configured_witness_join(
+                    'dfs_maxmin', demands, grounded_witnesses, relations,
+                    evaluate, time_limit=args.planner_time_limit,
+                    max_states=100000)
             if profile_stage is not None:
                 profile_stage.set_metrics({
                     'feasible': bool(plan['feasible']),
                     'demand_count': len(demands),
                     'witness_count': len(grounded_witnesses),
+                    'join_algorithm': extensions.join_algorithm,
                 })
         proof_source = 'grounded_witnesses'
         evidence_records = []
         if not plan['feasible'] or parse_status != 'ok':
+            failed_join_plan = plan
             strict_failure = ({'reason': 'invalid_query_graph', 'query_parse_status': parse_status,
                                'untrusted_fallback_solver_result': plan}
                               if parse_status != 'ok' else plan)
@@ -1385,10 +1425,20 @@ def main():
                     'query_graph_invalid': parse_status != 'ok',
                     'proof_status': 'no_complete_source_located_proof',
                     'selection_mode': 'nonproof_retrieval_package', 'semantic_proof': False}
+            plan['join_algorithm'] = extensions.join_algorithm
+            plan['join_fallback_used'] = True
+            plan['t_star'] = failed_join_plan.get('t_star')
+            plan['per_demand_coverage'] = failed_join_plan.get(
+                'per_demand_coverage', {demand['demand_id']: 0.0 for demand in demands})
+            plan['witnesses_per_demand'] = failed_join_plan.get(
+                'witnesses_per_demand', {demand['demand_id']: 0 for demand in demands})
+            plan['n_evaluate_calls'] = failed_join_plan.get('n_evaluate_calls', 0)
             evidence_records = package['selected_records']
             proof_source = 'explicit_nonproof_retrieval_package'
         else:
             evidence_records = plan.get('selected_witnesses', [])
+            plan['join_algorithm'] = extensions.join_algorithm
+            plan['join_fallback_used'] = False
             plan['proof_status'] = 'source_located_not_semantically_verified'
             plan['selection_mode'] = 'source_located_proof_join'
             plan['semantic_proof'] = False

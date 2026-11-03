@@ -233,6 +233,15 @@ def load_extensions(cfg_dict: Mapping) -> Extensions:
         fill_redundancy=_boolean(
             noisy_or, 'fill_redundancy', False, 'extensions.noisy_or'),
     )
+    join_algorithm = _choice(
+        value, 'join_algorithm', 'dfs_maxmin',
+        ('dfs_maxmin', 'noisy_or_saturate'), 'extensions')
+    if (join_algorithm == 'noisy_or_saturate'
+            and (calibration_config.calibrator_path is None
+                 or calibration_config.calibrator_sha256 is None)):
+        raise ValueError(
+            'extensions.join_algorithm noisy_or_saturate requires '
+            'calibrator_path and calibrator_sha256')
 
     return Extensions(
         visibility_protocol=_choice(
@@ -252,9 +261,7 @@ def load_extensions(cfg_dict: Mapping) -> Extensions:
         progressive_topk=progressive_config,
         candidate_dump=_optional_string(value, 'candidate_dump', 'extensions'),
         calibration=calibration_config,
-        join_algorithm=_choice(
-            value, 'join_algorithm', 'dfs_maxmin',
-            ('dfs_maxmin', 'noisy_or_saturate'), 'extensions'),
+        join_algorithm=join_algorithm,
         noisy_or=noisy_or_config,
         vision_feature_cache=_choice(
             value, 'vision_feature_cache', 'off', ('off', 'on'), 'extensions'),

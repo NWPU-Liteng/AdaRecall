@@ -107,6 +107,21 @@ class ExtensionsConfigTests(unittest.TestCase):
         self.assertEqual(configured.calibration.candidate_policy, 'conformal')
         self.assertEqual(configured.calibration.calibrator_sha256, digest)
 
+    def test_noisy_or_requires_a_calibrator(self):
+        digest = 'b' * 64
+        with self.assertRaisesRegex(ValueError, 'noisy_or_saturate requires'):
+            load_extensions({'extensions': {
+                'join_algorithm': 'noisy_or_saturate',
+            }})
+        configured = load_extensions({'extensions': {
+            'join_algorithm': 'noisy_or_saturate',
+            'calibration': {
+                'calibrator_path': '/tmp/calibrator.json',
+                'calibrator_sha256': digest,
+            },
+        }})
+        self.assertEqual(configured.join_algorithm, 'noisy_or_saturate')
+
     def test_yaml_on_off_booleans_are_normalized_for_switches(self):
         extensions = load_extensions({'extensions': {
             'operation_executor': False,
