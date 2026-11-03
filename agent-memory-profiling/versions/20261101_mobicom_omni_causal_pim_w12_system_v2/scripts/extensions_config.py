@@ -214,6 +214,15 @@ def load_extensions(cfg_dict: Mapping) -> Extensions:
         min_per_demand=_integer(
             calibration, 'min_per_demand', 4, 'extensions.calibration'),
     )
+    if calibration_config.candidate_policy == 'conformal':
+        if (calibration_config.calibrator_path is None
+                or calibration_config.calibrator_sha256 is None):
+            raise ValueError(
+                'extensions.calibration conformal policy requires '
+                'calibrator_path and calibrator_sha256')
+        if calibration_config.min_per_demand > 48:
+            raise ValueError(
+                'extensions.calibration.min_per_demand must be <= 48')
 
     noisy_or = _mapping(value.get('noisy_or', {}), 'extensions.noisy_or')
     _reject_unknown(noisy_or, _NOISY_OR_KEYS, 'extensions.noisy_or')

@@ -52,6 +52,9 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
                                             plan_evidence_state_prefilter)
 from pim_backend.functional_decode import materialize_w12a16_primary
 from pim_backend.candidate_dump import build_candidate_dump, write_candidate_dump
+from pim_backend.candidate_policy import (apply_conformal_candidate_policy,
+                                          load_calibrator,
+                                          threshold_for_alpha)
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.progressive_lm_head import ProgressiveLmHeadShadow
 from pim_backend.progressive_retrieval import (aggregate_retrieval_stats,
@@ -299,6 +302,14 @@ def main():
         raise ValueError('extensions JSON must be an object')
     extensions = load_extensions({'extensions': raw_extensions})
     extensions_contract = extensions.output_contract()
+    candidate_calibrator = None
+    candidate_policy_tau = None
+    if extensions.calibration.candidate_policy == 'conformal':
+        candidate_calibrator = load_calibrator(
+            extensions.calibration.calibrator_path,
+            extensions.calibration.calibrator_sha256)
+        candidate_policy_tau = threshold_for_alpha(
+            candidate_calibrator, extensions.calibration.alpha)
     witness_values_enabled = extensions.witness_values == 'on'
     operation_executor_enabled = extensions.operation_executor == 'on'
     witness_prompt = WITNESS_VALUES_PROMPT if witness_values_enabled else WITNESS_PROMPT
@@ -607,6 +618,17 @@ def main():
                 person_id=args.user_id, question_id=question_id, query=query,
                 request_index=position, service_seconds=time.perf_counter() - request_started,
                 visibility_protocol=extensions.visibility_protocol)
+            if extensions.calibration.candidate_policy == 'conformal':
+                _, empty_policy_stats = apply_conformal_candidate_policy(
+                    [], demand_ids=[], tau=candidate_policy_tau,
+                    min_per_demand=extensions.calibration.min_per_demand,
+                    alpha=extensions.calibration.alpha,
+                    calibrator_sha256=candidate_calibrator['sha256'])
+                row['candidate_policy_stats'] = {
+                    **empty_policy_stats,
+                    'witness_construct_structured_input_tokens': None,
+                    'structured_input_token_scope': 'no visible history',
+                }
             if replay is not None:
                 row['persistent_replay'] = {
                     'enabled': True,
@@ -794,10 +816,30 @@ def main():
                     'reranked_candidate_count': len(candidate_pool_records),
                 })
         if args.evidence_state_prefilter_shadow:
-            witness_records = [record for record in candidate_pool_records
-                               if record['retrieval_rank'] < 48]
+            candidate_policy_input = [record for record in candidate_pool_records
+                                      if record['retrieval_rank'] < 48]
         else:
-            witness_records = candidate_pool_records
+            candidate_policy_input = candidate_pool_records
+        candidate_policy_stats = None
+        if extensions.calibration.candidate_policy == 'conformal':
+            def witness_candidate_token_count(records):
+                compact = [compact_record(record, objects, f'r{index}')
+                           for index, record in enumerate(records)]
+                return len(processor.tokenizer.encode(
+                    json.dumps(compact, ensure_ascii=False),
+                    add_special_tokens=False))
+
+            witness_records, candidate_policy_stats = (
+                apply_conformal_candidate_policy(
+                    candidate_policy_input,
+                    demand_ids=[demand['demand_id'] for demand in demands],
+                    tau=candidate_policy_tau,
+                    min_per_demand=extensions.calibration.min_per_demand,
+                    alpha=extensions.calibration.alpha,
+                    calibrator_sha256=candidate_calibrator['sha256'],
+                    token_counter=witness_candidate_token_count))
+        else:
+            witness_records = candidate_policy_input
         with profile_scope('dense_retrieval'):
             frontier_started = time.perf_counter()
             grounding_frontier = compile_candidate_frontier(witness_records, question_id=question_id)
@@ -1432,6 +1474,17 @@ def main():
             'frontier_selected_level': (selected_frontier_level['level']
                                         if selected_frontier_level is not None else None),
             'frontier_attempts': grounding_attempts}
+        if candidate_policy_stats is not None:
+            candidate_policy_stats = {
+                **candidate_policy_stats,
+                'witness_construct_structured_input_tokens': (
+                    grounding_result.get('structured_input_tokens')
+                    if grounding_result is not None else None),
+                'structured_input_token_scope': (
+                    'final grounding attempt; includes witness prompt, demands, '
+                    'relations and candidate records'),
+            }
+            plan['candidate_policy_stats'] = candidate_policy_stats
         if proof_query_shadow is not None:
             plan['proof_query_shadow'] = proof_query_shadow
         if evidence_state_prefilter_shadow is not None:
@@ -1732,6 +1785,9 @@ def main():
             'question_ids': question_ids,
             'runtime_labels_read': False,
         })
+    accessed_splits = {
+        manifest['split'] for manifest in manifests.values()
+    }
     result = {'complete': True,
         'schema': ('proof-mainline-reader-input-capture-v1' if args.capture_reader_inputs
                    else 'proof-mainline-run-v1'),
@@ -1758,7 +1814,9 @@ def main():
         'w12_host_contract_rows': args.w12_host_contract_rows,
         'w12a16_group_size': args.w12a16_group_size,
         'w12_release_source': args.w12_release_source,
-        'evaluation_label_files_read': [], 'validation_accessed': False, 'holdout_accessed': False,
+        'evaluation_label_files_read': [],
+        'validation_accessed': 'validation' in accessed_splits,
+        'holdout_accessed': 'holdout' in accessed_splits,
         'model_load_and_index_seconds': startup_seconds,
         'shard_index': args.shard_index, 'shard_count': args.shard_count,
         'elapsed_seconds': time.perf_counter() - started,

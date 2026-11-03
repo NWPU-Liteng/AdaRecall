@@ -48,8 +48,8 @@ def _sha256(value, name):
     return value
 
 
-def load_candidate_dumps(root):
-    """Load and validate ``<root>/<user>/<question>.json`` development dumps."""
+def load_candidate_dumps(root, required_split='development'):
+    """Load and validate ``<root>/<user>/<question>.json`` dumps."""
     root = Path(root)
     paths = sorted(root.glob('*/*.json'))
     if not paths:
@@ -61,8 +61,9 @@ def load_candidate_dumps(root):
         if not isinstance(payload, dict) or payload.get('schema') != 'omni-candidate-dump-v1':
             raise ValueError(f'candidate dump schema mismatch: {path}')
         split = payload.get('split')
-        if split != 'development':
-            raise ValueError(f'candidate dump split must be development: {path}: {split}')
+        if split != required_split:
+            raise ValueError(
+                f'candidate dump split must be {required_split}: {path}: {split}')
         if payload.get('label_free') is not True:
             raise ValueError(f'candidate dump is not label_free: {path}')
         person_id = _identity(payload.get('person_id'), 'person')

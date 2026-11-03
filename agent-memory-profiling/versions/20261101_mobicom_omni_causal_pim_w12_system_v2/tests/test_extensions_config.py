@@ -86,6 +86,27 @@ class ExtensionsConfigTests(unittest.TestCase):
             with self.subTest(config=config), self.assertRaises(ValueError):
                 load_extensions(config)
 
+    def test_conformal_requires_calibrator_identity_and_fixed_width(self):
+        digest = 'a' * 64
+        with self.assertRaisesRegex(ValueError, 'requires calibrator_path'):
+            load_extensions({'extensions': {'calibration': {
+                'candidate_policy': 'conformal',
+            }}})
+        with self.assertRaisesRegex(ValueError, 'min_per_demand must be <= 48'):
+            load_extensions({'extensions': {'calibration': {
+                'candidate_policy': 'conformal',
+                'calibrator_path': '/tmp/calibrator.json',
+                'calibrator_sha256': digest,
+                'min_per_demand': 49,
+            }}})
+        configured = load_extensions({'extensions': {'calibration': {
+            'candidate_policy': 'conformal',
+            'calibrator_path': '/tmp/calibrator.json',
+            'calibrator_sha256': digest,
+        }}})
+        self.assertEqual(configured.calibration.candidate_policy, 'conformal')
+        self.assertEqual(configured.calibration.calibrator_sha256, digest)
+
     def test_yaml_on_off_booleans_are_normalized_for_switches(self):
         extensions = load_extensions({'extensions': {
             'operation_executor': False,
