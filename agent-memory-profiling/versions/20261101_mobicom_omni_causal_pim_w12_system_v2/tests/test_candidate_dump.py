@@ -85,6 +85,23 @@ class CandidateDumpTests(unittest.TestCase):
         self.assertEqual(
             object_session_ids(OBJECTS, ['text:a', 'text:b']), ['s1', 's4'])
 
+    def test_witness_can_reference_a_record_retrieved_for_another_demand(self):
+        witnesses = [{
+            'witness_id': 'w:cross-demand',
+            'demand_id': 'd1',
+            'record_ids': ['a0'],
+            'retrieval_record_ids': ['r0'],
+            'object_ids': ['text:a'],
+            'base_record_id': 'r0',
+            'score': 4.5,
+        }]
+        payload = build_candidate_dump(
+            person_id='1', question_id='1_q_test', split='development',
+            demands=DEMANDS, candidates=candidates(), witnesses=witnesses,
+            objects=OBJECTS)
+        self.assertEqual(payload['witnesses'][0]['demand_id'], 'd1')
+        self.assertEqual(payload['witnesses'][0]['record_ids'], ['r0'])
+
     def test_wrong_candidate_width_fails_closed(self):
         with self.assertRaisesRegex(ValueError, 'expected 48'):
             build_candidate_dump(

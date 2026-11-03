@@ -107,6 +107,7 @@ def build_candidate_dump(*, person_id, question_id, split, demands, candidates,
         grouped[demand_id].append(candidate)
 
     exported_demands = []
+    global_record_ids = set()
     for demand_id in demand_ids:
         rows = grouped[demand_id]
         if len(rows) != candidate_width:
@@ -148,6 +149,7 @@ def build_candidate_dump(*, person_id, question_id, split, demands, candidates,
             'candidate_count': len(exported),
             'candidates': exported,
         })
+        global_record_ids.update(item['record_id'] for item in exported)
 
     if not isinstance(witnesses, list):
         raise ValueError('witnesses must be a list')
@@ -164,11 +166,19 @@ def build_candidate_dump(*, person_id, question_id, split, demands, candidates,
         if witness_demand not in by_demand_record:
             raise ValueError('accepted witness belongs to an unknown demand')
         record_ids = witness.get('retrieval_record_ids')
-        if (not isinstance(record_ids, list) or not record_ids
-                or any(not isinstance(record_id, str)
-                       or record_id not in by_demand_record[witness_demand]
-                       for record_id in record_ids)):
+        if not isinstance(record_ids, list) or not record_ids:
             raise ValueError('accepted witness record_ids must reference candidates')
+        invalid_record_ids = [record_id for record_id in record_ids
+                              if not isinstance(record_id, str)]
+        missing_record_ids = [record_id for record_id in record_ids
+                              if isinstance(record_id, str)
+                              and record_id not in global_record_ids]
+        if invalid_record_ids or missing_record_ids:
+            raise ValueError(
+                'accepted witness record_ids must reference candidates: '
+                f'demand={witness_demand} invalid={invalid_record_ids} '
+                f'missing={missing_record_ids} '
+                f'candidate_records={len(global_record_ids)}')
         object_ids = witness.get('object_ids')
         if (not isinstance(object_ids, list) or not object_ids
                 or any(not isinstance(object_id, str) or not object_id
