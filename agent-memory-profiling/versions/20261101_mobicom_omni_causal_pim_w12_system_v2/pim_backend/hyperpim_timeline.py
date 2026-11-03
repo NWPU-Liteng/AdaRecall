@@ -7,7 +7,8 @@ an external calibration point, not as a substitute for the timeline.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from collections.abc import Mapping
+from dataclasses import dataclass, fields, replace
 import math
 
 
@@ -407,3 +408,324 @@ def with_residual_bits(config: HyperPimTimelineConfig, bits: int) -> HyperPimTim
     if bits not in (0, 2, 4):
         raise ValueError("residual bits must be zero, two or four")
     return replace(config, residual_bits=bits)
+
+
+def _timing_config(value) -> HyperPimTimelineConfig:
+    if isinstance(value, HyperPimTimelineConfig):
+        return value
+    if not isinstance(value, Mapping):
+        raise ValueError("timing_profile must be a timeline config or mapping")
+    allowed = {field.name for field in fields(HyperPimTimelineConfig)}
+    unknown = sorted(set(value) - allowed)
+    if unknown:
+        raise ValueError(f"unknown timing_profile fields: {unknown}")
+    return HyperPimTimelineConfig(**dict(value))
+
+
+def _layout_tile_map(layout_plan):
+    if not isinstance(layout_plan, Mapping):
+        raise ValueError("layout_plan must be a mapping")
+    tiling = {}
+    banks = layout_plan.get("banks")
+    if not isinstance(banks, list) or not banks:
+        raise ValueError("layout_plan banks must be a nonempty list")
+    for bank in banks:
+        bank_id = int(bank["bank"])
+        for tile in bank.get("tiles", []):
+            tile_id = int(tile["global_tile_id"])
+            if tile_id in tiling:
+                raise ValueError("duplicate global tile identity in layout_plan")
+            tiling[tile_id] = (bank_id, tile)
+    return banks, tiling
+
+
+def progressive_topk_cycles(layout_plan, rounds: list[dict], timing_profile,
+                            host_round_trip_cycles: int | None) -> dict:
+    """Estimate bit-plane rounds and compare them with a full GEMV.
+
+    T2.1 currently exports survivor counts, not survivor row identities.  When
+    a round lacks ``active_tile_ids`` this function therefore uses a clearly
+    labelled count bound: survivors are distributed evenly across active banks
+    and each bank's touched-tile count is ``ceil(rows_per_bank / tile_rows)``.
+    """
+    if (host_round_trip_cycles is None
+            or isinstance(host_round_trip_cycles, bool)
+            or not isinstance(host_round_trip_cycles, int)
+            or host_round_trip_cycles < 0):
+        raise ValueError("host_round_trip_cycles must be a nonnegative integer")
+    if not isinstance(rounds, list) or not rounds:
+        raise ValueError("nonempty progressive top-k rounds required")
+    config = _timing_config(timing_profile)
+    banks, tile_map = _layout_tile_map(layout_plan)
+    bits = int(layout_plan.get("bits") or 0)
+    cols = int(layout_plan.get("cols") or 0)
+    rows = int(layout_plan.get("rows") or 0)
+    tile_rows = int(layout_plan.get("tile_rows") or 0)
+    bank_count = int(layout_plan.get("bank_count") or 0)
+    row_bytes = int(layout_plan.get("row_bytes") or 0)
+    if (bits not in (8, 10, 12) or cols <= 0 or rows <= 0 or tile_rows <= 0
+            or bank_count <= 0 or row_bytes <= 0):
+        raise ValueError("layout_plan is missing valid plane/geometry fields")
+    if len(banks) != bank_count:
+        raise ValueError("layout_plan bank count does not match its bank list")
+
+    plane_total = 0
+    result_rounds = []
+    current_cycle = 0
+    total_row_activations = 0
+    total_read_cycles = 0
+    total_mac_cycles = 0
+    total_bound_cycles = 0
+    total_threshold_cycles = 0
+    total_internal_read_bytes = 0
+    total_partial_macs = 0
+    total_bound_updates = 0
+    any_tile_ids = False
+    for round_index, item in enumerate(rounds):
+        if not isinstance(item, Mapping):
+            raise ValueError("progressive top-k rounds must be mappings")
+        planes_in_round = item.get("planes_in_round")
+        rows_alive = item.get("rows_alive_before")
+        if (isinstance(planes_in_round, bool)
+                or not isinstance(planes_in_round, int)
+                or planes_in_round <= 0
+                or isinstance(rows_alive, bool)
+                or not isinstance(rows_alive, int)
+                or rows_alive <= 0):
+            raise ValueError("round plane and survivor counts must be positive")
+        if rows_alive > rows:
+            raise ValueError("round survivor count exceeds layout rows")
+        plane_total += planes_in_round
+        if plane_total > bits:
+            raise ValueError("progressive rounds exceed layout planes")
+
+        active_tile_ids = item.get("active_tile_ids")
+        if active_tile_ids is not None:
+            any_tile_ids = True
+            ids = list(active_tile_ids)
+            if (not ids or any(isinstance(value, bool)
+                               or not isinstance(value, int) for value in ids)
+                    or len(ids) != len(set(ids))
+                    or not set(ids) <= set(tile_map)):
+                raise ValueError("active_tile_ids must be unique known integers")
+            per_bank = {}
+            for tile_id in ids:
+                bank_id, _ = tile_map[tile_id]
+                per_bank[bank_id] = per_bank.get(bank_id, 0) + 1
+            active_banks = len(per_bank)
+            tiles_per_active_bank = max(per_bank.values())
+            bank_plane_rows = {}
+            for tile_id in ids:
+                bank_id, tile = tile_map[tile_id]
+                bank_plane_rows[bank_id] = (
+                    bank_plane_rows.get(bank_id, 0)
+                    + tile["dram_rows_per_plane"])
+            per_bank_plane_rows = max(bank_plane_rows.values())
+            total_bank_activations = sum(bank_plane_rows.values())
+            tile_source = "provided_active_tile_ids"
+        else:
+            active_banks = min(bank_count, rows_alive)
+            rows_per_active_bank = math.ceil(rows_alive / active_banks)
+            tiles_per_active_bank = math.ceil(rows_per_active_bank / tile_rows)
+            touched_banks = banks[:active_banks]
+            per_bank_plane_rows = max(
+                sum(tile["dram_rows_per_plane"]
+                    for tile in bank.get("tiles", [])[:tiles_per_active_bank])
+                for bank in touched_banks)
+            total_bank_activations = sum(
+                sum(tile["dram_rows_per_plane"]
+                    for tile in bank.get("tiles", [])[:tiles_per_active_bank])
+                for bank in touched_banks)
+            tile_source = "count_bound_no_row_ids"
+
+        row_activations_per_bank = per_bank_plane_rows * planes_in_round
+        row_activations_total = total_bank_activations * planes_in_round
+        read_bytes_per_bank = row_activations_per_bank * row_bytes
+        read_cycles = math.ceil(
+            read_bytes_per_bank / config.bank_internal_bytes_per_cycle)
+        rows_per_active_bank = math.ceil(rows_alive / active_banks)
+        elements_per_bank = rows_per_active_bank * cols
+        mac_cycles = math.ceil(
+            elements_per_bank * planes_in_round
+            / (8 * config.int8_macs_per_bank_cycle))
+        bound_cycles = math.ceil(
+            2 * elements_per_bank / config.int8_macs_per_bank_cycle)
+        active_cycles = (read_cycles + mac_cycles + bound_cycles
+                         + host_round_trip_cycles)
+        refreshed = refresh_elapsed(active_cycles, current_cycle, config)
+        result_rounds.append({
+            "round": round_index,
+            "planes_in_round": planes_in_round,
+            "planes_read_total": plane_total,
+            "rows_alive_before": rows_alive,
+            "active_banks": active_banks,
+            "tiles_per_active_bank": tiles_per_active_bank,
+            "tile_identity_source": tile_source,
+            "row_activations_per_bank": row_activations_per_bank,
+            "row_activations_total": row_activations_total,
+            "internal_read_bytes_per_bank": read_bytes_per_bank,
+            "internal_read_cycles": read_cycles,
+            "mac_cycles": mac_cycles,
+            "bound_cycles": bound_cycles,
+            "threshold_broadcast_cycles": host_round_trip_cycles,
+            "active_cycles": active_cycles,
+            "start_cycle": current_cycle,
+            "refresh_cycles": refreshed["refresh_cycles"],
+            "elapsed_cycles": refreshed["elapsed_cycles"],
+        })
+        current_cycle += refreshed["elapsed_cycles"]
+        total_row_activations += row_activations_total
+        total_read_cycles += read_cycles
+        total_mac_cycles += mac_cycles
+        total_bound_cycles += bound_cycles
+        total_threshold_cycles += host_round_trip_cycles
+        total_internal_read_bytes += read_bytes_per_bank * active_banks
+        total_partial_macs += (
+            elements_per_bank * planes_in_round * active_banks)
+        total_bound_updates += 2 * elements_per_bank * active_banks
+    if plane_total != bits:
+        raise ValueError("progressive rounds must read every layout plane")
+
+    full_config = with_weight_bits(config, bits)
+    full_gemv = matrix_cycles(cols, rows, full_config)
+    total_active_cycles = sum(item["active_cycles"] for item in result_rounds)
+    return {
+        "schema": "progressive-topk-cycles-v1",
+        "rows": rows,
+        "cols": cols,
+        "bits": bits,
+        "bank_count": bank_count,
+        "tile_rows": tile_rows,
+        "host_round_trip_cycles": host_round_trip_cycles,
+        "tile_identity_source": (
+            "provided_active_tile_ids" if any_tile_ids
+            else "count_bound_no_row_ids"),
+        "rounds": result_rounds,
+        "totals": {
+            "rounds": len(result_rounds),
+            "row_activations_total": total_row_activations,
+            "internal_read_cycles": total_read_cycles,
+            "mac_cycles": total_mac_cycles,
+            "bound_cycles": total_bound_cycles,
+            "threshold_broadcast_cycles": total_threshold_cycles,
+            "internal_read_bytes": total_internal_read_bytes,
+            "partial_macs": total_partial_macs,
+            "bound_updates": total_bound_updates,
+            "active_cycles": total_active_cycles,
+            "refresh_cycles": current_cycle - total_active_cycles,
+            "elapsed_cycles": current_cycle,
+            "active_ms": 1000 * total_active_cycles / config.clock_hz,
+            "elapsed_ms": 1000 * current_cycle / config.clock_hz,
+        },
+        "full_gemv": full_gemv,
+        "active_cycles_over_full_gemv": (
+            total_active_cycles / full_gemv["active_cycles"]
+            if full_gemv["active_cycles"] else None),
+        "boundary": (
+            "analytical bit-plane round model; count-bound tile identity is "
+            "used when T2.1 stats do not carry survivor row identities"),
+    }
+
+
+def retrieval_gemv_workload(n_records, dim=1024) -> dict:
+    """Represent dense retrieval scoring as a workload for the existing model."""
+    if (isinstance(n_records, bool) or not isinstance(n_records, int)
+            or n_records <= 0 or isinstance(dim, bool)
+            or not isinstance(dim, int) or dim <= 0):
+        raise ValueError("positive integer retrieval dimensions required")
+    sequence_item = {
+        "name": "dense_retrieval",
+        "inputs": dim,
+        "outputs": n_records,
+        "count": 1,
+    }
+    estimate = matrix_cycles(dim, n_records)
+    return {
+        "schema": "retrieval-gemv-workload-v1",
+        "name": sequence_item["name"],
+        "inputs": dim,
+        "outputs": n_records,
+        "macs": n_records * dim,
+        "weight_elements": n_records * dim,
+        "sequence_item": sequence_item,
+        "timeline": estimate,
+        "cycles": estimate["active_cycles"],
+        "boundary": (
+            "batch-1 dense retrieval workload in the existing target cycle "
+            "model; not a measured PIM kernel"),
+    }
+
+
+ENERGY_PARAM_KEYS = (
+    "e_act_pj_per_row",
+    "e_read_pj_per_byte_internal",
+    "e_io_pj_per_byte",
+    "e_mac_bf16_pj",
+    "e_bound_update_pj",
+    "e_refresh_pj_per_cycle",
+)
+ENERGY_COUNT_KEYS = (
+    "row_activations",
+    "internal_read_bytes",
+    "io_bytes",
+    "bf16_macs",
+    "bound_updates",
+    "refresh_cycles",
+)
+
+
+def energy_model(counts: dict, energy_params: dict) -> dict:
+    """Apply a fully specified energy profile to explicit execution counts."""
+    if not isinstance(energy_params, Mapping):
+        raise ValueError("energy_params must be a mapping")
+    unknown = sorted(set(energy_params) - set(ENERGY_PARAM_KEYS))
+    if unknown:
+        raise ValueError(f"unknown energy parameter names: {unknown}")
+    missing = [
+        key for key in ENERGY_PARAM_KEYS
+        if energy_params.get(key) is None
+    ]
+    if missing:
+        return {"status": "params_missing", "missing": missing}
+    if not isinstance(counts, Mapping):
+        raise ValueError("counts must be a mapping")
+    counts_missing = [key for key in ENERGY_COUNT_KEYS if key not in counts]
+    if counts_missing:
+        raise ValueError(f"energy counts are missing: {counts_missing}")
+    parameters = {}
+    for key in ENERGY_PARAM_KEYS:
+        value = energy_params[key]
+        if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                or not math.isfinite(value) or value < 0):
+            raise ValueError("energy parameters must be finite nonnegative numbers")
+        parameters[key] = float(value)
+    values = {}
+    for key in ENERGY_COUNT_KEYS:
+        value = counts[key]
+        if (not isinstance(value, (int, float)) or isinstance(value, bool)
+                or not math.isfinite(value) or value < 0):
+            raise ValueError("energy counts must be finite nonnegative numbers")
+        values[key] = float(value)
+    components = {
+        "activation_pj": values["row_activations"] * parameters["e_act_pj_per_row"],
+        "internal_read_pj": values["internal_read_bytes"]
+        * parameters["e_read_pj_per_byte_internal"],
+        "io_pj": values["io_bytes"] * parameters["e_io_pj_per_byte"],
+        "mac_bf16_pj": values["bf16_macs"] * parameters["e_mac_bf16_pj"],
+        "bound_update_pj": values["bound_updates"]
+        * parameters["e_bound_update_pj"],
+        "refresh_pj": values["refresh_cycles"]
+        * parameters["e_refresh_pj_per_cycle"],
+    }
+    total_pj = sum(components.values())
+    return {
+        "status": "ok",
+        "counts": values,
+        "energy_params": parameters,
+        "components_pj": components,
+        "total_pj": total_pj,
+        "total_nj": total_pj / 1000.0,
+        "boundary": (
+            "closed-form energy accounting over caller-provided counts and "
+            "parameters; no values are inferred or measured"),
+    }

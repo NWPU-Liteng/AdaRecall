@@ -443,3 +443,103 @@ def grammar_residency(weight_bytes: int, token_table_bytes: int,
         "feasible": total <= config.capacity_bytes,
         "weight_copies": 1,
     }
+
+
+def plane_major_layout_plan(rows, cols, bits=12, group_size=128,
+                            row_bytes=2048, tile_rows=16,
+                            bank_count=256) -> dict:
+    """Map global plane-major codes onto bank-local DRAM rows.
+
+    Each bank owns a contiguous shard of logical rows.  A shard is split into
+    ``tile_rows`` tiles, and every bit plane of a tile occupies independently
+    addressable DRAM rows.  The row-major comparison uses the same ``bits``
+    width and the same physical row size; it is a layout comparison, not a
+    BF16/FP32 weight inventory.
+    """
+    integer_fields = (rows, cols, bits, group_size, row_bytes, tile_rows,
+                      bank_count)
+    if any(isinstance(value, bool) or not isinstance(value, int) or value <= 0
+           for value in integer_fields):
+        raise ValueError("positive integer plane-major layout fields required")
+    if bits not in (8, 10, 12):
+        raise ValueError("plane-major timing layout supports 8, 10 or 12 bits")
+    if cols % group_size:
+        raise ValueError("columns must align to group_size")
+
+    rows_per_bank = math.ceil(rows / bank_count)
+    plane_bytes_per_row = math.ceil(cols / 8)
+    row_major_row_bytes = math.ceil(cols * bits / 8)
+    row_major_rows_per_record = math.ceil(row_major_row_bytes / row_bytes)
+    banks = []
+    global_tile_id = 0
+    plane_major_total = 0
+    row_major_total = 0
+    for bank in range(bank_count):
+        start_row = bank * rows_per_bank
+        bank_rows = max(0, min(rows_per_bank, rows - start_row))
+        tile_count = math.ceil(bank_rows / tile_rows) if bank_rows else 0
+        tiles = []
+        dram_rows_by_plane = [0] * bits
+        for tile_index in range(tile_count):
+            tile_start = start_row + tile_index * tile_rows
+            tile_row_count = min(tile_rows, bank_rows - tile_index * tile_rows)
+            plane_bytes = tile_row_count * plane_bytes_per_row
+            dram_rows_per_plane = math.ceil(plane_bytes / row_bytes)
+            tiles.append({
+                'global_tile_id': global_tile_id,
+                'tile_index': tile_index,
+                'start_row': tile_start,
+                'end_row': tile_start + tile_row_count,
+                'row_count': tile_row_count,
+                'plane_bytes': plane_bytes,
+                'dram_rows_per_plane': dram_rows_per_plane,
+            })
+            global_tile_id += 1
+        if tile_count:
+            dram_rows_per_plane = sum(
+                tile['dram_rows_per_plane'] for tile in tiles)
+            dram_rows_by_plane = [dram_rows_per_plane] * bits
+        dram_rows_all_planes = sum(dram_rows_by_plane)
+        bank_plane_bytes = sum(tile['plane_bytes'] for tile in tiles) * bits
+        bank_row_major_rows = bank_rows * row_major_rows_per_record
+        plane_major_total += dram_rows_all_planes
+        row_major_total += bank_row_major_rows
+        banks.append({
+            'bank': bank,
+            'start_row': start_row,
+            'row_count': bank_rows,
+            'tile_count': tile_count,
+            'tiles': tiles,
+            'dram_rows_by_plane': dram_rows_by_plane,
+            'dram_rows_all_planes': dram_rows_all_planes,
+            'plane_bytes': bank_plane_bytes,
+            'row_major_full_read_rows': bank_row_major_rows,
+        })
+
+    return {
+        'schema': 'plane-major-layout-plan-v1',
+        'layout': 'global plane-major, bank-sharded, tile-padded',
+        'rows': rows,
+        'cols': cols,
+        'bits': bits,
+        'group_size': group_size,
+        'row_bytes': row_bytes,
+        'tile_rows': tile_rows,
+        'bank_count': bank_count,
+        'rows_per_bank': rows_per_bank,
+        'plane_bytes_per_row': plane_bytes_per_row,
+        'row_major_logical_row_bytes': row_major_row_bytes,
+        'row_major_rows_per_record': row_major_rows_per_record,
+        'tile_count': global_tile_id,
+        'banks': banks,
+        'plane_major_full_read_row_activations': plane_major_total,
+        'row_major_full_read_row_activations': row_major_total,
+        'plane_major_over_row_major_activations': (
+            plane_major_total / row_major_total if row_major_total else None),
+        'full_precision_definition': (
+            'all bits planes at the same width in plane-major versus row-major; '
+            'not a BF16 or FP32 source-weight inventory'),
+        'boundary': (
+            'analytical DRAM row layout; no RTL, refresh, repair, or '
+            'runtime migration trace'),
+    }

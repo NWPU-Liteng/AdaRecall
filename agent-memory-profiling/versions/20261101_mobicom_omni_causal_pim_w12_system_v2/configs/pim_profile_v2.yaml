@@ -1,0 +1,21 @@
+schema: pim-profile-v2
+
+# TODO_CITE: 需要用户从文献填写
+host_round_trip_cycles: null
+
+# Empty mapping uses HyperPimTimelineConfig's existing target defaults.
+# Add explicit fields there when a different documented target is required.
+timing_profile: {}
+
+# TODO_CITE: 需要用户从文献填写
+energy_params:
+  e_act_pj_per_row: null
+  e_read_pj_per_byte_internal: null
+  e_io_pj_per_byte: null
+  e_mac_bf16_pj: null
+  e_bound_update_pj: null
+  e_refresh_pj_per_cycle: null
+
+boundary: >-
+  Configuration contains no inferred timing or energy constants.  Missing
+  values must be supplied and cited before any energy estimate is reported.
