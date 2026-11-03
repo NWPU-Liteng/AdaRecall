@@ -39,6 +39,9 @@ from omni_proof_grounding import (WITNESS_PROMPT, WITNESS_SCHEMA,
 from omni_proof_runtime import (authorize_development_users, authorize_users, file_digest, greedy, load_reader,
                                 prepare_inputs, structured_call, write_json)
 from residual_profile import ReaderOperatorTrace
+from omni_visual_feature_cache_runtime import (cache_counter_delta,
+                                               create_visual_feature_cache,
+                                               tagged_visual_feature_cache)
 from omni_proof_query_contract import (QUERY_CONTRACT_PROMPT, QUERY_CONTRACT_SCHEMA,
                                        parse_query_contract, reader_context,
                                        render_operation_plan, retrieval_views)
@@ -536,6 +539,8 @@ def main():
             reader_quantization_materialization = materialize_w12a16_primary(
                 reader, group_size=args.w12a16_group_size,
                 row_chunk=args.w12_host_contract_rows)
+    vision_feature_cache = create_visual_feature_cache(
+        extensions.vision_feature_cache, args.reader, processor, reader)
     tokenizer = AutoTokenizer.from_pretrained(str(args.embedder), local_files_only=True, padding_side='left')
     embedder = AutoModel.from_pretrained(str(args.embedder), local_files_only=True,
         dtype=torch.bfloat16, attn_implementation='sdpa').to('cuda:0').eval()
@@ -1635,11 +1640,25 @@ def main():
         if args.capture_reader_inputs:
             args.capture_reader_inputs.mkdir(parents=True, exist_ok=True)
             capture_path = args.capture_reader_inputs / f'{args.user_id}_{question_id}.pt'
-            if capture_path.exists():
+            metadata_path = capture_path.with_suffix('.json')
+            if capture_path.exists() or metadata_path.exists():
                 raise ValueError(f'refusing to overwrite captured Reader input: {capture_path}')
             torch.save({name: value.detach().cpu().contiguous()
                         for name, value in inputs.items() if isinstance(value, torch.Tensor)},
                        capture_path)
+            image_sha256s = [ref['image_sha256'] for ref in materialized['images']]
+            write_json(metadata_path, {
+                'schema': 'proof-mainline-reader-input-capture-metadata-v1',
+                'person_id': args.user_id,
+                'question_id': question_id,
+                'input_path': str(capture_path),
+                'input_tokens': int(inputs.input_ids.shape[1]),
+                'image_count': len(loaded),
+                'image_sha256s': image_sha256s,
+                'input_ids_sha256': hashlib.sha256(
+                    inputs.input_ids.detach().cpu().numpy().tobytes()).hexdigest(),
+                'evaluation_label_files_read': [],
+            })
             row = {
                 'person_id': args.user_id,
                 'question_id': question_id,
@@ -1650,6 +1669,7 @@ def main():
                 'input_path': str(capture_path),
                 'input_tokens': int(inputs.input_ids.shape[1]),
                 'image_count': len(loaded),
+                'image_sha256s': image_sha256s,
                 'input_ids_sha256': hashlib.sha256(
                     inputs.input_ids.detach().cpu().numpy().tobytes()).hexdigest(),
                 'pre_reader_seconds': time.perf_counter() - request_started,
@@ -1705,14 +1725,20 @@ def main():
                                           for object_id in plan['accepted_object_ids'])},
                             {'phase': 'reader_prefill', 'object_ids': plan['accepted_object_ids'],
                              'consumer': 'decode', 'backend': 'host', 'input_allocations': []},]
+        image_sha256s = [ref['image_sha256'] for ref in materialized['images']]
+        visual_cache_before = tagged_visual_feature_cache(vision_feature_cache)
         generation_started = time.perf_counter()
-        generated = greedy(reader, processor, inputs, max_tokens=args.max_new_tokens,
-                           profile_reader=stage_profiler is not None,
-                           stage_profiler=stage_profiler,
-                           stage_prefix='answer' if stage_profiler is not None else None,
-                           n_images=len(loaded),
-                           lm_head_shadow=progressive_lm_head_shadow,
-                           lm_head_shadow_phase='answer')
+        visual_context = (vision_feature_cache.activate(reader.model, image_sha256s)
+                          if vision_feature_cache is not None else nullcontext())
+        with visual_context:
+            generated = greedy(reader, processor, inputs, max_tokens=args.max_new_tokens,
+                               profile_reader=stage_profiler is not None,
+                               stage_profiler=stage_profiler,
+                               stage_prefix='answer' if stage_profiler is not None else None,
+                               n_images=len(loaded),
+                               lm_head_shadow=progressive_lm_head_shadow,
+                               lm_head_shadow_phase='answer')
+        visual_cache_after = tagged_visual_feature_cache(vision_feature_cache)
         w12_after_reader = w12_snapshot()
         w12_stage_dispatch = None
         if w12_dispatch is not None:
@@ -1772,6 +1798,19 @@ def main():
                 'runtime_labels_read': False,
             }),
             'evaluation_label_files_read': [], 'request_index': position}
+        if vision_feature_cache is not None:
+            visual_delta = cache_counter_delta(visual_cache_before, visual_cache_after)
+            row['vision_feature_cache'] = {
+                'enabled': True,
+                'image_sha256s': image_sha256s,
+                'delta': visual_delta,
+                'hit_on_this_question': visual_delta['hits'] > 0,
+                'miss_on_this_question': visual_delta['misses'] > 0,
+                'capacity_bytes': visual_cache_after['capacity_bytes'],
+                'resident_bytes': visual_cache_after['resident_bytes'],
+                'peak_resident_bytes': visual_cache_after['peak_resident_bytes'],
+                'entries': visual_cache_after['entries'],
+            }
         if progressive_retrieval_mode != 'off':
             row['progressive_retrieval_demands'] = question_retrieval_demands
         if stage_profile_enabled:
@@ -1856,6 +1895,8 @@ def main():
                                      if args.reader_quantization == 'w12a16'
                                      else None),
         'extensions': extensions_contract,
+        **({'vision_feature_cache': vision_feature_cache.snapshot()}
+           if vision_feature_cache is not None else {}),
         'reader_quantization_materialization': reader_quantization_materialization,
         'w12_functional_route': args.w12_functional_route,
         'w12_numeric_mode': args.w12_numeric_mode,
