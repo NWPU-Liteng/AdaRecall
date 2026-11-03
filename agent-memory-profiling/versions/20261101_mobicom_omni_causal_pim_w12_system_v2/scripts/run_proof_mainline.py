@@ -51,6 +51,7 @@ from pim_backend.evidence_prefilter import (audit_evidence_prefilter,
                                             enforce_host_witness_coverage,
                                             plan_evidence_state_prefilter)
 from pim_backend.functional_decode import materialize_w12a16_primary
+from pim_backend.candidate_dump import build_candidate_dump, write_candidate_dump
 from pim_backend.lm_head_functional import LmHeadBankDispatcher
 from pim_backend.progressive_lm_head import ProgressiveLmHeadShadow
 from pim_backend.progressive_retrieval import (aggregate_retrieval_stats,
@@ -597,6 +598,11 @@ def main():
                                    visible_session_ids & set(question_visible_session_ids))
         if (extensions.visibility_protocol == 'as_of_question'
                 and n_visible_sessions == 0):
+            if extensions.candidate_dump is not None:
+                write_candidate_dump(extensions.candidate_dump, build_candidate_dump(
+                    person_id=args.user_id, question_id=question_id,
+                    split=manifest['split'], demands=[], candidates=[],
+                    witnesses=[], objects=objects))
             row = no_visible_history_row(
                 person_id=args.user_id, question_id=question_id, query=query,
                 request_index=position, service_seconds=time.perf_counter() - request_started,
@@ -1021,6 +1027,12 @@ def main():
             selected_frontier_level = frontier_level
             if contract_complete or frontier_level.get('is_complete'):
                 break
+        if extensions.candidate_dump is not None:
+            write_candidate_dump(extensions.candidate_dump, build_candidate_dump(
+                person_id=args.user_id, question_id=question_id,
+                split=manifest['split'], demands=demands,
+                candidates=candidate_pool_records, witnesses=grounded_witnesses,
+                objects=objects))
 
         def materialize_shadow(witness, aliases):
             values = [aliases[alias] for alias in witness['record_ids']
