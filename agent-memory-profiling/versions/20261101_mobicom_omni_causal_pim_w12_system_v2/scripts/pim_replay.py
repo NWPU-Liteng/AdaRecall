@@ -120,16 +120,27 @@ def _load_stats(stats_dir):
         file_rows = list(payload.get('rows', []))
         lm_stats = payload.get('progressive_lm_head_stats')
         if lm_stats is not None and lm_stats.get('enabled') and len(file_rows) != 1:
-            raise ValueError(
-                'progressive lm_head stats are shard-level and cannot be '
-                f'attributed to {len(file_rows)} questions: {path}')
+            per_question = [row.get('progressive_lm_head_stats_question')
+                            for row in file_rows]
+            if not all(isinstance(item, dict) for item in per_question):
+                raise ValueError(
+                    'progressive lm_head stats are shard-level and cannot be '
+                    f'attributed to {len(file_rows)} questions: {path}')
         retrieval_stats = payload.get('progressive_retrieval_stats') or {}
         for source_row in file_rows:
             row = dict(source_row)
             question_id = str(row.get('question_id') or '')
             if not question_id or question_id in rows:
                 raise ValueError(f'duplicate or missing stats question_id: {path}')
-            if lm_stats is not None:
+            question_lm_stats = row.pop('progressive_lm_head_stats_question', None)
+            if question_lm_stats is not None:
+                if not isinstance(question_lm_stats, dict):
+                    raise ValueError(
+                        f'per-question progressive lm_head stats must be an object: {path}')
+                row['progressive_lm_head_stats'] = question_lm_stats
+                row['progressive_lm_head_attribution'] = (
+                    question_lm_stats.get('attribution') or 'per_question')
+            elif lm_stats is not None:
                 row['progressive_lm_head_stats'] = lm_stats
                 row['progressive_lm_head_attribution'] = 'single_question_shard'
             if retrieval_stats.get('enabled'):

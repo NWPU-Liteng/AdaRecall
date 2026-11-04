@@ -629,6 +629,9 @@ def main():
         if question_id in completed_ids:
             continue
         render_cache.clear()
+        progressive_lm_head_before = (
+            progressive_lm_head_shadow.snapshot()
+            if progressive_lm_head_shadow is not None else None)
         image_cache = {}
         manifest = manifests[question_id]
         query = manifest['question']
@@ -1860,6 +1863,10 @@ def main():
             }
         if progressive_retrieval_mode != 'off':
             row['progressive_retrieval_demands'] = question_retrieval_demands
+        if progressive_lm_head_before is not None:
+            row['progressive_lm_head_stats_question'] = (
+                progressive_lm_head_shadow.summary_delta(
+                    progressive_lm_head_before))
         if stage_profile_enabled:
             row['stage_profile'] = stage_profiler.as_dict(
                 request_wall_ms=service_seconds * 1000.0)

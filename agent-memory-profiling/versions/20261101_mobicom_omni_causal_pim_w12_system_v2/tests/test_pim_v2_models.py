@@ -353,6 +353,49 @@ class PimReplayTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'cannot be attributed'):
                 build_replay(trace_dir, stats_dir, profile)
 
+    def test_replay_accepts_per_question_lm_stats_in_multi_question_shard(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            trace_dir = root / 'trace'
+            stats_dir = root / 'stats'
+            trace_dir.mkdir()
+            stats_dir.mkdir()
+            rows = []
+            for question_id in ('1_q_a', '1_q_b'):
+                (trace_dir / question_id).with_suffix('.json').write_text(
+                    json.dumps({
+                        'schema': 'omni-serving-workload-trace-v1',
+                        'person_id': '1',
+                        'question_id': question_id,
+                        'reader_linear_operators': {},
+                        'stages': {},
+                    }))
+                rows.append({
+                    'person_id': '1',
+                    'question_id': question_id,
+                    'progressive_lm_head_stats_question': {
+                        'enabled': True,
+                        'attribution': 'per_question_delta',
+                        'phases': {},
+                    },
+                })
+            (stats_dir / 'user_1_shard_0.json').write_text(json.dumps({
+                'complete': True,
+                'progressive_lm_head_stats': {'enabled': True},
+                'rows': rows,
+            }))
+            profile = {
+                'schema': 'pim-profile-v2',
+                'source_path': 'inline',
+                'source_sha256': 'a' * 64,
+                'host_round_trip_cycles': 100,
+                'timing_profile': {},
+                'energy_params': {key: None for key in ENERGY_PARAM_KEYS},
+            }
+            result = build_replay(trace_dir, stats_dir, profile)
+            self.assertTrue(result['complete'])
+            self.assertEqual(result['question_count'], 2)
+
 
 if __name__ == '__main__':
     unittest.main()

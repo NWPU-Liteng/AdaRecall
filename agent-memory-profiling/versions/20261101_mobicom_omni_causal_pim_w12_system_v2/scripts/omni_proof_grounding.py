@@ -248,8 +248,15 @@ def validate_witnesses(proposal, demands, relations, aliases, objects):
             rejected.append({'proposal_index': index, 'reason': reason})
             continue
         record_ids = sorted({record['record_id'] for record in selected.values()})
+        image_object_ids = {
+            record['image_object_id'] for record in selected.values()
+            if record.get('kind') == 'image_locator'
+            and isinstance(record.get('image_object_id'), str)
+            and record['image_object_id'] in objects
+        }
         object_ids = sorted({anchor['object_id'] for anchor in
-                             anchors + binding_sources + relation_sources + value_sources})
+                             anchors + binding_sources + relation_sources + value_sources}
+                            | image_object_ids)
         identity_payload = {'demand': item['demand_id'], 'records': record_ids,
             'bindings': bindings, 'anchors': anchors,
             'source_relations': source_relations}
@@ -260,10 +267,17 @@ def validate_witnesses(proposal, demands, relations, aliases, objects):
             'record_ids': record_ids, 'object_ids': object_ids, 'bindings': bindings,
             'binding_sources': binding_sources, 'anchors': anchors,
             'discarded_optional_fields': optional_rejections,
-            'source_hints': {anchor['object_id']: selected[anchor['record_id']].get('image_source')
-                             for anchor in anchors if anchor.get('object_id') in objects
-                             and objects[anchor['object_id']]['kind'] == 'image'
-                             and selected[anchor['record_id']].get('image_source')},
+            'source_hints': {
+                **{anchor['object_id']: selected[anchor['record_id']].get('image_source')
+                   for anchor in anchors if anchor.get('object_id') in objects
+                   and objects[anchor['object_id']]['kind'] == 'image'
+                   and selected[anchor['record_id']].get('image_source')},
+                **{record['image_object_id']: record.get('image_source')
+                   for record in selected.values()
+                   if record.get('kind') == 'image_locator'
+                   and record.get('image_object_id') in image_object_ids
+                   and record.get('image_source')},
+            },
             'source_relations': source_relations, 'relation_sources': relation_sources,
             'grounding_status': 'source_located_not_semantically_verified',
             'image_locator_status': 'original_image_required' if any(

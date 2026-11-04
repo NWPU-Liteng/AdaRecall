@@ -248,6 +248,35 @@ class ProofRecoveryTests(unittest.TestCase):
         self.assertFalse(rejected)
         self.assertEqual(accepted[0]['object_ids'], ['text:a'])
 
+    def test_selected_image_locator_materializes_its_raw_image(self):
+        objects = {
+            'text:a': {'kind': 'text', 'raw_text': 'The living-room photo is relevant'},
+            'image:sha': {'kind': 'image'},
+        }
+        aliases = {'r0': {
+            'record_id': 'visual:sha:region:2',
+            'kind': 'image_locator',
+            'object_ids': ['text:a'],
+            'image_object_id': 'image:sha',
+            'locator_regions': [{'region_index': 0}],
+            'image_source': {'member': 'image/uid4/event/4_event_8.png'},
+        }}
+        proposal = {'witnesses': [{
+            'demand_id': 'd0', 'record_ids': ['r0'],
+            'anchors': [{'record_id': 'r0', 'text_index': 0}],
+            'bindings': [], 'source_relations': [],
+        }]}
+        expanded = expand_compact_sources(proposal, aliases, objects)
+        accepted, rejected = validate_witnesses(
+            expanded, [{'demand_id': 'd0', 'required': True, 'variables': []}],
+            [], aliases, objects)
+        self.assertFalse(rejected)
+        self.assertEqual(accepted[0]['object_ids'], ['image:sha', 'text:a'])
+        self.assertEqual(accepted[0]['image_locator_status'], 'original_image_required')
+        self.assertEqual(
+            accepted[0]['source_hints']['image:sha']['member'],
+            'image/uid4/event/4_event_8.png')
+
     def test_duplicate_image_regions_charge_one_raw_image(self):
         witnesses = [
             {'witness_id': 'region-0', 'demand_id': 'first', 'object_ids': ['image:sha'],

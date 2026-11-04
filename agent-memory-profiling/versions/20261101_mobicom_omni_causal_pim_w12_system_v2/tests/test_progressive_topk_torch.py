@@ -151,7 +151,32 @@ class ProgressiveLmHeadShadowTests(unittest.TestCase):
                              [0, 3])
             self.assertEqual(
                 [int(value) for value in shadow.full_allowed().nonzero().flatten()],
-                [0, 1, 2, 3, 4])
+                             [0, 1, 2, 3, 4])
+
+    def test_summary_delta_attributes_only_new_observations(self):
+        wrapper = self._wrapper()
+        activation = torch.randn(1, 1, 128, dtype=torch.bfloat16)
+        with ProgressiveLmHeadShadow(
+                wrapper, vocab_rows=8, valid_vocab_size=8,
+                shadow_every=2) as shadow:
+            output = wrapper(activation)
+            actual = int(output.argmax().item())
+            allowed = torch.ones(8, dtype=torch.bool)
+            shadow.observe(
+                phase='answer', actual_token=actual,
+                allowed=allowed, forced=False)
+            before = shadow.snapshot()
+            forced = torch.zeros(8, dtype=torch.bool)
+            forced[actual] = True
+            shadow.observe(
+                phase='answer', actual_token=actual,
+                allowed=forced, forced=True)
+            delta = shadow.summary_delta(before)
+        self.assertEqual(delta['attribution'], 'per_question_delta')
+        self.assertEqual(delta['phases']['answer']['checked_tokens'], 1)
+        self.assertEqual(delta['phases']['answer']['forced_tokens'], 1)
+        self.assertEqual(delta['phases']['answer']['progressive_calls'], 0)
+        self.assertEqual(delta['totals']['checked_tokens'], 1)
 
     def test_disabled_summary_has_all_phases(self):
         summary = ProgressiveLmHeadShadow.disabled_summary()

@@ -277,6 +277,48 @@ class EvalEvidenceRecallTests(unittest.TestCase):
                          'skipped_no_candidate_dump')
         self.assertFalse(report['evidence_levels']['atom'].startswith('computed'))
 
+    def test_candidate_dump_recall_uses_the_actual_retained_pool(self):
+        with tempfile.TemporaryDirectory() as directory:
+            fixture = create_fixture(Path(directory))
+            candidate_root = Path(directory) / 'candidates' / '0'
+            candidate_root.mkdir(parents=True)
+            candidates = {
+                '0_q_1': ([('0_1', [f'image:{SHA_A}']), ('0_4', [])]),
+                '0_q_2': ([('0_3', [])]),
+                '0_q_3': ([]),
+                '0_q_4': ([]),
+            }
+            for question_id, items in candidates.items():
+                (candidate_root / f'{question_id}.json').write_text(json.dumps({
+                    'question_id': question_id,
+                    'label_free': True,
+                    'demands': [{'demand_id': 'd0', 'candidates': [
+                        {'session_ids': [session_id], 'object_ids': object_ids}
+                        for session_id, object_ids in items
+                    ]}],
+                }))
+            report = build_report(
+                fixture['run_dir'], fixture['labels'],
+                candidate_dump=Path(directory) / 'candidates')
+        self.assertEqual(report['candidate_recall_session'], {
+            'status': 'computed_from_candidate_dump',
+            'dump_root': str((Path(directory) / 'candidates').resolve()),
+            'questions_with_labels': 3,
+            'labeled_units': 4,
+            'hits': 2,
+            'mean_per_question': 0.5,
+            'pooled_recall': 0.5,
+        })
+        self.assertEqual(report['candidate_recall_image'], {
+            'status': 'computed_from_candidate_dump',
+            'dump_root': str((Path(directory) / 'candidates').resolve()),
+            'questions_with_labels': 1,
+            'labeled_units': 2,
+            'hits': 1,
+            'mean_per_question': 0.5,
+            'pooled_recall': 0.5,
+        })
+
     def test_write_report_emits_json_and_uses_auto_discovered_index(self):
         with tempfile.TemporaryDirectory() as directory:
             fixture = create_fixture(Path(directory))

@@ -95,6 +95,11 @@ def ledger_path(rows_root: Path, question_id: str) -> Path:
     return rows_root / user_id / f"{question_id}.json"
 
 
+def ledger_identities(rows_root: Path, expected: set[str]) -> set[str]:
+    return ({path.stem for path in rows_root.glob("*/*.json") if path.is_file()}
+            & expected)
+
+
 def build_prompt(template: str, manifest: dict, label: dict, row: dict) -> str:
     replacements = {
         "[Question]": manifest["question"],
@@ -170,7 +175,7 @@ def gpu_free_gib() -> tuple[float | None, float | None, str | None]:
         return None, None, repr(error)
 
 
-def judge(config_path: Path) -> int:
+def judge(config_path: Path, requested_users: list[str] | None = None) -> int:
     config = load_config(config_path)
     paths = config["paths"]
     run_root = resolve(paths["run_root"])
@@ -190,8 +195,14 @@ def judge(config_path: Path) -> int:
             raise ValueError(f"prepared evaluation input hash mismatch: {name}")
     manifests = {row["question_id"]: row for row in load_jsonl(prepared / "manifests.jsonl")}
     labels = {row["question_id"]: row for row in load_jsonl(prepared / "labels.jsonl")}
+    users = sorted(cohort["question_ids_by_user"], key=int)
+    if requested_users is not None:
+        unknown = sorted(set(requested_users) - set(users), key=str)
+        if unknown:
+            raise ValueError(f"unknown users in cohort: {unknown}")
+        users = sorted(set(requested_users), key=int)
     order = {identity: index for index, identity in enumerate(
-        identity for user in sorted(cohort["question_ids_by_user"], key=int)
+        identity for user in users
         for identity in cohort["question_ids_by_user"][user])}
     expected = set(order)
     prompt_source = resolve(config["evaluation"]["judge_prompt_source"])
@@ -247,7 +258,7 @@ def judge(config_path: Path) -> int:
         return result
 
     def judged_identities() -> set[str]:
-        return {path.stem for path in rows_root.glob("*/*.json") if path.is_file()}
+        return ledger_identities(rows_root, expected)
 
     def update_status(state: str | None = None, **extra: Any) -> None:
         if state is not None:
@@ -366,8 +377,9 @@ def judge(config_path: Path) -> int:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, required=True)
+    parser.add_argument("--users", nargs="*")
     args = parser.parse_args()
-    raise SystemExit(judge(args.config.resolve()))
+    raise SystemExit(judge(args.config.resolve(), args.users))
 
 
 if __name__ == "__main__":

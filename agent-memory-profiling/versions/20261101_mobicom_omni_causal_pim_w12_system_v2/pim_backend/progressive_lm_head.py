@@ -252,6 +252,35 @@ class ProgressiveLmHeadShadow:
                          'remain on the normal Reader path'),
         }
 
+    def snapshot(self):
+        return copy.deepcopy(self._stats)
+
+    def summary_delta(self, before):
+        phases = {}
+        totals = _empty_phase_stats()
+        for phase in PHASES:
+            current = self._stats[phase]
+            previous = before[phase]
+            phases[phase] = _finish_stats({
+                key: current[key] - previous[key] for key in current
+            })
+            for key in totals:
+                totals[key] += current[key] - previous[key]
+        return {
+            'enabled': self.enabled,
+            'mode': 'shadow',
+            'vocab_rows': self.vocab_rows,
+            'valid_vocab_size': self.valid_vocab_size,
+            'bits': self.layout.weight_bits,
+            'group_size': self.layout.group_size,
+            'plane_schedule': list(self.plane_schedule),
+            'phases': phases,
+            'totals': _finish_stats(totals),
+            'attribution': 'per_question_delta',
+            'physical_pim_executed': False,
+            'performance_comparable': False,
+        }
+
     @classmethod
     def disabled_summary(cls):
         phases = {

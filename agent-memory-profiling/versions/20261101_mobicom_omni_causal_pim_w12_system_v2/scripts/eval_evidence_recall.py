@@ -395,6 +395,44 @@ def _recall_summary(rows, prefix):
     }
 
 
+def _candidate_evidence(path):
+    path = Path(path)
+    payload = json.loads(path.read_text())
+    demands = payload.get('demands')
+    if not isinstance(demands, list):
+        raise ValueError(f'candidate dump demands must be a list: {path}')
+    sessions = set()
+    images = set()
+    for demand in demands:
+        candidates = demand.get('candidates') if isinstance(demand, dict) else None
+        if not isinstance(candidates, list):
+            raise ValueError(f'candidate dump demand candidates must be a list: {path}')
+        for candidate in candidates:
+            if not isinstance(candidate, dict):
+                raise ValueError(f'candidate entry must be an object: {path}')
+            for session_id in candidate.get('session_ids') or []:
+                if isinstance(session_id, str):
+                    sessions.add(session_id)
+            for object_id in candidate.get('object_ids') or []:
+                if isinstance(object_id, str) and object_id.startswith('image:'):
+                    images.add(object_id.split(':', 1)[1])
+    return sessions, images
+
+
+def _candidate_summary(rows, prefix):
+    labeled = sum(row[f'candidate_{prefix}_labeled_units'] for row in rows)
+    hits = sum(row[f'candidate_{prefix}_hits'] for row in rows)
+    values = [row[f'candidate_{prefix}_recall'] for row in rows
+              if row[f'candidate_{prefix}_recall'] is not None]
+    return {
+        'questions_with_labels': len(values),
+        'labeled_units': labeled,
+        'hits': hits,
+        'mean_per_question': _mean(values),
+        'pooled_recall': hits / labeled if labeled else None,
+    }
+
+
 def aggregate(rows):
     failures = {
         name: sum(len(row['mapping_failures'][name]) for row in rows)
@@ -430,7 +468,7 @@ def _grouped(rows, key):
 
 
 def build_report(run_dir, labels_path, index_root=None, graph_path=None,
-                 manifests_path=None):
+                 manifests_path=None, candidate_dump=None):
     labels = load_labels(labels_path)
     graphs, graph_path = load_graph(labels_path, graph_path=graph_path)
     manifests, manifests_path = load_manifests(
@@ -485,6 +523,51 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None,
         }
         for user, source in sorted(sources.items())
     }
+    if candidate_dump is not None:
+        candidate_dump = Path(candidate_dump)
+        for row, result in zip(rows, results):
+            path = (candidate_dump / str(row['person_id'])
+                    / f"{row['question_id']}.json")
+            if not path.is_file():
+                raise FileNotFoundError(f'candidate dump missing: {path}')
+            candidate_sessions, candidate_images = _candidate_evidence(path)
+            mapped_sessions = (
+                set(result['labeled_session_ids'])
+                - set(result['mapping_failures']['session_ids']))
+            labeled_images = set(result['labeled_image_sha256'])
+            session_hits = len(mapped_sessions & candidate_sessions)
+            image_hits = len(labeled_images & candidate_images)
+            result['candidate_session_labeled_units'] = len(mapped_sessions)
+            result['candidate_session_hits'] = session_hits
+            result['candidate_session_recall'] = (
+                session_hits / len(mapped_sessions) if mapped_sessions else None)
+            result['candidate_image_labeled_units'] = len(labeled_images)
+            result['candidate_image_hits'] = image_hits
+            result['candidate_image_recall'] = (
+                image_hits / len(labeled_images) if labeled_images else None)
+        candidate_session = {
+            'status': 'computed_from_candidate_dump',
+            'dump_root': str(candidate_dump.resolve()),
+            **_candidate_summary(results, 'session'),
+        }
+        candidate_image = {
+            'status': 'computed_from_candidate_dump',
+            'dump_root': str(candidate_dump.resolve()),
+            **_candidate_summary(results, 'image'),
+        }
+    else:
+        candidate_session = {
+            'status': 'skipped_no_candidate_dump',
+            'reason': 'no --candidate-dump was supplied',
+            'mean_per_question': None,
+            'pooled_recall': None,
+        }
+        candidate_image = {
+            'status': 'skipped_no_candidate_dump',
+            'reason': 'no --candidate-dump was supplied',
+            'mean_per_question': None,
+            'pooled_recall': None,
+        }
     return {
         'schema': SCHEMA,
         'run_dir': str(Path(run_dir).resolve()),
@@ -513,20 +596,17 @@ def build_report(run_dir, labels_path, index_root=None, graph_path=None,
         'by_proof_status': by_proof_status,
         'by_question_type': by_question_type,
         'by_proof_status_and_question_type': by_both,
-        'candidate_recall_session': {
-            'status': 'skipped_no_candidate_dump',
-            'reason': 'candidate dump is introduced by T3.1 and is absent from this run',
-            'mean_per_question': None,
-            'pooled_recall': None,
-        },
+        'candidate_recall_session': candidate_session,
+        'candidate_recall_image': candidate_image,
         'boundary': 'label-side evaluation only; session/image recall does not establish semantic sufficiency or answer correctness',
     }
 
 
 def write_report(run_dir, labels_path, *, index_root=None, graph_path=None,
-                 manifests_path=None, output=None):
+                 manifests_path=None, output=None, candidate_dump=None):
     report = build_report(run_dir, labels_path, index_root=index_root,
-                          graph_path=graph_path, manifests_path=manifests_path)
+                          graph_path=graph_path, manifests_path=manifests_path,
+                          candidate_dump=candidate_dump)
     output = Path(output) if output else Path(run_dir) / 'evidence_recall.json'
     output.parent.mkdir(parents=True, exist_ok=True)
     temporary = output.with_suffix(output.suffix + '.tmp')
@@ -543,12 +623,13 @@ def main(argv=None):
     parser.add_argument('--index-root', type=Path)
     parser.add_argument('--graph', type=Path)
     parser.add_argument('--manifests', type=Path)
+    parser.add_argument('--candidate-dump', type=Path)
     parser.add_argument('--output', type=Path)
     args = parser.parse_args(argv)
     output, report = write_report(
         args.run_dir, args.labels, index_root=args.index_root,
         graph_path=args.graph, manifests_path=args.manifests,
-        output=args.output)
+        output=args.output, candidate_dump=args.candidate_dump)
     print(output)
     print(json.dumps({
         'questions': len(report['questions']),
@@ -557,6 +638,7 @@ def main(argv=None):
         'mapping_failures': report['mapping_failures'],
         'future_history_evidence': report['future_history_evidence'],
         'candidate_recall_session': report['candidate_recall_session']['status'],
+        'candidate_recall_image': report['candidate_recall_image']['status'],
     }, ensure_ascii=False))
 
 
