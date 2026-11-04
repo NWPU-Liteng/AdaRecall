@@ -110,16 +110,33 @@ def resolve_reader_quantization(functional_route, requested, lm_head_mode):
 
 
 def aggregate_w12_stage_dispatch(rows):
-    ledgers = [row['w12_stage_dispatch'] for row in rows
+    records = [row for row in rows
                if row.get('w12_stage_dispatch') is not None]
+    ledgers = [row['w12_stage_dispatch'] for row in records]
     if not ledgers:
         return None
-    identities = {
-        ledger[stage]['layout_instance_sha256']
-        for ledger in ledgers for stage in W12_STAGES
-    }
-    if len(identities) != 1:
-        raise RuntimeError('W12 layout identity changed across requests or stages')
+    instances = set()
+    specs = []
+    for ledger in ledgers:
+        request_instances = {
+            ledger[stage]['layout_instance_sha256'] for stage in W12_STAGES
+        }
+        if len(request_instances) != 1:
+            raise RuntimeError('W12 layout identity changed across stages')
+        instances.update(request_instances)
+        request_specs = {
+            ledger[stage].get('layout_spec_sha256') for stage in W12_STAGES
+        }
+        if len(request_specs) != 1:
+            raise RuntimeError('W12 layout spec changed across stages')
+        request_spec = next(iter(request_specs))
+        if request_spec is not None:
+            specs.append(request_spec)
+    if len(set(specs)) > 1:
+        raise RuntimeError('W12 content layout spec changed across requests')
+    spec_complete = len(specs) == len(ledgers)
+    single_layout = ((spec_complete and len(set(specs)) == 1)
+                     or (not specs and len(instances) == 1))
     stages = {}
     for stage in W12_STAGES:
         stage_rows = [ledger[stage] for ledger in ledgers]
@@ -136,23 +153,53 @@ def aggregate_w12_stage_dispatch(rows):
             'unique_layouts': ledgers[0][stage]['unique_layouts'],
         })
         stages[stage] = item
+    expected_stage_hits = []
+    raw_stage_hits = []
+    not_applicable_source_grounding = 0
+    for row in records:
+        ledger = row['w12_stage_dispatch']
+        grounding = row.get('proof_plan', {}).get('grounding', {})
+        expected = {
+            'query_parser': True,
+            'source_grounding': (
+                grounding.get('stop_reason') != 'not_applicable_contextual'),
+            'reader_generation': True,
+        }
+        if not expected['source_grounding']:
+            not_applicable_source_grounding += 1
+        expected_stage_hits.append(all(
+            ledger[stage]['bank_calls'] > 0
+            for stage in W12_STAGES if expected[stage]))
+        raw_stage_hits.append(all(
+            ledger[stage]['bank_calls'] > 0 for stage in W12_STAGES))
     return {
         'requests': len(ledgers),
         'stages': stages,
-        'all_requests_all_stages_hit_bank': all(
-            ledger[stage]['bank_calls'] > 0
-            for ledger in ledgers for stage in W12_STAGES),
+        'all_requests_all_stages_hit_bank': all(expected_stage_hits),
+        'all_requests_all_raw_stages_hit_bank': all(raw_stage_hits),
+        'not_applicable_source_grounding_requests': (
+            not_applicable_source_grounding),
         'decode_fallback_zero': all(
             ledger[stage]['decode_fallback_calls'] == 0
             for ledger in ledgers for stage in W12_STAGES),
         'single_dispatcher': True,
-        'single_layout': True,
-        'layout_instance_sha256': next(iter(identities)),
+        'single_layout': single_layout,
+        'layout_instance_sha256': (next(iter(instances))
+                                   if len(instances) == 1 else None),
+        'layout_instance_sha256s': sorted(instances),
+        'layout_instance_count': len(instances),
+        'layout_spec_sha256': (specs[0] if spec_complete else None),
+        'layout_spec_complete': spec_complete,
+        'layout_spec_available': bool(specs),
         'layout_identity_unchanged': True,
+        'layout_identity_scope': 'process_local_instance_plus_content_spec',
+        'resumed_processes': len(instances) > 1,
         'physical_pim_executed': False,
         'performance_comparable': False,
-        'boundary': ('stage deltas from one functional W12 dispatcher; Torch '
-                     'wall-clock is not a PIM latency measurement'),
+        'boundary': ('stage deltas from one functional W12 dispatcher per '
+                     'process; process-local instance IDs may differ after '
+                     'checkpoint resume, while content specs must agree; '
+                     'Torch wall-clock is not a PIM latency measurement'),
     }
 
 

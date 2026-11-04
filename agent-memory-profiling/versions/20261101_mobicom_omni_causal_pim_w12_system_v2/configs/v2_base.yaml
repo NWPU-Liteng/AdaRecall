@@ -1,0 +1,88 @@
+schema: mobilemem-omni-main-experiment-v1
+extensions:
+  visibility_protocol: history_end
+  as_of_rule: session_end_before_question
+  operation_executor: off
+  witness_values: off
+  stage_profiler: off
+  workload_trace: off
+  progressive_topk:
+    lm_head: off
+    lm_head_shadow_every: 8
+    retrieval: off
+    bits: 12
+    group_size: 128
+    plane_schedule: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    eps_rel: 1.0e-9
+  candidate_dump: null
+  calibration:
+    calibrator_path: null
+    calibrator_sha256: null
+    candidate_policy: fixed48
+    alpha: 0.1
+    min_per_demand: 4
+  join_algorithm: dfs_maxmin
+  noisy_or:
+    max_witnesses_per_demand: 3
+    levels: 20
+    fill_redundancy: false
+  vision_feature_cache: off
+subset:
+  name: pilot112_v1
+  audit: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/subsets/pilot112_v1/subset_audit.json
+  population_audit: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/subsets/core840_v1/subset_audit.json
+  boundary: development/validation only; deterministic 8 users x 7 types x 2 questions
+paths:
+  data: /data2/user25263093/userliteng/26_code/preTest/MobileMem-main/data/omni/data.jsonl
+  questions: /data2/user25263093/userliteng/26_code/preTest/MobileMem-main/data/omni/questions.jsonl
+  image_archive: /data2/user25263093/userliteng/26_code/preTest/MobileMem-main/data/omni/image.zip
+  split_reference: null
+  prepared: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/full_experiment_20261030/prepared
+  cohort: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/subsets/pilot112_v1/cohort.json
+  locator_root: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/full_experiment_20261030/visual_locators_final/visual_merged
+  index_root: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/artifacts/full_experiment_20261030/indexes_final
+  run_root: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261101_mobicom_omni_causal_pim_w12_system_v2/results/v2_base
+models:
+  reader: /data2/user25263093/.cache/modelscope/hub/models/Qwen/Qwen3___5-4B
+  embedder: /data2/user25263093/.cache/modelscope/hub/models/Qwen/Qwen3-Embedding-0___6B
+  reranker: /data2/user25263093/.cache/modelscope/hub/models/Qwen/Qwen3-Reranker-0___6B
+  judge: /data2/user25263093/.cache/modelscope/hub/models/Qwen/Qwen3-VL-8B-Instruct
+  judge_available: true
+serving:
+  splits: [development, validation]
+  max_new_tokens: 512
+  input_budget: 8192
+  total_text_tokens: 3600
+  max_images: 4
+  planner_time_limit: 2.0
+execution:
+  reader_gpus: [0, 1, 3, 5]
+  judge_gpu: 6
+  gpus: [0, 1, 3, 5]
+  worker_count: 4
+  shard_count: 1
+  retries: 2
+  judge_min_free_gib: 20
+resume:
+  seed_roots: []
+  judge_seed_results: []
+evaluation:
+  official_categories: [single_hop, multi_hop, knowledge_update, temporal_reasoning, visual_reasoning, implicit_preference, abstention]
+  judge_required_for_closure: true
+  judge_prompt_source: /data2/user25263093/userliteng/26_code/preTest/MobileMem-main/omni/eval/eval/question_answering_and_judge_prompts.txt
+  judge_max_new_tokens: 512
+  judge_boundary: user-selected local Qwen3-VL-8B-Instruct Judge; report as the fixed main-experiment Judge, not as the official Qwen3-14B score
+  holdout_protocol: one-shot frozen full run only; the core840 tuning subset contains no holdout questions
+pim:
+  backend: w12_functional_bank
+  claim_level: functional_exactness_plus_target_model_end_to_end
+  w12:
+    functional_route: replace
+    numeric_mode: bf16_reference
+    bank_count: 256
+    tile_rows: 16
+    host_contract_rows: 4096
+    group_size: 128
+    release_source: true
+    allow_decode_fallback: false
+  target_profile: /data2/user25263093/userliteng/26_code/preTest/agent-memory-profiling/versions/20261031_mobicom_omni_causal_pim_w12_system_v1/configs/edge_lpddr_pim_w12_target_v1.json

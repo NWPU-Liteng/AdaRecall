@@ -115,8 +115,30 @@ class W12FunctionalDispatchTests(unittest.TestCase):
         finally:
             dispatch.__exit__(None, None, None)
 
+    def test_layout_spec_is_stable_across_equivalent_dispatchers(self):
+        specs = []
+        for _ in range(2):
+            dispatch = W12FunctionalDispatch(
+                self.reader(), mode="replace", bank_count=4, tile_rows=16,
+                group_size=128, release_source=False).__enter__()
+            try:
+                specs.append(dispatch.counter_snapshot()["layout_spec_sha256"])
+            finally:
+                dispatch.__exit__(None, None, None)
+        self.assertEqual(specs[0], specs[1])
+
+        torch.manual_seed(24)
+        changed = W12FunctionalDispatch(
+            _Reader().to(torch.bfloat16).eval(), mode="replace", bank_count=4,
+            tile_rows=16, group_size=128, release_source=False).__enter__()
+        try:
+            changed_spec = changed.counter_snapshot()["layout_spec_sha256"]
+        finally:
+            changed.__exit__(None, None, None)
+        self.assertNotEqual(specs[0], changed_spec)
+
     def test_mainline_stage_aggregation_requires_all_three_stages(self):
-        def stage(bank_calls):
+        def stage(bank_calls, *, instance="layout", spec=None):
             return {
                 "bank_calls": bank_calls,
                 "decode_fallback_calls": 0,
@@ -126,7 +148,8 @@ class W12FunctionalDispatchTests(unittest.TestCase):
                 "fallback_external_bytes": 200,
                 "selected_modules": 2,
                 "unique_layouts": 2,
-                "layout_instance_sha256": "layout",
+                "layout_instance_sha256": instance,
+                "layout_spec_sha256": spec,
                 "layout_identity_unchanged": True,
             }
 
@@ -144,6 +167,44 @@ class W12FunctionalDispatchTests(unittest.TestCase):
         rows[0]["w12_stage_dispatch"]["source_grounding"]["bank_calls"] = 0
         summary = aggregate_w12_stage_dispatch(rows)
         self.assertFalse(summary["all_requests_all_stages_hit_bank"])
+
+        rows = []
+        for instance in ("process-a", "process-b"):
+            rows.append({"w12_stage_dispatch": {
+                "query_parser": stage(2, instance=instance, spec="layout-spec"),
+                "source_grounding": stage(3, instance=instance,
+                                          spec="layout-spec"),
+                "reader_generation": stage(4, instance=instance,
+                                           spec="layout-spec"),
+            }})
+        summary = aggregate_w12_stage_dispatch(rows)
+        self.assertTrue(summary["single_layout"])
+        self.assertEqual(summary["layout_instance_count"], 2)
+        self.assertEqual(summary["layout_instance_sha256s"],
+                         ["process-a", "process-b"])
+        self.assertEqual(summary["layout_spec_sha256"], "layout-spec")
+        self.assertTrue(summary["layout_spec_complete"])
+        self.assertTrue(summary["resumed_processes"])
+
+        rows[1]["w12_stage_dispatch"]["source_grounding"][
+            "layout_spec_sha256"] = "other-layout-spec"
+        with self.assertRaises(RuntimeError):
+            aggregate_w12_stage_dispatch(rows)
+
+        contextual = [{
+            "proof_plan": {"grounding": {
+                "stop_reason": "not_applicable_contextual"}},
+            "w12_stage_dispatch": {
+                "query_parser": stage(2),
+                "source_grounding": stage(0),
+                "reader_generation": stage(4),
+            },
+        }]
+        summary = aggregate_w12_stage_dispatch(contextual)
+        self.assertTrue(summary["all_requests_all_stages_hit_bank"])
+        self.assertFalse(summary["all_requests_all_raw_stages_hit_bank"])
+        self.assertEqual(
+            summary["not_applicable_source_grounding_requests"], 1)
 
     def test_mainline_resolves_host_w12_control_without_enabling_bank_route(self):
         self.assertEqual(resolve_reader_quantization("none", None, "off"), "bf16")

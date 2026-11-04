@@ -8,11 +8,21 @@ The fallback is intentionally visible in every summary.
 from __future__ import annotations
 
 import hashlib
+import json
 
 import torch
 
 from .functional_decode import Int12WeightOnlyContract
 from .w12_bank_layout import W12BankLayout
+
+
+def _update_tensor_digest(digest, tensor, *, chunk_bytes=64 << 20):
+    """Hash a tensor's exact bytes without materializing one large copy."""
+    values = (tensor.detach().cpu().contiguous().reshape(-1)
+              .view(torch.uint8).numpy())
+    view = memoryview(values).cast("B")
+    for begin in range(0, len(view), chunk_bytes):
+        digest.update(view[begin:begin + chunk_bytes])
 
 
 class W12FunctionalBankLinear(torch.nn.Module):
@@ -173,6 +183,7 @@ class W12FunctionalDispatch:
         self.released_source_bytes = 0
         self.conversion_seconds = 0.0
         self._layout_instance_sha256 = None
+        self._layout_spec_sha256 = None
 
     def _targets(self):
         for name, module in self.reader.named_modules():
@@ -241,6 +252,7 @@ class W12FunctionalDispatch:
             self.conversion_seconds = time.perf_counter() - started
             self.source_released = bool(self.release_source)
             self._layout_instance_sha256 = self._compute_layout_instance_sha256()
+            self._layout_spec_sha256 = self._compute_layout_spec_sha256()
             return self
         except BaseException:
             self.__exit__(None, None, None)
@@ -274,6 +286,34 @@ class W12FunctionalDispatch:
         digest.update(("unique_layouts=" + str(len(unique_layouts))).encode("ascii"))
         return digest.hexdigest()
 
+    def _compute_layout_spec_sha256(self):
+        """Return a process-independent identity for the materialized layouts."""
+        owners = {}
+        layouts = {}
+        for name in sorted(self.modules):
+            layout = self.modules[name].layout
+            identity = id(layout)
+            owners.setdefault(identity, []).append(name)
+            layouts[identity] = layout
+        digest = hashlib.sha256()
+        for identity in sorted(owners, key=lambda item: owners[item][0]):
+            layout = layouts[identity]
+            digest.update(("layout\t" + owners[identity][0] + "\n").encode("utf-8"))
+            for name in owners[identity]:
+                digest.update(("module\t" + name + "\n").encode("utf-8"))
+            inventory = json.dumps(layout.inventory(), sort_keys=True,
+                                   separators=(",", ":"))
+            digest.update(("inventory\t" + inventory + "\n").encode("utf-8"))
+            for field in ("storage", "group_scales", "bias"):
+                tensor = getattr(layout, field)
+                digest.update(("tensor\t" + field + "\t" + str(tensor.dtype)
+                               + "\t" + "x".join(str(value)
+                                                  for value in tensor.shape)
+                               + "\n").encode("ascii"))
+                _update_tensor_digest(digest, tensor)
+        digest.update(("unique_layouts=" + str(len(layouts))).encode("ascii"))
+        return digest.hexdigest()
+
     def counter_snapshot(self):
         """Return cumulative counters with a process-local layout identity."""
         if self._layout_instance_sha256 is None:
@@ -294,6 +334,7 @@ class W12FunctionalDispatch:
             "fallback_external_bytes": sum(item.fallback_external_bytes
                                            for item in wrappers),
             "layout_instance_sha256": self._layout_instance_sha256,
+            "layout_spec_sha256": self._layout_spec_sha256,
         }
 
     @staticmethod
@@ -301,6 +342,10 @@ class W12FunctionalDispatch:
         """Subtract snapshots and fail if the dispatcher was rematerialized."""
         if before["layout_instance_sha256"] != after["layout_instance_sha256"]:
             raise RuntimeError("W12 bank layout identity changed across a stage")
+        before_spec = before.get("layout_spec_sha256")
+        after_spec = after.get("layout_spec_sha256")
+        if before_spec != after_spec:
+            raise RuntimeError("W12 bank layout spec changed across a stage")
         fields = (
             "bank_calls",
             "decode_fallback_calls",
@@ -316,6 +361,8 @@ class W12FunctionalDispatch:
             "layout_instance_sha256": after["layout_instance_sha256"],
             "layout_identity_unchanged": True,
         })
+        if after_spec is not None:
+            result["layout_spec_sha256"] = after_spec
         return result
 
     def materialization_summary(self):
