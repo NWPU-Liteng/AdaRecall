@@ -2,6 +2,7 @@
 """Run the frozen Phase 5 validation arms sequentially with hard GPU guards."""
 from __future__ import annotations
 
+import argparse
 from collections import Counter
 from datetime import datetime, timezone
 import fcntl
@@ -51,6 +52,28 @@ def atomic_write(path: Path, value) -> None:
     temporary = path.with_suffix(path.suffix + '.tmp')
     temporary.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n')
     temporary.replace(path)
+
+
+def wait_for_judge_complete(judge_process: subprocess.Popen, run_root: Path,
+                            expected_questions: int) -> None:
+    marker = run_root / 'judge_complete.json'
+    while True:
+        if marker.is_file():
+            try:
+                payload = json.loads(marker.read_text())
+            except (OSError, json.JSONDecodeError):
+                payload = {}
+            if (payload.get('complete') is True
+                    and payload.get('questions') == expected_questions):
+                code = judge_process.wait()
+                if code:
+                    raise RuntimeError(f'incremental Judge failed: {code}')
+                return
+        code = judge_process.poll()
+        if code is not None:
+            raise RuntimeError(
+                f'incremental Judge exited before completion marker: {code}')
+        time.sleep(2)
 
 
 def load_config(arm: str) -> dict:
@@ -306,10 +329,10 @@ def run_arm(arm: str) -> None:
         reader_paths = validate_reader_outputs(config, cohort)
         validation = build_validation_links(run_root)
         postprocess_result = postprocess(config, cohort, validation)
-        judge_code = judge_process.wait()
+        expected_judge_questions = sum(
+            len(cohort['question_ids_by_user'][user]) for user in READER_USERS)
+        wait_for_judge_complete(judge_process, run_root, expected_judge_questions)
         judge_log.close()
-        if judge_code:
-            raise RuntimeError(f'incremental Judge failed: {judge_code}')
         judge_summary = write_judge_summary(run_root, cohort)
         if judge_summary['invalid'] != 0:
             raise ValueError(f"Judge produced invalid rows: {judge_summary['invalid']}")
@@ -338,6 +361,9 @@ def run_arm(arm: str) -> None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--arms', nargs='+', choices=ARMS, default=list(ARMS))
+    args = parser.parse_args()
     run_root = ROOT / 'results'
     run_root.mkdir(parents=True, exist_ok=True)
     lock_path = run_root / '.v2_matrix.lock'
@@ -346,7 +372,7 @@ def main() -> None:
         fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
     except BlockingIOError:
         raise SystemExit(f'another matrix runner owns {lock_path}')
-    for arm in ARMS:
+    for arm in args.arms:
         run_arm(arm)
 
 
